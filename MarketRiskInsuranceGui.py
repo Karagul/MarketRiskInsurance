@@ -16,6 +16,23 @@ from client.cltgui.cltguiwidgets import WPeriod, WExplication, WSpinbox
 logger = logging.getLogger("le2m")
 
 
+class MyTree(QtGui.QTreeWidget):
+    def __init__(self):
+        QtGui.QTreeWidget.__init__(self)
+        self.setHeaderItem(QtGui.QTreeWidgetItem(
+            [u"ID", u"Type", u"Prix", u"Quantité"]))
+        # self.header().setCascadingSectionResizes(True)
+        # self.header().setDefaultSectionSize(30)
+        # self.header().setMinimumSectionSize(30)
+        # self.header().setStretchLastSection(False)
+        self.header().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.setFixedWidth(350)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+    def addItem(self, list_of_elements):
+        self.addTopLevelItem(map(str, list_of_elements))
+
+
 class GuiDecision(QtGui.QDialog):
     def __init__(self, defered, automatique, parent, period, historique):
         super(GuiDecision, self).__init__(parent)
@@ -37,12 +54,24 @@ class GuiDecision(QtGui.QDialog):
             size=(450, 80), parent=self)
         layout.addWidget(wexplanation)
 
-        self._wdecision = WSpinbox(
-            label=trans_MRI(u"label decision"),
-            minimum=pms.DECISION_MIN, maximum=pms.DECISION_MAX,
-            interval=pms.DECISION_STEP, automatique=self._automatique,
-            parent=self)
-        layout.addWidget(self._wdecision)
+        hlayout = QtGui.QHBoxLayout()
+        layout.addLayout(hlayout)
+
+        # left part; triangle
+        left_layout = QtGui.QVBoxLayout()
+        hlayout.addLayout(left_layout)
+        self._triangle_achat = MyTree()
+        self._triangle_vente = MyTree()
+        left_layout.addWidget(self._triangle_achat)
+        left_layout.addWidget(self._triangle_vente)
+
+        # right part: star
+        right_layout = QtGui.QVBoxLayout()
+        hlayout.addLayout(right_layout)
+        self._star_achat = MyTree()
+        self._star_vente = MyTree()
+        right_layout.addWidget(self._star_achat)
+        right_layout.addWidget(self._star_vente)
 
         buttons = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok)
         buttons.accepted.connect(self._accept)

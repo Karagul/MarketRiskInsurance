@@ -88,7 +88,8 @@ class Serveur(object):
             self._le2mserv.gestionnaire_graphique.infoclt(
                 [None, le2mtrans(u"Period") + u" {}".format(period)],
                 fg="white", bg="gray")
-            # tirage entier
+
+            # random value
             valeur_aleatoire = randint(1, 100)
             yield (self._le2mserv.gestionnaire_experience.run_func(
                 self._tous, "newperiod", period, valeur_aleatoire))

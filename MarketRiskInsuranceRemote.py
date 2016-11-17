@@ -26,7 +26,7 @@ class RemoteMRI(IRemote):
             "MRI_periodpayoff", "MRI_cumulativepayoff"]
         self._histo.append(texts_MRI.get_histo_head())
 
-    def remote_configure(self, params):
+    def remote_configure(self, params, server_part):
         """
         Set the same parameters as in the server side
         :param params:
@@ -35,6 +35,7 @@ class RemoteMRI(IRemote):
         logger.info(u"{} configure".format(self._le2mclt.uid))
         for k, v in params.viewitems():
             setattr(pms, k, v)
+        self._server_part = server_part
 
     def remote_newperiod(self, period):
         """

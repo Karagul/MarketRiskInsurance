@@ -30,21 +30,27 @@ class PartieMRI(Partie):
     @defer.inlineCallbacks
     def configure(self):
         logger.debug(u"{} Configure".format(self.joueur))
-        yield (self.remote.callRemote("configure", get_module_attributes(pms)))
+        yield (self.remote.callRemote("configure", get_module_attributes(pms),
+                                      self))
         self.joueur.info(u"Ok")
 
     @defer.inlineCallbacks
     def newperiod(self, period, random_value):
         """
         Create a new period and inform the remote
-        If this is the first period then empty the historic
-        :param periode:
+        :param period: the current period number
+        :param the random value drawn by the server
         :return:
         """
         logger.debug(u"{} New Period".format(self.joueur))
-        self.currentperiod = RepetitionsMRI(period, random_value)
+
+        self.currentperiod = RepetitionsMRI(period)
+        self.currentperiod.MRI_random_value = random_value
+        self.currentperiod.MRI_group = self.joueur.group
+
         self.le2mserv.gestionnaire_base.ajouter(self.currentperiod)
         self.repetitions.append(self.currentperiod)
+
         yield (self.remote.callRemote("newperiod", period))
         logger.info(u"{} Ready for period {}".format(self.joueur, period))
 
@@ -120,6 +126,101 @@ class PartieMRI(Partie):
         logger.info(u'{} Payoff ecus {} Payoff euros {:.2f}'.format(
             self.joueur, self.MRI_gain_ecus, self.MRI_gain_euros))
 
+    def remote_add_proposition(self, infos_prop):
+        if self._is_prop_ok(infos_prop)[0]:
+            pass
+        else:
+            pass
+
+    def remote_remove_proposition(self, infos_prop):
+        pass
+
+    def _is_prop_ok(self, infos_prop):
+        """"
+        We check that the proposition is compatible with the player's budget
+        in any event.
+        1) check the player doesn't already have made a better proposition
+        2) check the player can buy the proposition
+        3) check the player's payoff at the end of the period taking into
+        account the two possible events
+        Return a tuple either of size 2 if the result is false
+        (False and the explanation) or of size 1 if the result is true.
+        """
+        logger.debug(u"{}: test of prop: {}".format(self.joueur, infos_prop))
+
+        # proposition's informations
+        contract = infos_prop['contract']  # triangle or star
+        kind = infos_prop["type"]  # purchase or sell
+        price = infos_prop["price"]
+
+        # Checks that the proposition is not less interesting than another one
+        # proposed by the player himself
+        prop_in_progress = [p for p in self.currentperiod.MRI_propositions if
+                            p.MRI_prop_status == pms.IN_PROGRESS and
+                            p.MRI_prop_contract == contract and
+                            p.MRI_prop_type == kind]
+
+        if kind == pms.BUY:
+            best_props = [p for p in prop_in_progress if
+                          p.MRI_prop_price > price]
+        else:
+            best_props = [p for p in prop_in_progress if
+                          p.MRI_prop_price < price]
+
+        if best_props:
+            return (False, u"Vous avez une meilleure proposition en cours.")
+
+        transactions_balance = self._get_transactions_balance()
+
+        solde_achats_ventes = self._get_solde_achats_ventes()
+        solde_recu_verse_triangle = self._get_solde_recu_verse(parametres.TRIANGLE)
+        solde_recu_verse_star = self._get_solde_recu_verse(parametres.STAR)
+
+        # check the player has a budget that corresponds to at least CAPITAL_REQUIREMENT of the price, without taking into account the events
+        if type == parametres.ACHAT:
+            if self.periodeCourante.revenu + solde_achats_ventes < Decimal(
+                    str(prix)) * parametres.CAPITAL_REQUIREMENT:
+                return (
+                False, u"Vous n'avez pas le budget nécessaire pour cet achat.")
+
+        # check the player has a budget that corresponds to at leat CAPITAL_REQUIREMENT of the price, if the event if TRIANGLE
+        elif type == parametres.VENTE:
+            if contrat == parametres.TRIANGLE:
+                solde_recu_verse_triangle -= parametres.TRIANGLE_VERSEMENT
+                if solde_recu_verse_triangle < 0:
+                    if self.periodeCourante.revenu + solde_achats_ventes < Decimal(
+                            str(abs(
+                                    solde_recu_verse_triangle))) * parametres.CAPITAL_REQUIREMENT:
+                        return (False,
+                                u"Vous n'avez pas le budget nécessaire pour cette vente si l'évènement \"triangle\" se réalise.")
+            elif contrat == parametres.STAR:
+                solde_recu_verse_star -= parametres.STAR_VERSEMENT
+                if solde_recu_verse_star < 0:
+                    if self.periodeCourante.revenu + solde_achats_ventes < Decimal(
+                            str(abs(
+                                    solde_recu_verse_star))) * parametres.CAPITAL_REQUIREMENT:
+                        return (False,
+                                u"Vous n'avez pas le budget nécessaire pour cette vente si l'évènement \"étoile\" se réalise.")
+
+        # si tous les tests sont passés
+        logger.debug(u"Résultat du test: True")
+        return (True,)
+
+    def _get_transactions_balance(self):
+        """
+        Return the sum of the player's sells minus the sum of the player's
+        purchases.
+        """
+        purchases = sum([t.MRI_trans_price for t in
+                         self.currentperiod.MRI_transactions if
+                         t.MRI_trans_buyer == self.joueur.uid])
+
+        sells = sum([t.MRI_trans_price for t in
+                         self.currentperiod.MRI_transactions if
+                         t.MRI_trans_seller == self.joueur.uid])
+
+        return sells - purchases
+
 
 class RepetitionsMRI(Base):
     __tablename__ = 'partie_MarketRiskInsurance_repetitions'
@@ -127,7 +228,8 @@ class RepetitionsMRI(Base):
     partie_partie_id = Column(
         Integer,
         ForeignKey("partie_MarketRiskInsurance.partie_id"))
-    MRI_offers = relationship('OffersMRI')
+    MRI_propositions = relationship('PropositionsMRI')
+    MRI_transactions = relationship('TransactionsMRI')
 
     MRI_period = Column(Integer)
     MRI_treatment = Column(Integer)
@@ -138,10 +240,9 @@ class RepetitionsMRI(Base):
     MRI_periodpayoff = Column(Float)
     MRI_cumulativepayoff = Column(Float)
 
-    def __init__(self, period, random_value):
+    def __init__(self, period):
         self.MRI_treatment = pms.TREATMENT
         self.MRI_period = period
-        self.MRI_random_value = random_value
         self.MRI_decisiontime = 0
         self.MRI_periodpayoff = 0
         self.MRI_cumulativepayoff = 0
@@ -152,24 +253,56 @@ class RepetitionsMRI(Base):
             temp["joueur"] = joueur
         return temp
 
-class OffersMRI(Base):
-    __tablename__ = 'partie_MarketRiskInsurance_repetitions_offers'
+
+class PropositionsMRI(Base):
+    __tablename__ = 'partie_MarketRiskInsurance_repetitions_propositions'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    repetitions_id = Column(Integer,
-                            ForeignKey("partie_MarketRiskInsurance_repetitions.id"))
+    repetitions_id = Column(
+        Integer, ForeignKey("partie_MarketRiskInsurance_repetitions.id"))
 
-    MRI_time = Column(String)
-    MRI_sender = Column(String)
-    MRI_sender_group = Column(String)
-    MRI_type = Column(Integer)
-    MRI_offer = Column(Float)
+    counter = 0
 
-    def __init__(self, time, sender, sender_group, type, offer):
-        self.MRI_time = time
-        self.MRI_sender = sender
-        self.MRI_sender_group = sender_group
-        self.MRI_type = type
-        self.MRI_offer = offer
+    MRI_prop_id = Column(Integer)
+    MRI_prop_time = Column(String)
+    MRI_prop_sender = Column(String)
+    MRI_prop_contract = Column(Integer)
+    MRI_prop_type = Column(Integer)
+    MRI_prop_price = Column(Float)
+    MRI_prop_status = Column(Integer)
+
+    def __init__(self, prop_infos):
+
+        self.MRI_prop_id = PropositionsMRI.counter
+        self.MRI_prop_time = prop_infos.get("time")
+        self.MRI_prop_sender = prop_infos.get("sender")
+        self.MRI_prop_type = prop_infos.get("type")
+        self.MRI_prop_price = prop_infos.get("price")
+
+        PropositionsMRI.counter += 1
+
+    def todict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class TransactionsMRI(Base):
+    __tablename__ = 'partie_MarketRiskInsurance_repetitions_transactions'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    repetitions_id = Column(
+        Integer, ForeignKey("partie_MarketRiskInsurance_repetitions.id"))
+
+    MRI_trans_time = Column(String)
+    MRI_trans_buyer = Column(String)
+    MRI_trans_seller = Column(String)
+    MRI_trans_contract = Column(Integer)
+    MRI_trans_price = Column(Float)
+
+    def __init__(self, time, buyer, seller, contract, price):
+
+        self.MRI_trans_time = time
+        self.MRI_trans_buyer = buyer
+        self.MRI_trans_seller = seller
+        self.MRI_trans_contract = contract
+        self.MRI_trans_price = price
 
     def todict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

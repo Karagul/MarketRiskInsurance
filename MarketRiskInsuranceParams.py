@@ -5,32 +5,37 @@ Do not change the variables.
 Parameters that can be changed without any risk of damages should be changed
 by clicking on the configure sub-menu at the server screen.
 If you need to change some parameters below please be sure of what you do,
-which means that you should ask to the developer ;-)
+otherwise ask to the developer ;-)
 ============================================================================="""
 from datetime import time
 
 # variables --------------------------------------------------------------------
-BASELINE = 0
-TREATMENTS_NAMES = {0: "Baseline"}
+MARKET_CONTRACT = 0
+MARKET_SWAP = 1
+TREATMENTS_NAMES = {MARKET_CONTRACT: u"Contract", MARKET_SWAP: u"Swap"}
+BUY = BUYER = 0
+SELL = SELLER = 1
+# status of propositions
+IN_PROGRESS = 0
+TRANSACTION = 1
+DELETED = 2
+DEPRECATED = 3
+# events
+TRIANGLE = 0
+STAR = 1
+TRIANGLE_PAY = 100  # amount payed by the seller if the event is TRIANGLE
+STAR_PAY = 100  # amount payed by the seller if the event is STAR
+
 
 # parameters -------------------------------------------------------------------
-TREATMENT = BASELINE
-TAUX_CONVERSION = 1
+TREATMENT = MARKET_CONTRACT
+TEMPS = time(0, 2, 0)  # hour, minute, second
+
 NOMBRE_PERIODES = 10
 TAILLE_GROUPES = 4
-GROUPES_CHAQUE_PERIODE = False
-MONNAIE = u"ecu"
 PERIODE_ESSAI = False
 
-TEMPS = time(0, 2, 0)  # hour, minute, second
-EVENT_TRIANGLE = 0
-EVENT_START = 1
-CONTRACT_TRIANGLE = (100, 0)
-CONTRACT_STAR = (100, 0)
-
-# DECISION
-DECISION_MIN = 0
-DECISION_MAX = 100
-DECISION_STEP = 1
+TAUX_CONVERSION = 1
+MONNAIE = u"ecu"
 
 
