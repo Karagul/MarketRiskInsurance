@@ -58,75 +58,20 @@ class PartieMRI(Partie):
     def display_decision(self):
         """
         Display the decision screen on the remote
-        Get back the decision
+        Get back noting because it is a market
         :return:
         """
         logger.debug(u"{} Decision".format(self.joueur))
-        debut = datetime.now()
-        self.currentperiod.MRI_decision = yield(self.remote.callRemote(
-            "display_decision"))
-        self.currentperiod.MRI_decisiontime = (datetime.now() - debut).seconds
-        self.joueur.info(u"{}".format(self.currentperiod.MRI_decision))
+        yield(self.remote.callRemote("display_decision"))
+        self.joueur.info(u"Ok")
         self.joueur.remove_waitmode()
-
-    def compute_periodpayoff(self):
-        """
-        Compute the payoff for the period
-        :return:
-        """
-        logger.debug(u"{} Period Payoff".format(self.joueur))
-        self.currentperiod.MRI_periodpayoff = 0
-
-        # cumulative payoff since the first period
-        if self.currentperiod.MRI_period < 2:
-            self.currentperiod.MRI_cumulativepayoff = \
-                self.currentperiod.MRI_periodpayoff
-        else: 
-            previousperiod = self.periods[self.currentperiod.MRI_period - 1]
-            self.currentperiod.MRI_cumulativepayoff = \
-                previousperiod.MRI_cumulativepayoff + \
-                self.currentperiod.MRI_periodpayoff
-
-        # we store the period in the self.periodes dictionnary
-        self.periods[self.currentperiod.MRI_period] = self.currentperiod
-
-        logger.debug(u"{} Period Payoff {}".format(
-            self.joueur,
-            self.currentperiod.MRI_periodpayoff))
-
-    @defer.inlineCallbacks
-    def display_summary(self, *args):
-        """
-        Send a dictionary with the period content values to the remote.
-        The remote creates the text and the history
-        :param args:
-        :return:
-        """
-        logger.debug(u"{} Summary".format(self.joueur))
-        yield(self.remote.callRemote(
-            "display_summary", self.currentperiod.todict()))
-        self.joueur.info("Ok")
-        self.joueur.remove_waitmode()
-
-    @defer.inlineCallbacks
-    def compute_partpayoff(self):
-        """
-        Compute the payoff for the part and set it on the remote.
-        The remote stores it and creates the corresponding text for display
-        (if asked)
-        :return:
-        """
-        logger.debug(u"{} Part Payoff".format(self.joueur))
-
-        self.MRI_gain_ecus = self.currentperiod.MRI_cumulativepayoff
-        self.MRI_gain_euros = float(self.MRI_gain_ecus) * float(pms.TAUX_CONVERSION)
-        yield (self.remote.callRemote(
-            "set_payoffs", self.MRI_gain_euros, self.MRI_gain_ecus))
-
-        logger.info(u'{} Payoff ecus {} Payoff euros {:.2f}'.format(
-            self.joueur, self.MRI_gain_ecus, self.MRI_gain_euros))
 
     def remote_add_proposition(self, infos_prop):
+        """
+
+        :param infos_prop:
+        :return:
+        """
         if self._is_prop_ok(infos_prop)[0]:
             pass
         else:
@@ -220,6 +165,63 @@ class PartieMRI(Partie):
                          t.MRI_trans_seller == self.joueur.uid])
 
         return sells - purchases
+    def compute_periodpayoff(self):
+        """
+        Compute the payoff for the period
+        :return:
+        """
+        logger.debug(u"{} Period Payoff".format(self.joueur))
+        self.currentperiod.MRI_periodpayoff = 0
+
+        # cumulative payoff since the first period
+        if self.currentperiod.MRI_period < 2:
+            self.currentperiod.MRI_cumulativepayoff = \
+                self.currentperiod.MRI_periodpayoff
+        else: 
+            previousperiod = self.periods[self.currentperiod.MRI_period - 1]
+            self.currentperiod.MRI_cumulativepayoff = \
+                previousperiod.MRI_cumulativepayoff + \
+                self.currentperiod.MRI_periodpayoff
+
+        # we store the period in the self.periodes dictionnary
+        self.periods[self.currentperiod.MRI_period] = self.currentperiod
+
+        logger.debug(u"{} Period Payoff {}".format(
+            self.joueur,
+            self.currentperiod.MRI_periodpayoff))
+
+    @defer.inlineCallbacks
+    def display_summary(self, *args):
+        """
+        Send a dictionary with the period content values to the remote.
+        The remote creates the text and the history
+        :param args:
+        :return:
+        """
+        logger.debug(u"{} Summary".format(self.joueur))
+        yield(self.remote.callRemote(
+            "display_summary", self.currentperiod.todict()))
+        self.joueur.info("Ok")
+        self.joueur.remove_waitmode()
+
+    @defer.inlineCallbacks
+    def compute_partpayoff(self):
+        """
+        Compute the payoff for the part and set it on the remote.
+        The remote stores it and creates the corresponding text for display
+        (if asked)
+        :return:
+        """
+        logger.debug(u"{} Part Payoff".format(self.joueur))
+
+        self.MRI_gain_ecus = self.currentperiod.MRI_cumulativepayoff
+        self.MRI_gain_euros = float(self.MRI_gain_ecus) * float(pms.TAUX_CONVERSION)
+        yield (self.remote.callRemote(
+            "set_payoffs", self.MRI_gain_euros, self.MRI_gain_ecus))
+
+        logger.info(u'{} Payoff ecus {} Payoff euros {:.2f}'.format(
+            self.joueur, self.MRI_gain_ecus, self.MRI_gain_euros))
+
 
 
 class RepetitionsMRI(Base):

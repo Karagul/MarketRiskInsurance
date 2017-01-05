@@ -48,28 +48,25 @@ class RemoteMRI(IRemote):
         if self.currentperiod == 1:
             del self.histo[1:]
 
-
     def remote_display_decision(self):
         """
-        Display the decision screen
+        Display the decision screen.
+        No simulation mode
         :return: deferred
         """
         logger.info(u"{} Decision".format(self._le2mclt.uid))
-        if self._le2mclt.simulation:
-            decision = \
-                random.randrange(
-                    pms.DECISION_MIN,
-                    pms.DECISION_MAX + pms.DECISION_STEP,
-                    pms.DECISION_STEP)
-            logger.info(u"{} Send back {}".format(self._le2mclt.uid, decision))
-            return decision
-        else: 
-            defered = defer.Deferred()
-            ecran_decision = GuiDecision(
-                defered, self._le2mclt.automatique,
-                self._le2mclt.screen, self.currentperiod, self.histo)
-            ecran_decision.show()
-            return defered
+        defered = defer.Deferred()
+        self._decision_screen = GuiDecision(
+            defered, self._le2mclt.automatique,
+            self._le2mclt.screen, self.currentperiod, self.histo)
+        self._decision_screen.show()
+        return defered
+
+    @defer.inlineCallbacks
+    def send_offer(self, triangle_or_star, buy_or_sell, value):
+        rep = yield (self._server_part.add_proposition())
+        if not rep:
+            self._decision_screen.display_offer_fail()
 
     def remote_display_summary(self, period_content):
         """
