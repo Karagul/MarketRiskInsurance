@@ -8,12 +8,11 @@ import logging
 from PyQt4 import QtGui, QtCore
 from twisted.internet import defer
 from random import randint, choice
-# from util.utili18n import le2mtrans
 import MarketRiskInsuranceParams as pms
 from MarketRiskInsuranceTexts import trans_MRI
 import MarketRiskInsuranceTexts as texts_MRI
 from client.cltgui.cltguidialogs import GuiHistorique
-from client.cltgui.cltguiwidgets import WPeriod, WExplication, WSpinbox, WCompterebours
+from client.cltgui.cltguiwidgets import WPeriod, WExplication, WCompterebours
 
 
 logger = logging.getLogger("le2m")
@@ -36,21 +35,112 @@ class MyStandardItem(QtGui.QStandardItem):
         return self.__value
 
 
-class MyTree(QtGui.QTreeWidget):
+class MyDoubleSpinBox(QtGui.QDoubleSpinBox):
     def __init__(self):
-        QtGui.QTreeWidget.__init__(self)
-        self.setHeaderItem(QtGui.QTreeWidgetItem(
-            [u"ID", u"Type", u"Prix", u"Quantité"]))
-        # self.header().setCascadingSectionResizes(True)
-        # self.header().setDefaultSectionSize(30)
-        # self.header().setMinimumSectionSize(30)
-        # self.header().setStretchLastSection(False)
-        self.header().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.setFixedWidth(350)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        QtGui.QDoubleSpinBox.__init__(self)
+        self.setDecimals(pms.DECIMALS)
+        self.setMinimum(0)
+        self.setMaximum(pms.OFFER_MAX)
+        self.setButtonSymbols(QtGui.QSpinBox.NoButtons)
+        self.setMaximumWidth(50)
 
-    def addItem(self, list_of_elements):
-        self.addTopLevelItem(map(str, list_of_elements))
+
+class InformationZone(QtGui.QWidget):
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
+        self.layout = QtGui.QHBoxLayout()
+        self.setLayout(self.layout)
+
+        self.layout.addSpacerItem(QtGui.QSpacerItem(
+            20, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding))
+
+        self.form = QtGui.QFormLayout()
+        self.layout.addLayout(self.form)
+        self.label_solde = QtGui.QLabel(u"...")
+        self.form.addRow(QtGui.QLabel(trans_MRI(u"Your account:")),
+                           self.label_solde)
+        self.label_triangle = QtGui.QLabel(u"...")
+        self.form.addRow(QtGui.QLabel(trans_MRI(u"Payoff if triangle:")),
+                           self.label_triangle)
+        self.label_star = QtGui.QLabel(u"...")
+        self.form.addRow(QtGui.QLabel(trans_MRI(u"Payoff if star:")),
+                           self.label_star)
+
+        self.layout.addSpacerItem(QtGui.QSpacerItem(
+            20, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding))
+
+
+class OfferZone(QtGui.QWidget):
+    def __init__(self, purchase_or_sell):
+        QtGui.QWidget.__init__(self)
+        self.layout_main = QtGui.QVBoxLayout()
+        self.setLayout(self.layout_main)
+
+        self.label = QtGui.QLabel()
+        if purchase_or_sell == pms.BUY:
+            self.label.setText(trans_MRI(u"Purchase offers"))
+        else:
+            self.label.setText(trans_MRI(u"Sell offers"))
+        self.layout_main.addWidget(self.label)
+
+        self.list = QtGui.QListView()
+        self.model = QtGui.QStandardItemModel()
+        self.list.setModel(self.model)
+        self.list.setFixedSize(350, 250)
+        self.layout_main.addWidget(self.list)
+
+        self.layout_offer = QtGui.QHBoxLayout()
+        self.layout_main.addLayout(self.layout_offer)
+        if purchase_or_sell == pms.BUY:
+            self.layout_offer.addWidget(
+                QtGui.QLabel(trans_MRI(u"Make a purchase offer")))
+        else:
+            self.layout_offer.addWidget(
+                QtGui.QLabel(trans_MRI(u"Make a sell offer")))
+        self.spin_offer = MyDoubleSpinBox()
+        self.layout_offer.addWidget(self.spin_offer)
+        self.pushbutton_send = QtGui.QPushButton(trans_MRI(u"Send"))
+        self.pushbutton_send.setMaximumWidth(100)
+        self.pushbutton_send.setToolTip(
+            trans_MRI(u"Make an offer or replace the current one"))
+        self.layout_offer.addWidget(self.pushbutton_send)
+        self.layout_offer.addSpacerItem(
+            QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding,
+                              QtGui.QSizePolicy.Minimum))
+
+        self.layout_accept_remove = QtGui.QHBoxLayout()
+        self.layout_main.addLayout(self.layout_accept_remove)
+        self.pushbutton_accept = QtGui.QPushButton(
+            trans_MRI(u"Accept the selected offer"))
+        self.pushbutton_accept.setMinimumWidth(180)
+        self.pushbutton_accept.setToolTip(
+            trans_MRI(u"Select an offer and click on this button to "
+                      u"accept it"))
+        self.layout_accept_remove.addWidget(self.pushbutton_accept)
+
+        self.pushbutton_remove = QtGui.QPushButton(trans_MRI(u"Remove my offer"))
+        self.pushbutton_remove.setMinimumWidth(150)
+        self.pushbutton_remove.setToolTip(
+            trans_MRI(u"If you have an offer click here to remove it"))
+        self.layout_accept_remove.addWidget(
+            self.pushbutton_remove)
+        self.layout_accept_remove.addSpacerItem(
+            QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding,
+                              QtGui.QSizePolicy.Minimum))
+
+
+class TransactionZone(QtGui.QWidget):
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
+        self.layout = QtGui.QVBoxLayout()
+        self.setLayout(self.layout)
+        self.label = QtGui.QLabel(trans_MRI(u"Transactions"))
+        self.layout.addWidget(self.label)
+        self.list = QtGui.QListView()
+        self.list.setFixedSize(400, 200)
+        self.layout.addWidget(self.list)
+        self.model = QtGui.QStandardItemModel()
+        self.list.setModel(self.model)
 
 
 class GuiDecision(QtGui.QDialog):
@@ -63,6 +153,12 @@ class GuiDecision(QtGui.QDialog):
         self._historique = GuiHistorique(self, historique)
         self._remote = remote
 
+        # current_offer
+        self._triangle_curent_purchase_offer = None
+        self._triangle_current_sell_offer = None
+        self.star_current_purchase_offer = None
+        self.start_current_sell_offer = None
+
         layout = QtGui.QVBoxLayout(self)
 
         wperiod = WPeriod(
@@ -71,102 +167,52 @@ class GuiDecision(QtGui.QDialog):
 
         wexplanation = WExplication(
             text=texts_MRI.get_text_explanation(),
-            size=(450, 80), parent=self)
+            size=(800, 100), parent=self)
         layout.addWidget(wexplanation)
 
-        # Compte à rebours
+        # Compte à rebours =====================================================
         self._compte_rebours = WCompterebours(
             parent=self, temps=pms.MARKET_TIME, actionfin=self._accept)
+        self._compte_rebours.setStyleSheet("color: blue;")
         layout.addWidget(self._compte_rebours)
 
-        # market
-        hlayout = QtGui.QHBoxLayout()
-        layout.addLayout(hlayout)
+        # zone information actualisée ==========================================
+        self._information = InformationZone()
+        layout.addWidget(self._information)
 
-        # left part: triangle ==================================================
-        triangle_layout = QtGui.QGridLayout()
-        hlayout.addLayout(triangle_layout)
-        triangle_layout_line = 0
+        # market ===============================================================
+        market_layout = QtGui.QGridLayout()
+        layout.addLayout(market_layout)
 
-        triangle_layout.addWidget(QtGui.QLabel(trans_MRI(u"Purchase offers")),
-                                  triangle_layout_line, 0)
-        triangle_layout.addWidget(QtGui.QLabel(trans_MRI(u"Sell offers")),
-                                  triangle_layout_line, 1)
+        # triangle
+        triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
+        triangle_label.setStyleSheet("color: red;")
+        market_layout.addWidget(triangle_label, 0, 0, 1, 2)
+        self._triangle_purchase_zone = OfferZone(pms.BUY)
+        market_layout.addWidget(self._triangle_purchase_zone, 1, 0)
+        self._triangle_sell_zone = OfferZone(pms.SELL)
+        market_layout.addWidget(self._triangle_sell_zone, 1, 1)
+        self._triangle_transactions = TransactionZone()
+        market_layout.addWidget(self._triangle_transactions, 2, 0, 1, 2)
 
-        triangle_layout_line += 1
+        # star
+        star_label = QtGui.QLabel(trans_MRI(u"Star"))
+        star_label.setStyleSheet("color: red;")
+        market_layout.addWidget(star_label, 0, 3, 1, 2)
+        self._star_purchase_zone = OfferZone(pms.BUY)
+        market_layout.addWidget(self._star_purchase_zone, 1, 3)
+        self._star_sell_zone = OfferZone(pms.SELL)
+        market_layout.addWidget(self._star_sell_zone, 1, 4)
+        self._star_transactions = TransactionZone()
+        market_layout.addWidget(self._star_transactions, 2, 3, 1, 2)
 
-        # --- lists
-        # purchase
-        self._triangle_purchase_model = QtGui.QStandardItemModel()
-        self._triangle_purchase__listview = QtGui.QListView()
-        self._triangle_purchase__listview.setModel(self._triangle_purchase_model)
-        self._triangle_purchase__listview.setMaximumSize(300, 600)
-        triangle_layout.addWidget(self._triangle_purchase__listview,
-                                       triangle_layout_line, 0)
+        separator = QtGui.QFrame()
+        separator.setFrameShape(QtGui.QFrame.VLine)
+        market_layout.addWidget(separator, 0, 2, market_layout.rowCount(), 1)
 
-        # sell
-        self._triangle_sell_model = QtGui.QStandardItemModel()
-        self._triangle_sell_listview = QtGui.QListView()
-        self._triangle_sell_listview.setModel(self._triangle_sell_model)
-        self._triangle_sell_listview.setMaximumSize(300, 600)
-        triangle_layout.addWidget(self._triangle_sell_listview,
-                                       triangle_layout_line, 1)
-
-        triangle_layout_line += 1
-
-        # --- offers' zone
-        # purchase
-        self._triangle_purchase_offer_layout = QtGui.QHBoxLayout()
-        self._triangle_purchase_offer_layout.addWidget(
-            QtGui.QLabel(trans_MRI(u"Purchase offer")))
-        self._triangle_purchase_spin_offer = QtGui.QDoubleSpinBox()
-        self._triangle_purchase_spin_offer.setDecimals(pms.DECIMALS)
-        self._triangle_purchase_spin_offer.setMinimum(0)
-        self._triangle_purchase_spin_offer.setMaximum(pms.OFFER_MAX)
-        self._triangle_purchase_spin_offer.setButtonSymbols(QtGui.QSpinBox.NoButtons)
-        self._triangle_purchase_spin_offer.setMaximumWidth(50)
-        self._triangle_purchase_offer_layout.addWidget(
-            self._triangle_purchase_spin_offer)
-        self._triangle_purchase_button_send_offer = QtGui.QPushButton(
-            trans_MRI(u"Send"))
-        self._triangle_purchase_button_send_offer.setMaximumWidth(100)
-        self._triangle_purchase_button_send_offer.clicked.connect(
-            lambda _: self._send_offer(
-                pms.TRIANGLE, pms.BUY, self._triangle_purchase_spin_offer.value()))
-        self._triangle_purchase_offer_layout.addWidget(
-            self._triangle_purchase_button_send_offer)
-        self._triangle_purchase_offer_layout.addSpacerItem(
-            QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding,
-                              QtGui.QSizePolicy.Minimum))
-        triangle_layout.addLayout(self._triangle_purchase_offer_layout,
-                                  triangle_layout_line, 0)
-
-        # sell
-        self._triangle_sell_offer_layout = QtGui.QHBoxLayout()
-        self._triangle_sell_offer_layout.addWidget(
-            QtGui.QLabel(trans_MRI(u"Sell offer")))
-        self._triangle_sell_spin_offer = QtGui.QDoubleSpinBox()
-        self._triangle_sell_spin_offer.setDecimals(pms.DECIMALS)
-        self._triangle_sell_spin_offer.setMinimum(0)
-        self._triangle_sell_spin_offer.setMaximum(pms.OFFER_MAX)
-        self._triangle_sell_spin_offer.setButtonSymbols(QtGui.QSpinBox.NoButtons)
-        self._triangle_sell_spin_offer.setMaximumWidth(50)
-        self._triangle_sell_offer_layout.addWidget(self._triangle_sell_spin_offer)
-        self._triangle_sell_button_send_offer = QtGui.QPushButton(
-            trans_MRI(u"Send"))
-        self._triangle_sell_button_send_offer.setMaximumWidth(100)
-        self._triangle_sell_button_send_offer.clicked.connect(
-            lambda _: self._remote_send_offer(
-                pms.TRIANGLE, pms.SELL, self._triangle_sell_spin_offer.value()))
-        self._triangle_sell_offer_layout.addWidget(
-            self._triangle_sell_button_send_offer)
-        self._triangle_sell_offer_layout.addSpacerItem(
-            QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding,
-                              QtGui.QSizePolicy.Minimum))
-        triangle_layout.addLayout(self._triangle_sell_offer_layout,
-                                  triangle_layout_line, 0)
-
-
+        # finalisation =========================================================
+        layout.addSpacing(50)
+        self._make_connections()
         self.setWindowTitle(trans_MRI(u"Market"))
         self.adjustSize()
         self.setFixedSize(self.size())
@@ -176,6 +222,26 @@ class GuiDecision(QtGui.QDialog):
             self._timer_automatique.timeout.connect(self._play_auto)
             self._timer_automatique.start(7000)
                 
+    def _make_connections(self):
+        self._triangle_purchase_zone.pushbutton_send.clicked.connect(
+            lambda _: self._send_offer(
+                pms.TRIANGLE, pms.BUY,
+                self._triangle_purchase_zone.spin_offer.value()))
+
+        self._triangle_sell_zone.pushbutton_send.clicked.connect(
+            lambda _: self._send_offer(
+                pms.TRIANGLE, pms.SELL,
+                self._triangle_sell_zone.spin_offer.value()))
+
+        self._star_purchase_zone.pushbutton_send.clicked.connect(
+            lambda _: self._send_offer(
+                pms.STAR, pms.BUY,
+                self._star_purchase_zone.spin_offer.value()))
+
+        self._star_sell_zone.pushbutton_send.clicked.connect(
+            lambda _: self._send_offer(
+                pms.STAR, pms.SELL, self._star_sell_zone.spin_offer.value()))
+
     def reject(self):
         pass
     

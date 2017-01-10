@@ -63,8 +63,8 @@ class RemoteMRI(IRemote):
         return defered
 
     @defer.inlineCallbacks
-    def send_offer(self, triangle_or_star, buy_or_sell, value):
-        rep = yield (self._server_part.add_proposition())
+    def send_offer(self, offer):
+        rep = yield (self._server_part.add_proposition(offer))
         if not rep:
             self._decision_screen.display_offer_fail()
 

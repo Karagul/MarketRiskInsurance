@@ -94,56 +94,58 @@ class PartieMRI(Partie):
         logger.debug(u"{}: test of prop: {}".format(self.joueur, infos_prop))
 
         # proposition's informations
-        contract = infos_prop['contract']  # triangle or star
-        kind = infos_prop["type"]  # purchase or sell
-        price = infos_prop["price"]
+        contract = infos_prop['MRI_prop_contract']  # triangle or star
+        kind = infos_prop["MRI_prop_type"]  # purchase or sell
+        price = infos_prop["MRI_prop_price"]
 
         # Checks that the proposition is not less interesting than another one
         # proposed by the player himself
-        prop_in_progress = [p for p in self.currentperiod.MRI_propositions if
-                            p.MRI_prop_status == pms.IN_PROGRESS and
-                            p.MRI_prop_contract == contract and
-                            p.MRI_prop_type == kind]
+        # prop_in_progress = [p for p in self.currentperiod.MRI_propositions if
+        #                     p.MRI_prop_status == pms.IN_PROGRESS and
+        #                     p.MRI_prop_contract == contract and
+        #                     p.MRI_prop_type == kind]
+        #
+        # if kind == pms.BUY:
+        #     best_props = [p for p in prop_in_progress if
+        #                   p.MRI_prop_price > price]
+        # else:
+        #     best_props = [p for p in prop_in_progress if
+        #                   p.MRI_prop_price < price]
+        #
+        # if best_props:
+        #     return (False, u"Vous avez une meilleure proposition en cours.")
 
-        if kind == pms.BUY:
-            best_props = [p for p in prop_in_progress if
-                          p.MRI_prop_price > price]
-        else:
-            best_props = [p for p in prop_in_progress if
-                          p.MRI_prop_price < price]
 
-        if best_props:
-            return (False, u"Vous avez une meilleure proposition en cours.")
 
         transactions_balance = self._get_transactions_balance()
 
         solde_achats_ventes = self._get_solde_achats_ventes()
-        solde_recu_verse_triangle = self._get_solde_recu_verse(parametres.TRIANGLE)
-        solde_recu_verse_star = self._get_solde_recu_verse(parametres.STAR)
+        solde_recu_verse_triangle = self._get_solde_recu_verse(pms.TRIANGLE)
+        solde_recu_verse_star = self._get_solde_recu_verse(pms.STAR)
 
         # check the player has a budget that corresponds to at least CAPITAL_REQUIREMENT of the price, without taking into account the events
-        if type == parametres.ACHAT:
+        if type == pms.ACHAT:
             if self.periodeCourante.revenu + solde_achats_ventes < Decimal(
-                    str(prix)) * parametres.CAPITAL_REQUIREMENT:
+                    str(prix)) * pms.CAPITAL_REQUIREMENT:
                 return (
                 False, u"Vous n'avez pas le budget nécessaire pour cet achat.")
 
         # check the player has a budget that corresponds to at leat CAPITAL_REQUIREMENT of the price, if the event if TRIANGLE
-        elif type == parametres.VENTE:
-            if contrat == parametres.TRIANGLE:
-                solde_recu_verse_triangle -= parametres.TRIANGLE_VERSEMENT
+        elif type == pms.VENTE:
+            if contrat == pms.TRIANGLE:
+                solde_recu_verse_triangle -= pms.TRIANGLE_VERSEMENT
                 if solde_recu_verse_triangle < 0:
                     if self.periodeCourante.revenu + solde_achats_ventes < Decimal(
                             str(abs(
-                                    solde_recu_verse_triangle))) * parametres.CAPITAL_REQUIREMENT:
+                                    solde_recu_verse_triangle))) * pms.CAPITAL_REQUIREMENT:
                         return (False,
                                 u"Vous n'avez pas le budget nécessaire pour cette vente si l'évènement \"triangle\" se réalise.")
-            elif contrat == parametres.STAR:
-                solde_recu_verse_star -= parametres.STAR_VERSEMENT
+            elif contrat == pms.STAR:
+                solde_recu_verse_star -= pms.STAR_VERSEMENT
                 if solde_recu_verse_star < 0:
                     if self.periodeCourante.revenu + solde_achats_ventes < Decimal(
                             str(abs(
-                                    solde_recu_verse_star))) * parametres.CAPITAL_REQUIREMENT:
+                                    solde_recu_verse_star))) * pms.CAPITAL_REQUIREMENT:
                         return (False,
                                 u"Vous n'avez pas le budget nécessaire pour cette vente si l'évènement \"étoile\" se réalise.")
 
@@ -151,7 +153,20 @@ class PartieMRI(Partie):
         logger.debug(u"Résultat du test: True")
         return (True,)
 
-    def _get_transactions_balance(self):
+    def _get_event_balance(self, event):
+        # compute the receipts and the expenses for the event
+        # if depends whether the player made transactions or not
+        rec = sum(
+            [t.MRI_trans_price for t in self.currentperiod.MRI_transactions
+             if t.MRI_trans_contract == event and
+             t.MRI_trans_seller == self.joueur.uid])
+        dep = sum(
+            [t.MRI_trans_price for t in self.currentperiod.MRI_transactions
+             if t.MRI_trans_contract == event and
+             t.MRI_trans_buyer == self.joueur.uid])
+        return rec - dep
+
+    def _get_transaction_balance(self):
         """
         Return the sum of the player's sells minus the sum of the player's
         purchases.
@@ -159,12 +174,11 @@ class PartieMRI(Partie):
         purchases = sum([t.MRI_trans_price for t in
                          self.currentperiod.MRI_transactions if
                          t.MRI_trans_buyer == self.joueur.uid])
-
         sells = sum([t.MRI_trans_price for t in
                          self.currentperiod.MRI_transactions if
                          t.MRI_trans_seller == self.joueur.uid])
-
         return sells - purchases
+
     def compute_periodpayoff(self):
         """
         Compute the payoff for the period
