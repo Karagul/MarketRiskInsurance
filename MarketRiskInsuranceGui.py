@@ -73,6 +73,9 @@ class InformationZone(QtGui.QWidget):
 class OfferZone(QtGui.QWidget):
     def __init__(self, purchase_or_sell):
         QtGui.QWidget.__init__(self)
+
+        self.current_index = None
+
         self.layout_main = QtGui.QVBoxLayout()
         self.setLayout(self.layout_main)
 
@@ -127,6 +130,14 @@ class OfferZone(QtGui.QWidget):
         self.layout_accept_remove.addSpacerItem(
             QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding,
                               QtGui.QSizePolicy.Minimum))
+
+        # connections
+        self.list.clicked.connect(self._set_current_index)
+
+
+    @QtCore.pyqtSlot(QtCore.QModelIndex)
+    def _set_current_index(self, index):
+        self.current_index = index
 
 
 class TransactionZone(QtGui.QWidget):
@@ -188,8 +199,8 @@ class GuiDecision(QtGui.QDialog):
         triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
         triangle_label.setStyleSheet("color: red;")
         market_layout.addWidget(triangle_label, 0, 0, 1, 2)
-        self._triangle_purchase_zone = OfferZone(pms.BUY)
-        market_layout.addWidget(self._triangle_purchase_zone, 1, 0)
+        self.triangle_purchase_zone = OfferZone(pms.BUY)
+        market_layout.addWidget(self.triangle_purchase_zone, 1, 0)
         self._triangle_sell_zone = OfferZone(pms.SELL)
         market_layout.addWidget(self._triangle_sell_zone, 1, 1)
         self._triangle_transactions = TransactionZone()
@@ -223,10 +234,14 @@ class GuiDecision(QtGui.QDialog):
             self._timer_automatique.start(7000)
                 
     def _make_connections(self):
-        self._triangle_purchase_zone.pushbutton_send.clicked.connect(
+        self.triangle_purchase_zone.pushbutton_send.clicked.connect(
             lambda _: self._send_offer(
                 pms.TRIANGLE, pms.BUY,
-                self._triangle_purchase_zone.spin_offer.value()))
+                self.triangle_purchase_zone.spin_offer.value()))
+        self.triangle_purchase_zone.pushbutton_accept.clicked.connect(
+            lambda _: self._accept_selected_offer(
+                pms.TRIANGLE, pms.BUY, self.triangle_purchase_zone.model,
+                self.triangle_purchase_zone.current_index))
 
         self._triangle_sell_zone.pushbutton_send.clicked.connect(
             lambda _: self._send_offer(
@@ -262,6 +277,43 @@ class GuiDecision(QtGui.QDialog):
                  "MRI_prop_price": value}
         yield (self._remote.send_offer(offer))
 
+    def remove_offer(self, triangle_or_star, buy_or_sell, model, index):
+        QtGui.QMessageBox.information(self, "Test", index.data().toString())
+        model.removeRow(index.row())
+
+    def _accept_selected_offer(self, triangle_or_star, buy_or_sell, model, index):
+        try:
+            value = float(index.data().toString())
+            QtGui.QMessageBox.information(
+                self, "Test", "Current value: {}".format(
+                    index.data().toString()))
+            #yield (self._send_offer(triangle_or_star, buy_or_sell, value))
+        except AttributeError: # if no item selected
+            pass
+
+    # def add_offer(self, offer):
+    #     logger.debug("add_offer: {}".format(offer))
+    #
+    #     # on supprime les offres de celui qui vient de faire l'offre
+    #     for v in self._offer_items.viewvalues():
+    #         if v["MC_sender"] == offer["MC_sender"]:
+    #             self.remove_offer(v)
+    #
+    #     if offer["MC_type"] == pms.OFFRE_ACHAT:
+    #         item = MyStandardItem(offer["MC_offer"])
+    #         # self._model_achats.insertRow(0, item)
+    #         self._model_achats.appendRow(item)
+    #         self._sort_list(self._model_achats)
+    #
+    #     else:
+    #         item = MyStandardItem(offer["MC_offer"])
+    #         # self._model_ventes.insertRow(0, item)
+    #         self._model_ventes.appendRow(item)
+    #         self._sort_list(self._model_ventes)
+    #
+    #     self._offer_items[item] = offer
+
+
     def display_offer_failure(self):
         QtGui.QMessageBox.warning(
             self, trans_MRI(u"Be careful"),
@@ -277,8 +329,6 @@ class GuiDecision(QtGui.QDialog):
         triangle_or_star = choice([pms.TRIANGLE, pms.STAR])
         buy_or_sell = choice([pms.BUY, pms.SELL])
         value = randint(0, pms.OFFER_MAX)
-
-
 
 
 class DConfigure(QtGui.QDialog):
@@ -362,4 +412,6 @@ if __name__ == "__main__":
         remote=None
     )
     my_screen.show()
+    my_item = MyStandardItem(25.5)
+    my_screen.triangle_purchase_zone.model.appendRow(my_item)
     sys.exit(app.exec_())
