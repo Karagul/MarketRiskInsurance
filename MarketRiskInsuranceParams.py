@@ -29,12 +29,12 @@ STAR_PAY = 100  # amount payed by the seller if the event is STAR
 
 # parameters -------------------------------------------------------------------
 TREATMENT = MARKET_CONTRACT
-MARKET_TIME = time(0, 2, 0)  # hour, minute, second
+MARKET_TIME = time(0, 1, 0)  # hour, minute, second
 DECIMALS = 2
 OFFER_MAX = 500
 
-NOMBRE_PERIODES = 10
-TAILLE_GROUPES = 4
+NOMBRE_PERIODES = 1
+TAILLE_GROUPES = 2
 PERIODE_ESSAI = False
 
 TAUX_CONVERSION = 1

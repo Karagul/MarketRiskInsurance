@@ -2,7 +2,7 @@
 
 import logging
 import random
-
+from time import strftime, localtime
 from twisted.internet import defer
 from twisted.spread import pb
 from client.cltremote import IRemote
@@ -21,10 +21,6 @@ class RemoteMRI(IRemote):
     """
     def __init__(self, le2mclt):
         IRemote.__init__(self, le2mclt)
-        self._histo_vars = [
-            "MRI_period", "MRI_decision",
-            "MRI_periodpayoff", "MRI_cumulativepayoff"]
-        self._histo.append(texts_MRI.get_histo_head())
 
     def remote_configure(self, params, server_part):
         """
@@ -58,15 +54,34 @@ class RemoteMRI(IRemote):
         defered = defer.Deferred()
         self._decision_screen = GuiDecision(
             defered, self._le2mclt.automatique,
-            self._le2mclt.screen, self.currentperiod, self.histo)
+            self._le2mclt.screen, self.currentperiod, self.histo, self)
         self._decision_screen.show()
         return defered
 
     @defer.inlineCallbacks
-    def send_offer(self, offer):
-        rep = yield (self._server_part.add_proposition(offer))
-        if not rep:
-            self._decision_screen.display_offer_fail()
+    def add_offer(self, offer):
+        """
+        send the offer to the server part
+        called by the decision screen (method _send_offer)
+        :param offer:
+        :return:
+        """
+        offer["sender"] = self.le2mclt.uid
+        offer["time"] = strftime("%X", localtime())
+        yield (self._server_part.callRemote("add_offer", offer))
+
+    def remote_add_offer(self, offer):
+        logger.debug(u"Received an offer to display: {}".format(offer))
+        self._decision_screen.add_offer(offer)
+
+    @defer.inlineCallbacks
+    def remove_offer(self, offer):
+        offer["sender"] = self.le2mclt.uid
+        yield (self._server_part.callRemote("remove_offer", offer))
+
+    def remote_remove_offer(self, offer):
+        logger.debug(u"Remove the offer: {}".format(offer))
+        self._decision_screen.remove_offer(offer)
 
     def remote_display_summary(self, period_content):
         """

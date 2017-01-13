@@ -8,7 +8,7 @@ from util import utiltools
 from util.utili18n import le2mtrans
 import MarketRiskInsuranceParams as pms
 from MarketRiskInsuranceGui import DConfigure
-
+from MarketRiskInsuranceTexts import trans_MRI
 
 logger = logging.getLogger("le2m.{}".format(__name__))
 
@@ -35,12 +35,15 @@ class Serveur(object):
     def _configure(self):
         screen_conf = DConfigure(self._le2mserv.gestionnaire_graphique.screen)
         if screen_conf.exec_():
-            self._le2mserv.gestionnaire_graphique.infoserv(u"Traitement: {}".format(
+            self._le2mserv.gestionnaire_graphique.infoserv(
+                trans_MRI(u"treatment") + u": {}".format(
                 pms.TREATMENTS_NAMES.get(pms.TREATMENT)))
-            self._le2mserv.gestionnaire_graphique.infoserv(u"Période d'essai: {}".format(
-                u"oui" if pms.PERIODE_ESSAI else u"non"))
-            self._le2mserv.gestionnaire_graphique.infoserv(u"Durée du marché: {}".format(
-                pms.TEMPS))
+            self._le2mserv.gestionnaire_graphique.infoserv(
+                trans_MRI(u"Trial periods") + u": {}".format(
+                le2mtrans(u"yes") if pms.PERIODE_ESSAI else le2mtrans(u"no")))
+            self._le2mserv.gestionnaire_graphique.infoserv(
+                trans_MRI(u"Market duration") + u": {}".format(
+                pms.MARKET_TIME))
 
     @defer.inlineCallbacks
     def _demarrer(self):

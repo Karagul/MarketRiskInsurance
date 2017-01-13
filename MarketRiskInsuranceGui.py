@@ -75,12 +75,14 @@ class OfferZone(QtGui.QWidget):
         QtGui.QWidget.__init__(self)
 
         self.current_index = None
+        self._purchase_or_sell = purchase_or_sell
+        self._offers = {}
 
         self.layout_main = QtGui.QVBoxLayout()
         self.setLayout(self.layout_main)
 
         self.label = QtGui.QLabel()
-        if purchase_or_sell == pms.BUY:
+        if self._purchase_or_sell == pms.BUY:
             self.label.setText(trans_MRI(u"Purchase offers"))
         else:
             self.label.setText(trans_MRI(u"Sell offers"))
@@ -94,7 +96,7 @@ class OfferZone(QtGui.QWidget):
 
         self.layout_offer = QtGui.QHBoxLayout()
         self.layout_main.addLayout(self.layout_offer)
-        if purchase_or_sell == pms.BUY:
+        if self._purchase_or_sell == pms.BUY:
             self.layout_offer.addWidget(
                 QtGui.QLabel(trans_MRI(u"Make a purchase offer")))
         else:
@@ -134,10 +136,50 @@ class OfferZone(QtGui.QWidget):
         # connections
         self.list.clicked.connect(self._set_current_index)
 
-
     @QtCore.pyqtSlot(QtCore.QModelIndex)
     def _set_current_index(self, index):
         self.current_index = index
+
+    def add_offer(self, sender, price):
+        # remove the current offer
+        self.remove_offer(sender)
+        # add the new offer
+        item = MyStandardItem(price)
+        self.model.appendRow(item)
+        self._sort()
+        self._offers[sender] = item
+
+    def remove_offer(self, sender):
+        """
+        Remove the offer from the list
+        :param sender:
+        :return:
+        """
+        offer_item = self._offers.pop(sender, None)
+        if offer_item is not None:
+            for row in range(self.model.rowCount()):
+                if self.model.item(row, 0) == offer_item:
+                    self.model.removeRow(row)
+                    break
+            self._sort()
+
+    def _sort(self):
+        if self._purchase_or_sell == pms.BUY:
+            self.model.sort(0, QtCore.Qt.DescendingOrder)
+        else:
+            self.model.sort(0, QtCore.Qt.AscendingOrder)
+        first_item = self.model.item(0, 0)
+        try:
+            first_item.setForeground(QtGui.QColor("blue"))
+            for i in range(1, self.model.rowCount()):
+                self.model.item(i, 0).setForeground(QtGui.QColor("black"))
+        except AttributeError:
+            pass
+
+    def clear(self):
+        # we clear both the model and the dict that stores the offers
+        self.model.clear()
+        self._offers.clear()
 
 
 class TransactionZone(QtGui.QWidget):
@@ -163,12 +205,6 @@ class GuiDecision(QtGui.QDialog):
         self._automatique = automatique
         self._historique = GuiHistorique(self, historique)
         self._remote = remote
-
-        # current_offer
-        self._triangle_curent_purchase_offer = None
-        self._triangle_current_sell_offer = None
-        self.star_current_purchase_offer = None
-        self.start_current_sell_offer = None
 
         layout = QtGui.QVBoxLayout(self)
 
@@ -199,8 +235,8 @@ class GuiDecision(QtGui.QDialog):
         triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
         triangle_label.setStyleSheet("color: red;")
         market_layout.addWidget(triangle_label, 0, 0, 1, 2)
-        self.triangle_purchase_zone = OfferZone(pms.BUY)
-        market_layout.addWidget(self.triangle_purchase_zone, 1, 0)
+        self._triangle_purchase_zone = OfferZone(pms.BUY)
+        market_layout.addWidget(self._triangle_purchase_zone, 1, 0)
         self._triangle_sell_zone = OfferZone(pms.SELL)
         market_layout.addWidget(self._triangle_sell_zone, 1, 1)
         self._triangle_transactions = TransactionZone()
@@ -234,28 +270,35 @@ class GuiDecision(QtGui.QDialog):
             self._timer_automatique.start(7000)
                 
     def _make_connections(self):
-        self.triangle_purchase_zone.pushbutton_send.clicked.connect(
-            lambda _: self._send_offer(
+        # send offer ===========================================================
+        self._triangle_purchase_zone.pushbutton_send.clicked.connect(
+            lambda _: self._add_offer(
                 pms.TRIANGLE, pms.BUY,
-                self.triangle_purchase_zone.spin_offer.value()))
-        self.triangle_purchase_zone.pushbutton_accept.clicked.connect(
-            lambda _: self._accept_selected_offer(
-                pms.TRIANGLE, pms.BUY, self.triangle_purchase_zone.model,
-                self.triangle_purchase_zone.current_index))
-
+                self._triangle_purchase_zone.spin_offer.value()))
         self._triangle_sell_zone.pushbutton_send.clicked.connect(
-            lambda _: self._send_offer(
+            lambda _: self._add_offer(
                 pms.TRIANGLE, pms.SELL,
                 self._triangle_sell_zone.spin_offer.value()))
 
         self._star_purchase_zone.pushbutton_send.clicked.connect(
-            lambda _: self._send_offer(
+            lambda _: self._add_offer(
                 pms.STAR, pms.BUY,
                 self._star_purchase_zone.spin_offer.value()))
 
         self._star_sell_zone.pushbutton_send.clicked.connect(
-            lambda _: self._send_offer(
+            lambda _: self._add_offer(
                 pms.STAR, pms.SELL, self._star_sell_zone.spin_offer.value()))
+        
+        # remove offer =========================================================
+        # self._triangle_purchase_zone.pushbutton_remove.connect(
+        #     lambda _: self._remove_offer(
+        #         pms.TRIANGLE, pms.BUY, self._triangle_purchase_zone.get_offer(
+        #             self._remote.lec2mclt.uid)))
+
+        # accept selected offer ================================================
+        self._triangle_purchase_zone.pushbutton_accept.clicked.connect(
+            lambda _: self._accept_selected_offer(
+                pms.TRIANGLE, pms.BUY, self._triangle_purchase_zone.current_index))
 
     def reject(self):
         pass
@@ -270,16 +313,70 @@ class GuiDecision(QtGui.QDialog):
         self._defered.callback(True)
 
     @defer.inlineCallbacks
-    def _send_offer(self, triangle_or_star, buy_or_sell, value):
-        logger.debug("call of send_offer")
-        offer = {"MRI_prop_contract": triangle_or_star,
-                 "MRI_prop_type": buy_or_sell,
-                 "MRI_prop_price": value}
-        yield (self._remote.send_offer(offer))
+    def _add_offer(self, triangle_or_star, buy_or_sell, price):
+        """
+        send the offer to the server
+        called by pushbutton_send of the offer zone
+        """
+        logger.info("send_offer contract: {} - type: {} - value: {}".format(
+            triangle_or_star, buy_or_sell, price))
+        offer = {"MRI_offer_contract": triangle_or_star,
+                 "MRI_offer_type": buy_or_sell,
+                 "MRI_offer_price": price}
+        yield (self._remote.add_offer(offer))
 
-    def remove_offer(self, triangle_or_star, buy_or_sell, model, index):
-        QtGui.QMessageBox.information(self, "Test", index.data().toString())
-        model.removeRow(index.row())
+    def add_offer(self, offer):
+        """
+        add the offer to the list
+        called by remote
+        :param offer:
+        :return:
+        """
+        sender = offer["MRI_offer_sender"]
+        price = offer["MRI_offer_price"]
+        if offer["MRI_offer_contract"] == pms.TRIANGLE:
+            if offer["MRI_offer_type"] == pms.BUY:
+                self._triangle_purchase_zone.add_offer(sender, price)
+            else:  # purchase
+                self._triangle_sell_zone.add_offer(sender, price)
+        else:  # star
+            if offer["MRI_offer_type"] == pms.BUY:
+                self._star_purchase_zone.add_offer(sender, price)
+            else:  # purchase
+                self._star_sell_zone.add_offer(sender, price)
+        
+    @defer.inlineCallbacks
+    def _remove_offer(self, triangle_or_star, buy_or_sell, price):
+        """
+        Called pushbutton_remove_offer from the offer zone
+        :param triangle_or_star: 
+        :param buy_or_sell: 
+        :param price: 
+        :return: 
+        """
+        offer = {"MRI_offer_contract": triangle_or_star,
+                 "MRI_offer_type": buy_or_sell,
+                 "MRI_offer_price": price}
+        yield (self._remote.remove_offer(offer))
+
+    def remove_offer(self, offer):
+        """
+        remove the offer from the list
+        called by remote
+        :param offer:
+        :return:
+        """
+        sender = offer["MRI_offer_sender"]
+        if offer["MRI_offer_contract"] == pms.TRIANGLE:
+            if offer["MRI_offer_type"] == pms.BUY:
+                self._triangle_purchase_zone.remove_offer(sender)
+            else:  # purchase
+                self._triangle_sell_zone.remove_offer(sender)
+        else:  # star
+            if offer["MRI_offer_type"] == pms.BUY:
+                self._star_purchase_zone.remove_offer(sender)
+            else:  # purchase
+                self._star_sell_zone.remove_offer(sender)
 
     def _accept_selected_offer(self, triangle_or_star, buy_or_sell, model, index):
         try:
@@ -287,32 +384,9 @@ class GuiDecision(QtGui.QDialog):
             QtGui.QMessageBox.information(
                 self, "Test", "Current value: {}".format(
                     index.data().toString()))
-            #yield (self._send_offer(triangle_or_star, buy_or_sell, value))
+            yield (self._add_offer(triangle_or_star, buy_or_sell, value))
         except AttributeError: # if no item selected
             pass
-
-    # def add_offer(self, offer):
-    #     logger.debug("add_offer: {}".format(offer))
-    #
-    #     # on supprime les offres de celui qui vient de faire l'offre
-    #     for v in self._offer_items.viewvalues():
-    #         if v["MC_sender"] == offer["MC_sender"]:
-    #             self.remove_offer(v)
-    #
-    #     if offer["MC_type"] == pms.OFFRE_ACHAT:
-    #         item = MyStandardItem(offer["MC_offer"])
-    #         # self._model_achats.insertRow(0, item)
-    #         self._model_achats.appendRow(item)
-    #         self._sort_list(self._model_achats)
-    #
-    #     else:
-    #         item = MyStandardItem(offer["MC_offer"])
-    #         # self._model_ventes.insertRow(0, item)
-    #         self._model_ventes.appendRow(item)
-    #         self._sort_list(self._model_ventes)
-    #
-    #     self._offer_items[item] = offer
-
 
     def display_offer_failure(self):
         QtGui.QMessageBox.warning(
@@ -346,9 +420,9 @@ class DConfigure(QtGui.QDialog):
         self._combo_treatment.addItems(
             list(sorted(pms.TREATMENTS_NAMES.viewvalues())))
         self._combo_treatment.setCurrentIndex(pms.TREATMENT)
-        form.addRow(QtGui.QLabel(u"Traitement"), self._combo_treatment)
+        form.addRow(QtGui.QLabel(trans_MRI(u"Treatment")), self._combo_treatment)
 
-        # nombre de périodes
+        # periods
         self._spin_periods = QtGui.QSpinBox()
         self._spin_periods.setMinimum(0)
         self._spin_periods.setMaximum(100)
@@ -356,14 +430,14 @@ class DConfigure(QtGui.QDialog):
         self._spin_periods.setValue(pms.NOMBRE_PERIODES)
         self._spin_periods.setButtonSymbols(QtGui.QSpinBox.NoButtons)
         self._spin_periods.setMaximumWidth(50)
-        form.addRow(QtGui.QLabel(u"Nombre de périodes"), self._spin_periods)
+        form.addRow(QtGui.QLabel(trans_MRI(u"Number of periods")), self._spin_periods)
 
-        # periode essai
+        # trial
         self._checkbox_essai = QtGui.QCheckBox()
         self._checkbox_essai.setChecked(pms.PERIODE_ESSAI)
-        form.addRow(QtGui.QLabel(u"Période d'essai"), self._checkbox_essai)
+        form.addRow(QtGui.QLabel(trans_MRI(u"Trail period")), self._checkbox_essai)
 
-        # taille groupes
+        # group size
         self._spin_groups = QtGui.QSpinBox()
         self._spin_groups.setMinimum(2)
         self._spin_groups.setMaximum(100)
@@ -371,16 +445,16 @@ class DConfigure(QtGui.QDialog):
         self._spin_groups.setValue(pms.TAILLE_GROUPES)
         self._spin_groups.setButtonSymbols(QtGui.QSpinBox.NoButtons)
         self._spin_groups.setMaximumWidth(50)
-        form.addRow(QtGui.QLabel(u"Taille des groupes"), self._spin_groups)
+        form.addRow(QtGui.QLabel(trans_MRI(u"Group size")), self._spin_groups)
 
-        # temps de marché
+        # market duration
         self._timeEdit = QtGui.QTimeEdit()
         self._timeEdit.setDisplayFormat("hh:mm:ss")
         self._timeEdit.setTime(QtCore.QTime(pms.MARKET_TIME.hour,
                                             pms.MARKET_TIME.minute,
                                             pms.MARKET_TIME.second))
         self._timeEdit.setMaximumWidth(100)
-        form.addRow(QtGui.QLabel(u"Durée du marché"), self._timeEdit)
+        form.addRow(QtGui.QLabel(trans_MRI(u"Market duration")), self._timeEdit)
 
         button = QtGui.QDialogButtonBox(
             QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
@@ -388,7 +462,7 @@ class DConfigure(QtGui.QDialog):
         button.rejected.connect(self.reject)
         layout.addWidget(button)
 
-        self.setWindowTitle(u"Configurer")
+        self.setWindowTitle(trans_MRI(u"Configure"))
         self.adjustSize()
         self.setFixedSize(self.size())
 
