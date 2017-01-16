@@ -66,8 +66,8 @@ class RemoteMRI(IRemote):
         :param offer:
         :return:
         """
-        offer["sender"] = self.le2mclt.uid
-        offer["time"] = strftime("%X", localtime())
+        offer["MRI_offer_sender"] = self.le2mclt.uid
+        offer["MRI_offer_time"] = strftime("%X", localtime())
         yield (self._server_part.callRemote("add_offer", offer))
 
     def remote_add_offer(self, offer):
@@ -76,12 +76,23 @@ class RemoteMRI(IRemote):
 
     @defer.inlineCallbacks
     def remove_offer(self, offer):
-        offer["sender"] = self.le2mclt.uid
+        offer["MRI_offer_sender"] = self.le2mclt.uid
         yield (self._server_part.callRemote("remove_offer", offer))
 
     def remote_remove_offer(self, offer):
         logger.debug(u"Remove the offer: {}".format(offer))
         self._decision_screen.remove_offer(offer)
+
+    @defer.inlineCallbacks
+    def add_transaction(self, existing_offer, new_offer):
+        new_offer["MRI_offer_sender"] = self.le2mclt.uid
+        new_offer["MRI_offer_time"] = strftime("%X", localtime())
+        yield(self._server_part.callRemote("add_transaction",
+                                           existing_offer, new_offer))
+
+    def remote_add_transaction(self, transaction):
+        logger.debug(u"Received a transaction to display: {}".format(transaction))
+        self._decision_screen.add_transaction(transaction)
 
     def remote_display_summary(self, period_content):
         """

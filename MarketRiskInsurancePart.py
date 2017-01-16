@@ -103,6 +103,29 @@ class PartieMRI(Partie, pb.Referenceable):
             yield (j.get_part(self.nom).remote.callRemote(
                 "remove_offer", offer))
 
+    @defer.inlineCallbacks
+    def remote_add_transaction(self, existing_offer, new_offer):
+        # first remove the existing offer
+        yield(self.remote_remove_offer(existing_offer))
+        # create a new offer (just for the player)
+        new_offer_temp = OffersMRI(new_offer)
+        self.currentperiod.MRI_offers.append(new_offer_temp)
+        infos_transaction = {}
+        infos_transaction["MRI_trans_time"] = new_offer["MRI_offer_time"]
+        infos_transaction["MRI_trans_contract"] = new_offer["MRI_offer_contract"]
+        if new_offer["MRI_offer_type"] == pms.BUY:
+            infos_transaction["MRI_trans_buyer"] = new_offer["MRI_offer_sender"]
+            infos_transaction["MRI_trans_seller"] = existing_offer["MRI_offer_sender"]
+        else:
+            infos_transaction["MRI_trans_buyer"] = existing_offer["MRI_offer_sender"]
+            infos_transaction["MRI_trans_seller"] = new_offer["MRI_offer_sender"]
+        infos_transaction["MRI_trans_price"] = new_offer["MRI_offer_price"]
+        new_transaction = TransactionsMRI(infos_transaction)
+        self.currentperiod.MRI_transactions.append(new_transaction)
+        for j in self.joueur.group_composition:
+            yield (j.get_part(self.nom).remote.callRemote(
+                "add_transaction", infos_transaction))
+
     def _is_offer_ok(self, offer):
         """"
         We check that the offer is compatible with the player's budget
@@ -310,12 +333,8 @@ class OffersMRI(Base):
 
     def __init__(self, offer):
         self.MRI_offer_id = OffersMRI.counter
-        self.MRI_offer_time = offer["time"]
-        self.MRI_offer_sender = offer["sender"]
-        self.MRI_offer_contract = offer["MRI_offer_contract"]
-        self.MRI_offer_type = offer["MRI_offer_type"]
-        self.MRI_offer_price = offer["MRI_offer_price"]
-
+        for k, v in offer.viewitems():
+            setattr(self, k, v)
         OffersMRI.counter += 1
 
     def todict(self):
@@ -329,18 +348,15 @@ class TransactionsMRI(Base):
         Integer, ForeignKey("partie_MarketRiskInsurance_repetitions.id"))
 
     MRI_trans_time = Column(String)
+    MRI_trans_contract = Column(Integer)
     MRI_trans_buyer = Column(String)
     MRI_trans_seller = Column(String)
     MRI_trans_contract = Column(Integer)
     MRI_trans_price = Column(Float)
 
-    def __init__(self, time, buyer, seller, contract, price):
-
-        self.MRI_trans_time = time
-        self.MRI_trans_buyer = buyer
-        self.MRI_trans_seller = seller
-        self.MRI_trans_contract = contract
-        self.MRI_trans_price = price
+    def __init__(self, transaction):
+        for k, v in transaction.viewitems():
+            setattr(self, k, v)
 
     def todict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

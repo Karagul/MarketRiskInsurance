@@ -74,7 +74,7 @@ class OfferZone(QtGui.QWidget):
     def __init__(self, purchase_or_sell):
         QtGui.QWidget.__init__(self)
 
-        self.current_index = None
+        self.current_offer = None
         self._purchase_or_sell = purchase_or_sell
         self._offers = {}
 
@@ -138,7 +138,14 @@ class OfferZone(QtGui.QWidget):
 
     @QtCore.pyqtSlot(QtCore.QModelIndex)
     def _set_current_index(self, index):
-        self.current_index = index
+        # self.current_index = index
+        current_item = self.model.item(index.row(), 0)
+        for k, v in self._offers.viewitems():
+            if v == current_item:
+                self.current_offer = {
+                    "MRI_offer_sender": k,
+                    "MRI_offer_type": self._purchase_or_sell,
+                    "MRI_offer_price": float(index.data())}
 
     def add_offer(self, sender, price):
         # remove the current offer
@@ -290,15 +297,13 @@ class GuiDecision(QtGui.QDialog):
                 pms.STAR, pms.SELL, self._star_sell_zone.spin_offer.value()))
         
         # remove offer =========================================================
-        # self._triangle_purchase_zone.pushbutton_remove.connect(
-        #     lambda _: self._remove_offer(
-        #         pms.TRIANGLE, pms.BUY, self._triangle_purchase_zone.get_offer(
-        #             self._remote.lec2mclt.uid)))
+        self._triangle_purchase_zone.pushbutton_remove.clicked.connect(
+            lambda _: self._remove_offer(pms.TRIANGLE, pms.BUY))
 
         # accept selected offer ================================================
         self._triangle_purchase_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
-                pms.TRIANGLE, pms.BUY, self._triangle_purchase_zone.current_index))
+                pms.TRIANGLE, self._triangle_purchase_zone.current_offer))
 
     def reject(self):
         pass
@@ -346,17 +351,15 @@ class GuiDecision(QtGui.QDialog):
                 self._star_sell_zone.add_offer(sender, price)
         
     @defer.inlineCallbacks
-    def _remove_offer(self, triangle_or_star, buy_or_sell, price):
+    def _remove_offer(self, triangle_or_star, buy_or_sell):
         """
-        Called pushbutton_remove_offer from the offer zone
+        Called by pushbutton_remove_offer from the offer zone
         :param triangle_or_star: 
         :param buy_or_sell: 
-        :param price: 
-        :return: 
+        :return:
         """
         offer = {"MRI_offer_contract": triangle_or_star,
-                 "MRI_offer_type": buy_or_sell,
-                 "MRI_offer_price": price}
+                 "MRI_offer_type": buy_or_sell}
         yield (self._remote.remove_offer(offer))
 
     def remove_offer(self, offer):
@@ -378,15 +381,29 @@ class GuiDecision(QtGui.QDialog):
             else:  # purchase
                 self._star_sell_zone.remove_offer(sender)
 
-    def _accept_selected_offer(self, triangle_or_star, buy_or_sell, model, index):
+    @defer.inlineCallbacks
+    def _accept_selected_offer(self, triangle_or_star, existing_offer):
         try:
-            value = float(index.data().toString())
-            QtGui.QMessageBox.information(
-                self, "Test", "Current value: {}".format(
-                    index.data().toString()))
-            yield (self._add_offer(triangle_or_star, buy_or_sell, value))
+            if existing_offer["MRI_offer_sender"] != self._remote.le2mclt.uid:
+                existing_offer["MRI_offer_contract"] = triangle_or_star
+                new_offer = {}
+                new_offer["MRI_offer_contract"] = \
+                    existing_offer["MRI_offer_contract"]
+                if existing_offer["MRI_offer_type"] == pms.BUY:
+                    new_offer["MRI_offer_type"] = pms.SELL
+                else:
+                    new_offer["MRI_offer_type"] = pms.BUY
+                yield (self._remote.add_transaction(existing_offer, new_offer))
         except AttributeError: # if no item selected
             pass
+
+    def add_transaction(self, transaction):
+        """
+        Add the transaction in the transaction zone
+        :param transaction:
+        :return:
+        """
+        pass
 
     def display_offer_failure(self):
         QtGui.QMessageBox.warning(
