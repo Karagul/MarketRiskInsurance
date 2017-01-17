@@ -467,7 +467,7 @@ class GuiDecision(QtGui.QDialog):
                 else:
                     new_offer["MRI_offer_type"] = pms.BUY
                 yield (self._remote.add_transaction(existing_offer, new_offer))
-        except (AttributeError, KeyError):  # if no item selected
+        except (TypeError, KeyError):  # if no item selected
             pass
 
     def add_transaction(self, transaction):
