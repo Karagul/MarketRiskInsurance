@@ -300,13 +300,24 @@ class RepetitionsMRI(Base):
     MRI_treatment = Column(Integer)
     MRI_group = Column(Integer)
     MRI_random_value = Column(Integer)
+    MRI_event = Column(Integer)
+    MRI_dotation = Column(Integer)
+    MRI_triangle_number_of_purchase = Column(Integer)
+    MRI_triangle_number_of_sell = Column(Integer)
+    MRI_triangle_sum_purchase = Column(Float)
+    MRI_triangle_sum_sell = Column(Float)
+    MRI_star_number_of_purchase = Column(Integer)
+    MRI_star_number_of_sell = Column(Integer)
+    MRI_star_sum_purchase = Column(Float)
+    MRI_star_sum_sell = Column(Float)
     MRI_periodpayoff = Column(Float)
     MRI_cumulativepayoff = Column(Float)
 
     def __init__(self, period):
         self.MRI_treatment = pms.TREATMENT
         self.MRI_period = period
-        self.MRI_decisiontime = 0
+        self.MRI_triangle_number_of_purchase = 0
+
         self.MRI_periodpayoff = 0
         self.MRI_cumulativepayoff = 0
 
