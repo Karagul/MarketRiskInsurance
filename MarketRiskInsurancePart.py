@@ -287,7 +287,6 @@ class PartieMRI(Partie, pb.Referenceable):
             self.joueur, self.MRI_gain_ecus, self.MRI_gain_euros))
 
 
-
 class RepetitionsMRI(Base):
     __tablename__ = 'partie_MarketRiskInsurance_repetitions'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -301,8 +300,6 @@ class RepetitionsMRI(Base):
     MRI_treatment = Column(Integer)
     MRI_group = Column(Integer)
     MRI_random_value = Column(Integer)
-    MRI_decision = Column(Integer)
-    MRI_decisiontime = Column(Integer)
     MRI_periodpayoff = Column(Float)
     MRI_cumulativepayoff = Column(Float)
 
