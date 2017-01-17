@@ -71,20 +71,47 @@ class RemoteMRI(IRemote):
         yield (self._server_part.callRemote("add_offer", offer))
 
     def remote_add_offer(self, offer):
+        """
+        Add the offer to the corresponding list on the decision decision
+        Called by the server part
+        :param offer:
+        :return:
+        """
         logger.debug(u"Received an offer to display: {}".format(offer))
         self._decision_screen.add_offer(offer)
 
     @defer.inlineCallbacks
     def remove_offer(self, offer):
+        """
+        send the order to the server part to remove the offer on the group
+        members screen
+        Called by the screen with the remove my offer button
+        :param offer:
+        :return:
+        """
         offer["MRI_offer_sender"] = self.le2mclt.uid
         yield (self._server_part.callRemote("remove_offer", offer))
 
     def remote_remove_offer(self, offer):
+        """
+        Remove the offer from the corresponding list
+        Called by the server part
+        :param offer:
+        :return:
+        """
         logger.debug(u"Remove the offer: {}".format(offer))
         self._decision_screen.remove_offer(offer)
 
     @defer.inlineCallbacks
     def add_transaction(self, existing_offer, new_offer):
+        """
+        send the elements for a new transaction to the server
+        Called by the decision screen when the subject click on accept
+        the selected offer
+        :param existing_offer:
+        :param new_offer:
+        :return:
+        """
         new_offer["MRI_offer_sender"] = self.le2mclt.uid
         new_offer["MRI_offer_time"] = strftime("%X", localtime())
         yield(self._server_part.callRemote("add_transaction",
@@ -93,6 +120,13 @@ class RemoteMRI(IRemote):
     def remote_add_transaction(self, transaction):
         logger.debug(u"Received a transaction to display: {}".format(transaction))
         self._decision_screen.add_transaction(transaction)
+
+    def remote_update_balance(self, balance, balance_if_triangle,
+                              balance_if_star):
+        logger.debug(u"Update of balance: {} - {} - {}".format(
+            balance, balance_if_triangle, balance_if_star))
+        self._decision_screen.update_balance(balance, balance_if_triangle,
+                                             balance_if_star)
 
     def remote_display_summary(self, period_content):
         """

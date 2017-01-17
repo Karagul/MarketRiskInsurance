@@ -110,21 +110,25 @@ class PartieMRI(Partie, pb.Referenceable):
         # create a new offer (just for the player)
         new_offer_temp = OffersMRI(new_offer)
         self.currentperiod.MRI_offers.append(new_offer_temp)
-        infos_transaction = {}
-        infos_transaction["MRI_trans_time"] = new_offer["MRI_offer_time"]
-        infos_transaction["MRI_trans_contract"] = new_offer["MRI_offer_contract"]
+        # create the transaction
+        transaction = dict()
+        transaction["MRI_trans_time"] = new_offer["MRI_offer_time"]
+        transaction["MRI_trans_contract"] = new_offer["MRI_offer_contract"]
         if new_offer["MRI_offer_type"] == pms.BUY:
-            infos_transaction["MRI_trans_buyer"] = new_offer["MRI_offer_sender"]
-            infos_transaction["MRI_trans_seller"] = existing_offer["MRI_offer_sender"]
+            transaction["MRI_trans_buyer"] = new_offer["MRI_offer_sender"]
+            transaction["MRI_trans_seller"] = existing_offer["MRI_offer_sender"]
         else:
-            infos_transaction["MRI_trans_buyer"] = existing_offer["MRI_offer_sender"]
-            infos_transaction["MRI_trans_seller"] = new_offer["MRI_offer_sender"]
-        infos_transaction["MRI_trans_price"] = new_offer["MRI_offer_price"]
-        new_transaction = TransactionsMRI(infos_transaction)
+            transaction["MRI_trans_buyer"] = existing_offer["MRI_offer_sender"]
+            transaction["MRI_trans_seller"] = new_offer["MRI_offer_sender"]
+        transaction["MRI_trans_price"] = new_offer["MRI_offer_price"]
+        new_transaction = TransactionsMRI(transaction)
         self.currentperiod.MRI_transactions.append(new_transaction)
+        self.joueur.info(u"Trans {MRI_trans_contract}, "
+                         u"{MRI_trans_price}".format(**transaction))
+        # send the transaction to everyone in the group
         for j in self.joueur.group_composition:
             yield (j.get_part(self.nom).remote.callRemote(
-                "add_transaction", infos_transaction))
+                "add_transaction", transaction))
 
     def _is_offer_ok(self, offer):
         """"
@@ -324,7 +328,6 @@ class OffersMRI(Base):
 
     counter = 0
 
-    MRI_offer_id = Column(Integer)
     MRI_offer_time = Column(String)
     MRI_offer_sender = Column(String)
     MRI_offer_contract = Column(Integer)
@@ -332,10 +335,11 @@ class OffersMRI(Base):
     MRI_offer_price = Column(Float)
 
     def __init__(self, offer):
-        self.MRI_offer_id = OffersMRI.counter
-        for k, v in offer.viewitems():
-            setattr(self, k, v)
-        OffersMRI.counter += 1
+        self.MRI_offer_time = offer["MRI_offer_time"]
+        self.MRI_offer_contract = offer["MRI_offer_contract"]
+        self.MRI_offer_sender = offer["MRI_offer_sender"]
+        self.MRI_offer_type = offer["MRI_offer_type"]
+        self.MRI_offer_price = offer["MRI_offer_price"]
 
     def todict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -351,12 +355,14 @@ class TransactionsMRI(Base):
     MRI_trans_contract = Column(Integer)
     MRI_trans_buyer = Column(String)
     MRI_trans_seller = Column(String)
-    MRI_trans_contract = Column(Integer)
     MRI_trans_price = Column(Float)
 
     def __init__(self, transaction):
-        for k, v in transaction.viewitems():
-            setattr(self, k, v)
+        self.MRI_trans_time = transaction["MRI_trans_time"]
+        self.MRI_trans_contract = transaction["MRI_trans_contract"]
+        self.MRI_trans_buyer = transaction["MRI_trans_buyer"]
+        self.MRI_trans_seller = transaction["MRI_trans_seller"]
+        self.MRI_trans_price = transaction["MRI_trans_price"]
 
     def todict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

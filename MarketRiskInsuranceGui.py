@@ -145,7 +145,7 @@ class OfferZone(QtGui.QWidget):
                 self.current_offer = {
                     "MRI_offer_sender": k,
                     "MRI_offer_type": self._purchase_or_sell,
-                    "MRI_offer_price": float(index.data())}
+                    "MRI_offer_price": v.value()}
 
     def add_offer(self, sender, price):
         # remove the current offer
@@ -201,6 +201,13 @@ class TransactionZone(QtGui.QWidget):
         self.layout.addWidget(self.list)
         self.model = QtGui.QStandardItemModel()
         self.list.setModel(self.model)
+
+    def add_transaction(self, price, buyer, seller):
+        item = MyStandardItem(price)
+        self.model.insertRow(0, item)
+
+    def clear(self):
+        self.model.clear()
 
 
 class GuiDecision(QtGui.QDialog):
@@ -277,6 +284,11 @@ class GuiDecision(QtGui.QDialog):
             self._timer_automatique.start(7000)
                 
     def _make_connections(self):
+        """
+        Connect the pushbutton of the different offer zones to the method
+        of GUIDecision (add
+        :return:
+        """
         # send offer ===========================================================
         self._triangle_purchase_zone.pushbutton_send.clicked.connect(
             lambda _: self._add_offer(
@@ -299,11 +311,26 @@ class GuiDecision(QtGui.QDialog):
         # remove offer =========================================================
         self._triangle_purchase_zone.pushbutton_remove.clicked.connect(
             lambda _: self._remove_offer(pms.TRIANGLE, pms.BUY))
+        self._triangle_sell_zone.pushbutton_remove.clicked.connect(
+            lambda _: self._remove_offer(pms.TRIANGLE, pms.SELL))
+        self._star_purchase_zone.pushbutton_remove.clicked.connect(
+            lambda _: self._remove_offer(pms.STAR, pms.BUY))
+        self._star_sell_zone.pushbutton_remove.clicked.connect(
+            lambda _: self._remove_offer(pms.STAR, pms.SELL))
 
         # accept selected offer ================================================
         self._triangle_purchase_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.TRIANGLE, self._triangle_purchase_zone.current_offer))
+        self._triangle_sell_zone.pushbutton_accept.clicked.connect(
+            lambda _: self._accept_selected_offer(
+                pms.TRIANGLE, self._triangle_sell_zone.current_offer))
+        self._star_purchase_zone.pushbutton_accept.clicked.connect(
+            lambda _: self._accept_selected_offer(
+                pms.STAR, self._star_purchase_zone.current_offer))
+        self._star_sell_zone.pushbutton_accept.clicked.connect(
+            lambda _: self._accept_selected_offer(
+                pms.STAR, self._star_sell_zone.current_offer))
 
     def reject(self):
         pass
@@ -383,12 +410,20 @@ class GuiDecision(QtGui.QDialog):
 
     @defer.inlineCallbacks
     def _accept_selected_offer(self, triangle_or_star, existing_offer):
+        """
+        Called by pushbutton accept_selected_offer from the offer zone
+        Complete the offer and if all is fine add a new transaction
+        :param triangle_or_star:
+        :param existing_offer:
+        :return:
+        """
         try:
             if existing_offer["MRI_offer_sender"] != self._remote.le2mclt.uid:
                 existing_offer["MRI_offer_contract"] = triangle_or_star
-                new_offer = {}
+                new_offer = dict()
                 new_offer["MRI_offer_contract"] = \
                     existing_offer["MRI_offer_contract"]
+                new_offer["MRI_offer_price"] = existing_offer["MRI_offer_price"]
                 if existing_offer["MRI_offer_type"] == pms.BUY:
                     new_offer["MRI_offer_type"] = pms.SELL
                 else:
@@ -403,7 +438,13 @@ class GuiDecision(QtGui.QDialog):
         :param transaction:
         :return:
         """
-        pass
+        price = transaction["MRI_trans_price"]
+        buyer = transaction["MRI_trans_buyer"]
+        seller = transaction["MRI_trans_seller"]
+        if transaction["MRI_trans_contract"] == pms.TRIANGLE:
+            self._triangle_transactions.add_transaction(price, buyer, seller)
+        else:
+            self._star_transactions.add_transaction(price, buyer, seller)
 
     def display_offer_failure(self):
         QtGui.QMessageBox.warning(
