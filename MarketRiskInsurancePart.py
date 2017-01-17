@@ -103,13 +103,33 @@ class PartieMRI(Partie, pb.Referenceable):
             yield (j.get_part(self.nom).remote.callRemote(
                 "remove_offer", offer))
 
+    def add_transaction(self, transaction):
+        new_transaction = TransactionsMRI(transaction)
+        self.currentperiod.MRI_transactions.append(new_transaction)
+        self.joueur.info(u"Transaction {MRI_trans_contract}, "
+                         u"{MRI_trans_price}".format(**transaction))
+
     @defer.inlineCallbacks
     def remote_add_transaction(self, existing_offer, new_offer):
-        # first remove the existing offer
+        """
+        Called by remote, when either:
+        (i) the player accept an existing offer
+        (ii) the player makes an offer at the same price than an existing offer
+        (a purchase or a sell, it depends)
+        :param existing_offer:
+        :param new_offer:
+        :return:
+        """
+        # remove the existing offer from the list on the screen
         yield(self.remote_remove_offer(existing_offer))
+
         # create a new offer (just for the player)
         new_offer_temp = OffersMRI(new_offer)
         self.currentperiod.MRI_offers.append(new_offer_temp)
+        self.joueur.info(u"Offer {MRI_offer_contract}, "
+                         u"{MRI_offer_type}, {MRI_offer_price}".format(
+            **new_offer))
+
         # create the transaction
         transaction = dict()
         transaction["MRI_trans_time"] = new_offer["MRI_offer_time"]
@@ -121,12 +141,13 @@ class PartieMRI(Partie, pb.Referenceable):
             transaction["MRI_trans_buyer"] = existing_offer["MRI_offer_sender"]
             transaction["MRI_trans_seller"] = new_offer["MRI_offer_sender"]
         transaction["MRI_trans_price"] = new_offer["MRI_offer_price"]
-        new_transaction = TransactionsMRI(transaction)
-        self.currentperiod.MRI_transactions.append(new_transaction)
-        self.joueur.info(u"Transaction {MRI_trans_contract}, "
-                         u"{MRI_trans_price}".format(**transaction))
+        self.add_transaction(transaction)
+
         # send the transaction to everyone in the group
         for j in self.joueur.group_composition:
+            # if this is the other player implied in the transaction
+            if j.uid == existing_offer["MRI_offer_sender"]:
+                j.get_part(self.nom).add_transaction(transaction)
             yield (j.get_part(self.nom).remote.callRemote(
                 "add_transaction", transaction))
 
