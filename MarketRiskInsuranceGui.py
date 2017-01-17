@@ -134,11 +134,10 @@ class OfferZone(QtGui.QWidget):
                               QtGui.QSizePolicy.Minimum))
 
         # connections
-        self.list.clicked.connect(self._set_current_index)
+        self.list.clicked.connect(self._set_current_offer)
 
     @QtCore.pyqtSlot(QtCore.QModelIndex)
-    def _set_current_index(self, index):
-        # self.current_index = index
+    def _set_current_offer(self, index):
         current_item = self.model.item(index.row(), 0)
         for k, v in self._offers.viewitems():
             if v == current_item:
@@ -184,9 +183,28 @@ class OfferZone(QtGui.QWidget):
             pass
 
     def clear(self):
-        # we clear both the model and the dict that stores the offers
+        """
+        we clear both the model and the dict that stores the offers
+        :return:
+        """
         self.model.clear()
         self._offers.clear()
+
+    def exists_offer(self, price):
+        """
+        We check whether there exists an offer with that price.
+        If it does return the offer. If it doesn't return False
+        :param price:
+        :return:
+        """
+        for k, v in self._offers.viewitems():
+            if v.value() == price:
+                existing_offer = dict()
+                existing_offer["MRI_offer_sender"] = k
+                existing_offer["MRI_offer_price"] = v.value()
+                logger.debug(u"exists_offer: {}".format(existing_offer))
+                return existing_offer
+        return False
 
 
 class TransactionZone(QtGui.QWidget):
@@ -350,12 +368,36 @@ class GuiDecision(QtGui.QDialog):
         send the offer to the server
         called by pushbutton_send of the offer zone
         """
-        logger.info("send_offer contract: {} - type: {} - value: {}".format(
+        logger.info("add_offer: contract {} - type {} - price {}".format(
             triangle_or_star, buy_or_sell, price))
-        offer = {"MRI_offer_contract": triangle_or_star,
-                 "MRI_offer_type": buy_or_sell,
-                 "MRI_offer_price": price}
-        yield (self._remote.add_offer(offer))
+        # we test whether there exists an offer with the same price
+        if triangle_or_star == pms.TRIANGLE:
+            if buy_or_sell == pms.BUY:
+                existing_offer = self._triangle_sell_zone.exists_offer(price)
+            else:
+                existing_offer = self._triangle_purchase_zone.exists_offer(price)
+        else:
+            if buy_or_sell == pms.BUY:
+                existing_offer = self._star_sell_zone.exists_offer(price)
+            else:
+                existing_offer = self._star_purchase_zone.exists_offer(price)
+
+        # if the existing is player's own offer we cancel this existing offer
+        if existing_offer:
+            if existing_offer["MRI_offer_sender"] == self._remote.le2mclt.uid:
+                existing_offer = False
+
+        if existing_offer:
+            existing_offer["MRI_offer_contract"] = triangle_or_star
+            existing_offer["MRI_offer_type"] = \
+                pms.SELL if buy_or_sell == pms.BUY else pms.BUY
+            yield (self._accept_selected_offer(triangle_or_star,
+                                               existing_offer))
+        else:
+            offer = {"MRI_offer_contract": triangle_or_star,
+                     "MRI_offer_type": buy_or_sell,
+                     "MRI_offer_price": price}
+            yield (self._remote.add_offer(offer))
 
     def add_offer(self, offer):
         """

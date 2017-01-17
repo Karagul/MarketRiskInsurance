@@ -82,8 +82,8 @@ class PartieMRI(Partie, pb.Referenceable):
         new_offer = OffersMRI(offer)
         new_offer_dict = new_offer.todict()
         logger.debug(u"Offer created: {}".format(new_offer.todict()))
-        self.joueur.info(u"Offer: {MRI_offer_contract} - "
-                         u"{MRI_offer_type} - {MRI_offer_price}".format(
+        self.joueur.info(u"Offer {MRI_offer_contract}, "
+                         u"{MRI_offer_type}, {MRI_offer_price}".format(
                             **new_offer_dict))
         self.currentperiod.MRI_offers.append(new_offer)
         # add the offer to the screen of group members
@@ -123,7 +123,7 @@ class PartieMRI(Partie, pb.Referenceable):
         transaction["MRI_trans_price"] = new_offer["MRI_offer_price"]
         new_transaction = TransactionsMRI(transaction)
         self.currentperiod.MRI_transactions.append(new_transaction)
-        self.joueur.info(u"Trans {MRI_trans_contract}, "
+        self.joueur.info(u"Transaction {MRI_trans_contract}, "
                          u"{MRI_trans_price}".format(**transaction))
         # send the transaction to everyone in the group
         for j in self.joueur.group_composition:
