@@ -146,11 +146,12 @@ class OfferZone(QtGui.QWidget):
                     "MRI_offer_type": self._purchase_or_sell,
                     "MRI_offer_price": v.value()}
 
-    def add_offer(self, sender, price):
+    def add_offer(self, sender, price, color):
         # remove the current offer
         self.remove_offer(sender)
         # add the new offer
         item = MyStandardItem(price)
+        item.setForeground(QtGui.QColor(color))
         self.model.appendRow(item)
         self._sort()
         self._offers[sender] = item
@@ -174,13 +175,6 @@ class OfferZone(QtGui.QWidget):
             self.model.sort(0, QtCore.Qt.DescendingOrder)
         else:
             self.model.sort(0, QtCore.Qt.AscendingOrder)
-        first_item = self.model.item(0, 0)
-        try:
-            first_item.setForeground(QtGui.QColor("blue"))
-            for i in range(1, self.model.rowCount()):
-                self.model.item(i, 0).setForeground(QtGui.QColor("black"))
-        except AttributeError:
-            pass
 
     def clear(self):
         """
@@ -220,8 +214,9 @@ class TransactionZone(QtGui.QWidget):
         self.model = QtGui.QStandardItemModel()
         self.list.setModel(self.model)
 
-    def add_transaction(self, price, buyer, seller):
+    def add_transaction(self, price, buyer, seller, color):
         item = MyStandardItem(price)
+        item.setForeground(QtGui.QColor(color))
         self.model.insertRow(0, item)
 
     def clear(self):
@@ -408,16 +403,17 @@ class GuiDecision(QtGui.QDialog):
         """
         sender = offer["MRI_offer_sender"]
         price = offer["MRI_offer_price"]
+        color = "blue" if sender == self._remote.le2mclt.uid else "black"
         if offer["MRI_offer_contract"] == pms.TRIANGLE:
             if offer["MRI_offer_type"] == pms.BUY:
-                self._triangle_purchase_zone.add_offer(sender, price)
+                self._triangle_purchase_zone.add_offer(sender, price, color)
             else:  # purchase
-                self._triangle_sell_zone.add_offer(sender, price)
+                self._triangle_sell_zone.add_offer(sender, price, color)
         else:  # star
             if offer["MRI_offer_type"] == pms.BUY:
-                self._star_purchase_zone.add_offer(sender, price)
+                self._star_purchase_zone.add_offer(sender, price, color)
             else:  # purchase
-                self._star_sell_zone.add_offer(sender, price)
+                self._star_sell_zone.add_offer(sender, price, color)
         
     @defer.inlineCallbacks
     def _remove_offer(self, triangle_or_star, buy_or_sell):
@@ -471,7 +467,7 @@ class GuiDecision(QtGui.QDialog):
                 else:
                     new_offer["MRI_offer_type"] = pms.BUY
                 yield (self._remote.add_transaction(existing_offer, new_offer))
-        except AttributeError: # if no item selected
+        except (AttributeError, KeyError):  # if no item selected
             pass
 
     def add_transaction(self, transaction):
@@ -483,10 +479,16 @@ class GuiDecision(QtGui.QDialog):
         price = transaction["MRI_trans_price"]
         buyer = transaction["MRI_trans_buyer"]
         seller = transaction["MRI_trans_seller"]
-        if transaction["MRI_trans_contract"] == pms.TRIANGLE:
-            self._triangle_transactions.add_transaction(price, buyer, seller)
+        if buyer == self._remote.le2mclt.uid or \
+                        seller == self._remote.le2mclt.uid:
+            color = "blue"
         else:
-            self._star_transactions.add_transaction(price, buyer, seller)
+            color = "black"
+        if transaction["MRI_trans_contract"] == pms.TRIANGLE:
+            self._triangle_transactions.add_transaction(
+                price, buyer, seller, color)
+        else:
+            self._star_transactions.add_transaction(price, buyer, seller, color)
 
     def display_offer_failure(self):
         QtGui.QMessageBox.warning(
