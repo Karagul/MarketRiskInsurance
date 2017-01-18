@@ -93,9 +93,9 @@ class Serveur(object):
                 fg="white", bg="gray")
 
             # random value
-            valeur_aleatoire = randint(1, 100)
+            random_value = randint(1, 100)
             yield (self._le2mserv.gestionnaire_experience.run_func(
-                self._tous, "newperiod", period, valeur_aleatoire))
+                self._tous, "newperiod", period, random_value))
             
             # decision
             yield(self._le2mserv.gestionnaire_experience.run_step(

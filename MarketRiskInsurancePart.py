@@ -44,14 +44,13 @@ class PartieMRI(Partie, pb.Referenceable):
         :return:
         """
         logger.debug(u"{} New Period".format(self.joueur))
-
         self.currentperiod = RepetitionsMRI(period)
-        self.currentperiod.MRI_random_value = random_value
-        self.currentperiod.MRI_group = self.joueur.group
-
         self.le2mserv.gestionnaire_base.ajouter(self.currentperiod)
         self.repetitions.append(self.currentperiod)
-
+        self.currentperiod.MRI_random_value = random_value
+        self.currentperiod.MRI_event = pms.TRIANGLE if random_value < 51 else \
+            pms.STAR
+        self.currentperiod.MRI_group = self.joueur.group
         yield (self.remote.callRemote("newperiod", period))
         logger.info(u"{} Ready for period {}".format(self.joueur, period))
 
@@ -77,7 +76,6 @@ class PartieMRI(Partie, pb.Referenceable):
         :return:
         """
         logger.info(u"{} add_offer {}".format(self.joueur, offer))
-        # todo: check whether the offer is ok
         # create proposition
         new_offer = OffersMRI(offer)
         new_offer_dict = new_offer.todict()
@@ -103,11 +101,37 @@ class PartieMRI(Partie, pb.Referenceable):
             yield (j.get_part(self.nom).remote.callRemote(
                 "remove_offer", offer))
 
+    @defer.inlineCallbacks
     def add_transaction(self, transaction):
+        """
+        Create the transaction and update the balances
+        Called by remote_add_transaction
+        :param transaction:
+        :return:
+        """
         new_transaction = TransactionsMRI(transaction)
         self.currentperiod.MRI_transactions.append(new_transaction)
+        if transaction["MRI_trans_contract"] == pms.TRIANGLE:
+            if transaction["MRI_trans_buyer"] == self.joueur.uid:
+                self.currentperiod.MRI_triangle_number_of_purchase += 1
+                self.currentperiod.MRI_triangle_sum_of_purchase += \
+                    transaction["MRI_trans_price"]
+            else:
+                self.currentperiod.MRI_triangle_number_of_sell += 1
+                self.currentperiod.MRI_triangle_sum_of_sell += \
+                    transaction["MRI_trans_price"]
+        else:  # star
+            if transaction["MRI_trans_buyer"] == self.joueur.uid:
+                self.currentperiod.MRI_star_number_of_purchase += 1
+                self.currentperiod.MRI_star_sum_of_purchase += \
+                    transaction["MRI_trans_price"]
+            else:
+                self.currentperiod.MRI_star_number_of_sell += 1
+                self.currentperiod.MRI_star_sum_of_sell += \
+                    transaction["MRI_trans_price"]
         self.joueur.info(u"Transaction {MRI_trans_contract}, "
                          u"{MRI_trans_price}".format(**transaction))
+        yield (self.update_balance())
 
     @defer.inlineCallbacks
     def remote_add_transaction(self, existing_offer, new_offer):
@@ -127,8 +151,7 @@ class PartieMRI(Partie, pb.Referenceable):
         new_offer_temp = OffersMRI(new_offer)
         self.currentperiod.MRI_offers.append(new_offer_temp)
         self.joueur.info(u"Offer {MRI_offer_contract}, "
-                         u"{MRI_offer_type}, {MRI_offer_price}".format(
-            **new_offer))
+                         u"{MRI_offer_type}, {MRI_offer_price}".format(**new_offer))
 
         # create the transaction
         transaction = dict()
@@ -151,104 +174,25 @@ class PartieMRI(Partie, pb.Referenceable):
             yield (j.get_part(self.nom).remote.callRemote(
                 "add_transaction", transaction))
 
-    def _is_offer_ok(self, offer):
-        """"
-        We check that the offer is compatible with the player's budget
-        in any event.
-        1) check the player doesn't already have made a better offer
-        2) check the player can buy the offer
-        3) check the player's payoff at the end of the period taking into
-        account the two possible events
-        Return a tuple either of size 2 if the result is false
-        (False and the explanation) or of size 1 if the result is true.
-        """
-        logger.debug(u"{}: test of prop: {}".format(self.joueur, offer))
-
-        # proposition's informations
-        contract = offer['MRI_offer_contract']  # triangle or star
-        kind = offer["MRI_offer_type"]  # purchase or sell
-        price = offer["MRI_offer_price"]
-
-        # Checks that the proposition is not less interesting than another one
-        # proposed by the player himself
-        # prop_in_progress = [p for p in self.currentperiod.MRI_propositions if
-        #                     p.MRI_prop_status == pms.IN_PROGRESS and
-        #                     p.MRI_prop_contract == contract and
-        #                     p.MRI_prop_type == kind]
-        #
-        # if kind == pms.BUY:
-        #     best_props = [p for p in prop_in_progress if
-        #                   p.MRI_prop_price > price]
-        # else:
-        #     best_props = [p for p in prop_in_progress if
-        #                   p.MRI_prop_price < price]
-        #
-        # if best_props:
-        #     return (False, u"Vous avez une meilleure proposition en cours.")
-
-
-
-        transactions_balance = self._get_transactions_balance()
-
-        solde_achats_ventes = self._get_solde_achats_ventes()
-        solde_recu_verse_triangle = self._get_solde_recu_verse(pms.TRIANGLE)
-        solde_recu_verse_star = self._get_solde_recu_verse(pms.STAR)
-
-        # check the player has a budget that corresponds to at least CAPITAL_REQUIREMENT of the price, without taking into account the events
-        # if type == pms.ACHAT:
-        #     if self.periodeCourante.revenu + solde_achats_ventes < Decimal(
-        #             str(prix)) * pms.CAPITAL_REQUIREMENT:
-        #         return (
-        #         False, u"Vous n'avez pas le budget nécessaire pour cet achat.")
-        #
-        # # check the player has a budget that corresponds to at leat CAPITAL_REQUIREMENT of the price, if the event if TRIANGLE
-        # elif type == pms.VENTE:
-        #     if contrat == pms.TRIANGLE:
-        #         solde_recu_verse_triangle -= pms.TRIANGLE_VERSEMENT
-        #         if solde_recu_verse_triangle < 0:
-        #             if self.periodeCourante.revenu + solde_achats_ventes < Decimal(
-        #                     str(abs(
-        #                             solde_recu_verse_triangle))) * pms.CAPITAL_REQUIREMENT:
-        #                 return (False,
-        #                         u"Vous n'avez pas le budget nécessaire pour cette vente si l'évènement \"triangle\" se réalise.")
-        #     elif contrat == pms.STAR:
-        #         solde_recu_verse_star -= pms.STAR_VERSEMENT
-        #         if solde_recu_verse_star < 0:
-        #             if self.periodeCourante.revenu + solde_achats_ventes < Decimal(
-        #                     str(abs(
-        #                             solde_recu_verse_star))) * pms.CAPITAL_REQUIREMENT:
-        #                 return (False,
-        #                         u"Vous n'avez pas le budget nécessaire pour cette vente si l'évènement \"étoile\" se réalise.")
-        #
-        # # si tous les tests sont passés
-        # logger.debug(u"Résultat du test: True")
-        # return (True,)
-
-    def _get_event_balance(self, event):
-        # compute the receipts and the expenses for the event
-        # if depends whether the player made transactions or not
-        rec = sum(
-            [t.MRI_trans_price for t in self.currentperiod.MRI_transactions
-             if t.MRI_trans_contract == event and
-             t.MRI_trans_seller == self.joueur.uid])
-        dep = sum(
-            [t.MRI_trans_price for t in self.currentperiod.MRI_transactions
-             if t.MRI_trans_contract == event and
-             t.MRI_trans_buyer == self.joueur.uid])
-        return rec - dep
-
-    def _get_transaction_balance(self):
-        """
-        Return the sum of the player's sells minus the sum of the player's
-        purchases.
-        """
-        purchases = sum([t.MRI_trans_price for t in
-                         self.currentperiod.MRI_transactions if
-                         t.MRI_trans_buyer == self.joueur.uid])
-        sells = sum([t.MRI_trans_price for t in
-                         self.currentperiod.MRI_transactions if
-                         t.MRI_trans_seller == self.joueur.uid])
-        return sells - purchases
+    @defer.inlineCallbacks
+    def update_balance(self):
+        balance = self.currentperiod.MRI_endowment - \
+                self.currentperiod.MRI_triangle_sum_of_purchase + \
+                self.currentperiod.MRI_triangle_sum_of_sell - \
+                self.currentperiod.MRI_star_sum_of_purchase + \
+                self.currentperiod.MRI_star_sum_of_sell
+        balance_if_triangle = balance + \
+                              (self.currentperiod.MRI_triangle_number_of_purchase *
+                              pms.TRIANGLE_PAY) - \
+                              (self.currentperiod.MRI_triangle_number_of_sell *
+                              pms.TRIANGLE_PAY)
+        balance_if_star = balance + \
+                          (self.currentperiod.MRI_star_number_of_purchase *
+                           pms.STAR_PAY) - \
+                          (self.currentperiod.MRI_star_number_of_sell *
+                          pms.STAR_PAY)
+        yield (self.remote.callRemote("update_balance", balance,
+                                      balance_if_triangle, balance_if_star))
 
     def compute_periodpayoff(self):
         """
@@ -322,11 +266,11 @@ class RepetitionsMRI(Base):
     MRI_group = Column(Integer)
     MRI_random_value = Column(Integer)
     MRI_event = Column(Integer)
-    MRI_dotation = Column(Integer)
+    MRI_endowment = Column(Integer)
     MRI_triangle_number_of_purchase = Column(Integer)
     MRI_triangle_number_of_sell = Column(Integer)
     MRI_triangle_sum_of_purchase = Column(Float)
-    MRI_triangle_sum__of_sell = Column(Float)
+    MRI_triangle_sum_of_sell = Column(Float)
     MRI_star_number_of_purchase = Column(Integer)
     MRI_star_number_of_sell = Column(Integer)
     MRI_star_sum_of_purchase = Column(Float)
@@ -335,10 +279,17 @@ class RepetitionsMRI(Base):
     MRI_cumulativepayoff = Column(Float)
 
     def __init__(self, period):
-        self.MRI_treatment = pms.TREATMENT
         self.MRI_period = period
+        self.MRI_treatment = pms.TREATMENT
+        self.MRI_endowment = pms.ENDOWMENT
         self.MRI_triangle_number_of_purchase = 0
-
+        self.MRI_triangle_number_of_sell = 0
+        self.MRI_triangle_sum_of_purchase = 0
+        self.MRI_triangle_sum_of_sell = 0
+        self.MRI_star_number_of_purchase = 0
+        self.MRI_star_number_of_sell = 0
+        self.MRI_star_sum_of_purchase = 0
+        self.MRI_star_sum_of_sell = 0
         self.MRI_periodpayoff = 0
         self.MRI_cumulativepayoff = 0
 

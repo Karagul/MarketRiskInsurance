@@ -56,15 +56,18 @@ class InformationZone(QtGui.QWidget):
 
         self.form = QtGui.QFormLayout()
         self.layout.addLayout(self.form)
-        self.label_solde = QtGui.QLabel(u"...")
+        self.label_balance = QtGui.QLabel(u"...")
+        self.label_balance.setAlignment(QtCore.Qt.AlignRight)
         self.form.addRow(QtGui.QLabel(trans_MRI(u"Your account:")),
-                           self.label_solde)
-        self.label_triangle = QtGui.QLabel(u"...")
+                         self.label_balance)
+        self.label_balance_if_triangle = QtGui.QLabel(u"...")
+        self.label_balance_if_triangle.setAlignment(QtCore.Qt.AlignRight)
         self.form.addRow(QtGui.QLabel(trans_MRI(u"Payoff if triangle:")),
-                           self.label_triangle)
-        self.label_star = QtGui.QLabel(u"...")
+                         self.label_balance_if_triangle)
+        self.label_balance_if_star = QtGui.QLabel(u"...")
+        self.label_balance_if_star.setAlignment(QtCore.Qt.AlignRight)
         self.form.addRow(QtGui.QLabel(trans_MRI(u"Payoff if star:")),
-                           self.label_star)
+                         self.label_balance_if_star)
 
         self.layout.addSpacerItem(QtGui.QSpacerItem(
             20, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding))
@@ -489,6 +492,11 @@ class GuiDecision(QtGui.QDialog):
                 price, buyer, seller, color)
         else:
             self._star_transactions.add_transaction(price, buyer, seller, color)
+
+    def update_balance(self, balance, balance_if_triangle, balance_if_star):
+        self._information.label_balance.setText(str(balance))
+        self._information.label_balance_if_triangle.setText(str(balance_if_triangle))
+        self._information.label_balance_if_star.setText(str(balance_if_star))
 
     def display_offer_failure(self):
         QtGui.QMessageBox.warning(

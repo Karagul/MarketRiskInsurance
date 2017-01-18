@@ -21,6 +21,9 @@ class RemoteMRI(IRemote):
     """
     def __init__(self, le2mclt):
         IRemote.__init__(self, le2mclt)
+        self.balance = 0
+        self.balance_if_triangle = 0
+        self.balance_if_star = 0
 
     def remote_configure(self, params, server_part):
         """
@@ -42,6 +45,7 @@ class RemoteMRI(IRemote):
         logger.info(u"{} Period {}".format(self._le2mclt.uid, period))
         self.currentperiod = period
         if self.currentperiod == 1:
+            self.balance = self.balance_if_triangle = self.balance_if_star = pms.ENDOWMENT
             del self.histo[1:]
 
     def remote_display_decision(self):
@@ -56,6 +60,9 @@ class RemoteMRI(IRemote):
             defered, self._le2mclt.automatique,
             self._le2mclt.screen, self.currentperiod, self.histo, self)
         self._decision_screen.show()
+        self._decision_screen.update_balance(self.balance,
+                                             self.balance_if_triangle,
+                                             self.balance_if_star)
         return defered
 
     @defer.inlineCallbacks
@@ -125,6 +132,9 @@ class RemoteMRI(IRemote):
                               balance_if_star):
         logger.debug(u"Update of balance: {} - {} - {}".format(
             balance, balance_if_triangle, balance_if_star))
+        self.balance = balance
+        self.balance_if_triangle = balance_if_triangle
+        self.balance_if_star = balance_if_star
         self._decision_screen.update_balance(balance, balance_if_triangle,
                                              balance_if_star)
 
