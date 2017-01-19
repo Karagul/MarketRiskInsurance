@@ -23,15 +23,18 @@ DEPRECATED = 3
 # events
 TRIANGLE = 0
 STAR = 1
+# sender_type
+PRICE_TAKER = 0
+PRICE_MAKER = 1
 
 # parameters -------------------------------------------------------------------
 TREATMENT = MARKET_CONTRACT
 MARKET_TIME = time(0, 1, 0)  # hour, minute, second
-ENDOWMENT = 100
-TRIANGLE_PAY = 100  # amount payed by the seller if the event is TRIANGLE
-STAR_PAY = 100  # amount payed by the seller if the event is STAR
+ENDOWMENT = 10
+TRIANGLE_PAY = 1  # amount payed by the seller if the event is TRIANGLE
+STAR_PAY = 1  # amount payed by the seller if the event is STAR
 DECIMALS = 2
-OFFER_MAX = 500
+OFFER_MAX = 100
 BALANCE_THRESHOLD = 0
 
 NOMBRE_PERIODES = 1
@@ -39,6 +42,6 @@ TAILLE_GROUPES = 2
 PERIODE_ESSAI = False
 
 TAUX_CONVERSION = 1
-MONNAIE = u"ecu"
+MONNAIE = u"euro"
 
 
