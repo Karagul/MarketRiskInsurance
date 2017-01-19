@@ -143,21 +143,19 @@ class OfferZone(QtGui.QWidget):
     def _set_current_offer(self, index):
         current_item = self.model.item(index.row(), 0)
         for k, v in self._offers.viewitems():
-            if v == current_item:
-                self.current_offer = {
-                    "MRI_offer_sender": k,
-                    "MRI_offer_type": self._purchase_or_sell,
-                    "MRI_offer_price": v.value()}
+            if v[0] == current_item:
+                self.current_offer = v[1]
+                break
 
-    def add_offer(self, sender, price, color):
+    def add_offer(self, sender, offer, color):
         # remove the current offer
         self.remove_offer(sender)
         # add the new offer
-        item = MyStandardItem(price)
+        item = MyStandardItem(offer["MRI_offer_price"])
         item.setForeground(QtGui.QColor(color))
         self.model.appendRow(item)
         self._sort()
-        self._offers[sender] = item
+        self._offers[sender] = (item, offer)
 
     def remove_offer(self, sender):
         """
@@ -168,7 +166,7 @@ class OfferZone(QtGui.QWidget):
         offer_item = self._offers.pop(sender, None)
         if offer_item is not None:
             for row in range(self.model.rowCount()):
-                if self.model.item(row, 0) == offer_item:
+                if self.model.item(row, 0) == offer_item[0]:
                     self.model.removeRow(row)
                     break
             self._sort()
@@ -187,20 +185,24 @@ class OfferZone(QtGui.QWidget):
         self.model.clear()
         self._offers.clear()
 
-    def exists_offer(self, price):
+    def exists_offer(self, price, sender):
         """
         We check whether there exists an offer with that price.
         If it does return the offer. If it doesn't return False
+        :param sender:
         :param price:
         :return:
         """
+        existing_offers = list()
         for k, v in self._offers.viewitems():
-            if v.value() == price:
-                existing_offer = dict()
-                existing_offer["MRI_offer_sender"] = k
-                existing_offer["MRI_offer_price"] = v.value()
+            if v[1]["MRI_offer_price"] == price and \
+                            v[1]["MRI_offer_sender"] != sender:
+                existing_offer = v[1]
                 logger.debug(u"exists_offer: {}".format(existing_offer))
-                return existing_offer
+                existing_offers.append(existing_offer)
+        if existing_offers:
+            existing_offers.sort(key=lambda x: x["MRI_offer_time"])
+            return existing_offers[0]
         return False
 
 
@@ -376,14 +378,18 @@ class GuiDecision(QtGui.QDialog):
         # we test whether there exists an offer with the same price
         if triangle_or_star == pms.TRIANGLE:
             if buy_or_sell == pms.BUY:
-                existing_offer = self._triangle_sell_zone.exists_offer(price)
+                existing_offer = self._triangle_sell_zone.exists_offer(
+                    price, self._remote.le2mclt.uid)
             else:
-                existing_offer = self._triangle_purchase_zone.exists_offer(price)
+                existing_offer = self._triangle_purchase_zone.exists_offer(
+                    price, self._remote.le2mclt.uid)
         else:
             if buy_or_sell == pms.BUY:
-                existing_offer = self._star_sell_zone.exists_offer(price)
+                existing_offer = self._star_sell_zone.exists_offer(
+                    price, self._remote.le2mclt.uid)
             else:
-                existing_offer = self._star_purchase_zone.exists_offer(price)
+                existing_offer = self._star_purchase_zone.exists_offer(
+                    price, self._remote.le2mclt.uid)
 
         # if the existing is player's own offer we cancel this existing offer
         if existing_offer:
@@ -399,7 +405,8 @@ class GuiDecision(QtGui.QDialog):
         else:
             offer = {"MRI_offer_contract": triangle_or_star,
                      "MRI_offer_type": buy_or_sell,
-                     "MRI_offer_price": price}
+                     "MRI_offer_price": price,
+                     "MRI_offer_sender_type": pms.PRICE_MAKER}
             if self._remote.is_offer_ok(offer):
                 yield (self._remote.add_offer(offer))
             else:
@@ -414,18 +421,17 @@ class GuiDecision(QtGui.QDialog):
         :return:
         """
         sender = offer["MRI_offer_sender"]
-        price = offer["MRI_offer_price"]
         color = "blue" if sender == self._remote.le2mclt.uid else "black"
         if offer["MRI_offer_contract"] == pms.TRIANGLE:
             if offer["MRI_offer_type"] == pms.BUY:
-                self._triangle_purchase_zone.add_offer(sender, price, color)
+                self._triangle_purchase_zone.add_offer(sender, offer, color)
             else:  # purchase
-                self._triangle_sell_zone.add_offer(sender, price, color)
+                self._triangle_sell_zone.add_offer(sender, offer, color)
         else:  # star
             if offer["MRI_offer_type"] == pms.BUY:
-                self._star_purchase_zone.add_offer(sender, price, color)
+                self._star_purchase_zone.add_offer(sender, offer, color)
             else:  # purchase
-                self._star_sell_zone.add_offer(sender, price, color)
+                self._star_sell_zone.add_offer(sender, offer, color)
         
     @defer.inlineCallbacks
     def _remove_offer(self, triangle_or_star, buy_or_sell):
@@ -474,6 +480,7 @@ class GuiDecision(QtGui.QDialog):
                 new_offer["MRI_offer_contract"] = \
                     existing_offer["MRI_offer_contract"]
                 new_offer["MRI_offer_price"] = existing_offer["MRI_offer_price"]
+                new_offer["MRI_offer_sender_type"] = pms.PRICE_TAKER
                 if existing_offer["MRI_offer_type"] == pms.BUY:
                     new_offer["MRI_offer_type"] = pms.SELL
                 else:

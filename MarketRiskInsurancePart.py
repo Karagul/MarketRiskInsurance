@@ -313,6 +313,7 @@ class OffersMRI(Base):
     MRI_offer_contract = Column(Integer)
     MRI_offer_type = Column(Integer)
     MRI_offer_price = Column(Float)
+    MRI_offer_sender_type = Column(Integer)
 
     def __init__(self, offer):
         self.MRI_offer_time = offer["MRI_offer_time"]
@@ -320,6 +321,7 @@ class OffersMRI(Base):
         self.MRI_offer_sender = offer["MRI_offer_sender"]
         self.MRI_offer_type = offer["MRI_offer_type"]
         self.MRI_offer_price = offer["MRI_offer_price"]
+        self.MRI_offer_sender_type = offer["MRI_offer_sender_type"]
 
     def todict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

@@ -138,25 +138,6 @@ class RemoteMRI(IRemote):
         self._decision_screen.update_balance(balance, balance_if_triangle,
                                              balance_if_star)
 
-    def remote_display_summary(self, period_content):
-        """
-        Display the summary screen
-        :param period_content: dictionary with the content of the current period
-        :return: deferred
-        """
-        logger.info(u"{} Summary".format(self._le2mclt.uid))
-        self.histo.append([period_content.get(k) for k in self._histo_vars])
-        if self._le2mclt.simulation:
-            return 1
-        else:
-            defered = defer.Deferred()
-            ecran_recap = GuiRecapitulatif(
-                defered, self._le2mclt.automatique, self._le2mclt.screen,
-                self.currentperiod, self.histo,
-                texts_MRI.get_text_summary(period_content))
-            ecran_recap.show()
-            return defered
-
     def is_offer_ok(self, offer):
         """
         Check whether the subject can make this offer.
@@ -181,3 +162,23 @@ class RemoteMRI(IRemote):
                 if self.balance_if_star - pms.STAR_PAY < pms.BALANCE_THRESHOLD:
                     return False
         return True
+
+    def remote_display_summary(self, period_content):
+        """
+        Display the summary screen
+        :param period_content: dictionary with the content of the current period
+        :return: deferred
+        """
+        logger.info(u"{} Summary".format(self._le2mclt.uid))
+        return 1
+        # self.histo.append([period_content.get(k) for k in self._histo_vars])
+        # if self._le2mclt.simulation:
+        #     return 1
+        # else:
+        #     defered = defer.Deferred()
+        #     ecran_recap = GuiRecapitulatif(
+        #         defered, self._le2mclt.automatique, self._le2mclt.screen,
+        #         self.currentperiod, self.histo,
+        #         texts_MRI.get_text_summary(period_content))
+        #     ecran_recap.show()
+        #     return defered
