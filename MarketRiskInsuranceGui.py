@@ -217,8 +217,13 @@ class TransactionZone(QtGui.QWidget):
         self.model = QtGui.QStandardItemModel()
         self.list.setModel(self.model)
 
-    def add_transaction(self, price, buyer, seller, color):
-        item = MyStandardItem(price)
+    def add_transaction(self, price, buyer_seller, color):
+        if buyer_seller == pms.BUYER:
+            item = MyStandardItem(str(price) + u" (" + trans_MRI(u"purchase") + u")")
+        elif buyer_seller == pms.SELLER:
+            item = MyStandardItem(str(price) + u" (" + trans_MRI(u"sell") + u")")
+        else:
+            item = MyStandardItem(price)
         item.setForeground(QtGui.QColor(color))
         self.model.insertRow(0, item)
 
@@ -395,7 +400,11 @@ class GuiDecision(QtGui.QDialog):
             offer = {"MRI_offer_contract": triangle_or_star,
                      "MRI_offer_type": buy_or_sell,
                      "MRI_offer_price": price}
-            yield (self._remote.add_offer(offer))
+            if self._remote.is_offer_ok(offer):
+                yield (self._remote.add_offer(offer))
+            else:
+                self._display_offer_failure(
+                    trans_MRI(u"You can't make this offer"))
 
     def add_offer(self, offer):
         """
@@ -469,7 +478,12 @@ class GuiDecision(QtGui.QDialog):
                     new_offer["MRI_offer_type"] = pms.SELL
                 else:
                     new_offer["MRI_offer_type"] = pms.BUY
-                yield (self._remote.add_transaction(existing_offer, new_offer))
+                if self._remote.is_offer_ok(new_offer):
+                    yield (self._remote.add_transaction(existing_offer,
+                                                        new_offer))
+                else:
+                    self._display_offer_failure(
+                        trans_MRI(u"You can't accept this offer"))
         except (TypeError, KeyError):  # if no item selected
             pass
 
@@ -482,26 +496,28 @@ class GuiDecision(QtGui.QDialog):
         price = transaction["MRI_trans_price"]
         buyer = transaction["MRI_trans_buyer"]
         seller = transaction["MRI_trans_seller"]
+        buyer_or_seller = None
         if buyer == self._remote.le2mclt.uid or \
-                        seller == self._remote.le2mclt.uid:
+                    seller == self._remote.le2mclt.uid:
             color = "blue"
+            buyer_or_seller = pms.BUYER if buyer == self._remote.le2mclt.uid \
+                else pms.SELLER
         else:
             color = "black"
         if transaction["MRI_trans_contract"] == pms.TRIANGLE:
             self._triangle_transactions.add_transaction(
-                price, buyer, seller, color)
+                price, buyer_or_seller, color)
         else:
-            self._star_transactions.add_transaction(price, buyer, seller, color)
+            self._star_transactions.add_transaction(price, buyer_or_seller,
+                                                    color)
 
     def update_balance(self, balance, balance_if_triangle, balance_if_star):
         self._information.label_balance.setText(str(balance))
         self._information.label_balance_if_triangle.setText(str(balance_if_triangle))
         self._information.label_balance_if_star.setText(str(balance_if_star))
 
-    def display_offer_failure(self):
-        QtGui.QMessageBox.warning(
-            self, trans_MRI(u"Be careful"),
-            trans_MRI(u"You can't do this offer"))
+    def _display_offer_failure(self, message):
+        QtGui.QMessageBox.warning(self, trans_MRI(u"Be careful"), message)
         return
 
     def _play_auto(self):

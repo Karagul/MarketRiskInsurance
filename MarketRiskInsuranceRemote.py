@@ -156,3 +156,28 @@ class RemoteMRI(IRemote):
                 texts_MRI.get_text_summary(period_content))
             ecran_recap.show()
             return defered
+
+    def is_offer_ok(self, offer):
+        """
+        Check whether the subject can make this offer.
+        If this is a purchase we just check he can pay the price.
+        If this is a sell then we check that he can pay in case the event is
+        the one of the contract in this offer (because in that case he has to
+        pay).
+        Called by the decision screen, just after the creation of a new offer,
+        i.e. by add_offer and accept_selected_offer
+        :param offer:
+        :return:
+        """
+        if offer["MRI_offer_type"] == pms.BUY:
+            if self.balance - offer["MRI_offer_price"] < pms.BALANCE_THRESHOLD:
+                return False
+        else:
+            if offer["MRI_offer_contract"] == pms.TRIANGLE:
+                if self.balance_if_triangle - pms.TRIANGLE_PAY < \
+                        pms.BALANCE_THRESHOLD:
+                    return False
+            else:
+                if self.balance_if_star - pms.STAR_PAY < pms.BALANCE_THRESHOLD:
+                    return False
+        return True
