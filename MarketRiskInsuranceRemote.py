@@ -128,6 +128,7 @@ class RemoteMRI(IRemote):
         logger.debug(u"Received a transaction to display: {}".format(transaction))
         self._decision_screen.add_transaction(transaction)
 
+    @defer.inlineCallbacks
     def remote_update_balance(self, balance, balance_if_triangle,
                               balance_if_star):
         logger.debug(u"Update of balance: {} - {} - {}".format(
@@ -135,8 +136,8 @@ class RemoteMRI(IRemote):
         self.balance = balance
         self.balance_if_triangle = balance_if_triangle
         self.balance_if_star = balance_if_star
-        self._decision_screen.update_balance(balance, balance_if_triangle,
-                                             balance_if_star)
+        yield (self._decision_screen.update_balance(balance, balance_if_triangle,
+                                             balance_if_star))
 
     def is_offer_ok(self, offer):
         """

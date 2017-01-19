@@ -205,6 +205,11 @@ class OfferZone(QtGui.QWidget):
             return existing_offers[0]
         return False
 
+    def get_sender_offer(self, sender):
+        try:
+            return self._offers[sender][1]
+        except KeyError:
+            return None
 
 class TransactionZone(QtGui.QWidget):
     def __init__(self):
@@ -221,9 +226,11 @@ class TransactionZone(QtGui.QWidget):
 
     def add_transaction(self, price, buyer_seller, color):
         if buyer_seller == pms.BUYER:
-            item = MyStandardItem(str(price) + u" (" + trans_MRI(u"purchase") + u")")
+            item = MyStandardItem(str(price) + u" (" +
+                                  trans_MRI(u"purchase") + u")")
         elif buyer_seller == pms.SELLER:
-            item = MyStandardItem(str(price) + u" (" + trans_MRI(u"sell") + u")")
+            item = MyStandardItem(str(price) + u" (" +
+                                  trans_MRI(u"sell") + u")")
         else:
             item = MyStandardItem(price)
         item.setForeground(QtGui.QColor(color))
@@ -503,25 +510,41 @@ class GuiDecision(QtGui.QDialog):
         price = transaction["MRI_trans_price"]
         buyer = transaction["MRI_trans_buyer"]
         seller = transaction["MRI_trans_seller"]
-        buyer_or_seller = None
+        implied, buyer_or_seller = False, None
         if buyer == self._remote.le2mclt.uid or \
                     seller == self._remote.le2mclt.uid:
-            color = "blue"
+            implied = True
             buyer_or_seller = pms.BUYER if buyer == self._remote.le2mclt.uid \
                 else pms.SELLER
-        else:
-            color = "black"
+        color = "blue" if implied else "black"
         if transaction["MRI_trans_contract"] == pms.TRIANGLE:
-            self._triangle_transactions.add_transaction(
-                price, buyer_or_seller, color)
+            self._triangle_transactions.add_transaction(price, buyer_or_seller,
+                                                        color)
         else:
             self._star_transactions.add_transaction(price, buyer_or_seller,
                                                     color)
 
+    @defer.inlineCallbacks
     def update_balance(self, balance, balance_if_triangle, balance_if_star):
+        """
+        Display the new balances and test each player's offers in the list.
+        If an offer is no more possible then removes it
+        :param balance:
+        :param balance_if_triangle:
+        :param balance_if_star:
+        :return:
+        """
         self._information.label_balance.setText(str(balance))
-        self._information.label_balance_if_triangle.setText(str(balance_if_triangle))
+        self._information.label_balance_if_triangle.setText(
+            str(balance_if_triangle))
         self._information.label_balance_if_star.setText(str(balance_if_star))
+
+        # todo: test the existing the player's existing offers
+        triangle_purchase_sender_offer = \
+            self._triangle_purchase_zone.get_sender_offer(self._remote.le2mclt.uid)
+        if triangle_purchase_sender_offer:
+            if not self._remote.is_offer_ok(triangle_purchase_sender_offer):
+                yield (self._remove_offer(pms.TRIANGLE, pms.BUY))
 
     def _display_offer_failure(self, message):
         QtGui.QMessageBox.warning(self, trans_MRI(u"Be careful"), message)
