@@ -31,6 +31,7 @@ PRICE_MAKER = 1
 TREATMENT = MARKET_CONTRACT
 MARKET_TIME = time(0, 1, 0)  # hour, minute, second
 ENDOWMENT = 10
+PROB_TRIANGLE = 50  # An integer between 1 and 100
 TRIANGLE_PAY = 1  # amount payed by the seller if the event is TRIANGLE
 STAR_PAY = 1  # amount payed by the seller if the event is STAR
 DECIMALS = 2
