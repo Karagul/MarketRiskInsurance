@@ -6,9 +6,8 @@ from time import strftime, localtime
 from twisted.internet import defer
 from twisted.spread import pb
 from client.cltremote import IRemote
-from client.cltgui.cltguidialogs import GuiRecapitulatif
 import MarketRiskInsuranceParams as pms
-from MarketRiskInsuranceGui import GuiDecision
+from MarketRiskInsuranceGui import GuiDecision, GuiRecapitulatif
 import MarketRiskInsuranceTexts as texts_MRI
 
 

@@ -8,11 +8,15 @@ import logging
 from PyQt4 import QtGui, QtCore
 from twisted.internet import defer
 from random import random, randint, choice
+from util.utili18n import le2mtrans
 import MarketRiskInsuranceParams as pms
 from MarketRiskInsuranceTexts import trans_MRI
 import MarketRiskInsuranceTexts as texts_MRI
 from client.cltgui.cltguidialogs import GuiHistorique
-from client.cltgui.cltguiwidgets import WPeriod, WExplication, WCompterebours
+from client.cltgui.cltguiwidgets import WPeriod, WExplication, WCompterebours, \
+    WTableview
+from client.cltgui.cltguitablemodels import TableModelHistorique
+
 
 
 logger = logging.getLogger("le2m")
@@ -672,6 +676,91 @@ class DConfigure(QtGui.QDialog):
         pms.NOMBRE_PERIODES = self._spin_periods.value()
         pms.TAILLE_GROUPES = self._spin_groups.value()
         self.accept()
+
+
+class GuiRecapitulatif(QtGui.QDialog):
+    """
+    Dialog for the summary, for repeated game or one-shot.
+    If ecran_historique is set it replaces the default GuiHistorique
+    """
+
+    def __init__(self, defered, automatique, parent, periode, historique,
+                 texte_recap, ecran_historique=None, size_histo=(500, 90)):
+        """
+
+        :param defered:
+        :param automatique:
+        :param parent:
+        :param periode:
+        :param historique:
+        :param texte_recap:
+        :param ecran_historique:
+        :param size_histo: the size of the history table. The width of the
+        explanation area will be the same than the width of the history table
+        :return:
+        """
+        super(GuiRecapitulatif, self).__init__(parent)
+
+        self._defered = defered
+        self._automatique = automatique
+
+        layout = QtGui.QVBoxLayout(self)
+
+        # the history screen. Displayed when the subject clicks on the
+        # corresponding button in widperiod below
+        self.ecran_historique = \
+            ecran_historique or GuiHistorique(self, historique,
+                                              size=(size_histo[0], 500))
+        if periode:
+            self.widperiod = WPeriod(
+                period=periode, ecran_historique=self.ecran_historique,
+                parent=self)
+            layout.addWidget(self.widperiod)
+
+        self.widexplication = WExplication(text=texte_recap, parent=self,
+                                           size=(size_histo[0], 80))
+        layout.addWidget(self.widexplication)
+
+        # in this screen we only keep the header and the last line of the
+        # history
+        histo_recap = [historique[0], historique[-1]]
+        self.tablemodel = TableModelHistorique(histo_recap)
+        self.widtableview = WTableview(parent=self, tablemodel=self.tablemodel,
+                                       size=size_histo)
+        self.widtableview.ui.tableView.verticalHeader().setResizeMode(
+            QtGui.QHeaderView.Stretch)
+        layout.addWidget(self.widtableview)
+
+        buttons = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok)
+        buttons.accepted.connect(self._accept)
+        layout.addWidget(buttons)
+
+        # automatique
+        if self._automatique:
+            self._timer_automatique = QtCore.QTimer()
+            self._timer_automatique.timeout.connect(
+                buttons.button(QtGui.QDialogButtonBox.Ok).click)
+            self._timer_automatique.start(7000)
+
+        # taille et titre
+        self.setWindowTitle(le2mtrans(u"Summary"))
+        self.adjustSize()
+        self.setFixedSize(self.size())
+
+    def _accept(self):
+        """
+        :return:
+        """
+        try:
+            self._timer_automatique.stop()
+        except AttributeError:
+            pass
+        logger.info(u"callback: Ok summary")
+        self._defered.callback(1)
+        self.accept()
+
+    def reject(self):
+        pass
 
 
 if __name__ == "__main__":
