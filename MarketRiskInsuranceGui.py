@@ -7,7 +7,7 @@ import sys
 import logging
 from PyQt4 import QtGui, QtCore
 from twisted.internet import defer
-from random import randint, choice
+from random import random, randint, choice
 import MarketRiskInsuranceParams as pms
 from MarketRiskInsuranceTexts import trans_MRI
 import MarketRiskInsuranceTexts as texts_MRI
@@ -211,6 +211,14 @@ class OfferZone(QtGui.QWidget):
         except KeyError:
             return None
 
+    def select_an_item(self):
+        if self._offers:
+            random_item = choice([v[0] for v in self._offers.viewvalues()])
+            index = self.model.indexFromItem(random_item)
+            self.list.setCurrentIndex(index)
+            self._set_current_offer(index)
+
+
 class TransactionZone(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
@@ -311,7 +319,7 @@ class GuiDecision(QtGui.QDialog):
         if self._automatique:
             self._timer_automatique = QtCore.QTimer()
             self._timer_automatique.timeout.connect(self._play_auto)
-            self._timer_automatique.start(7000)
+            self._timer_automatique.start(randint(2000, 7000))
                 
     def _make_connections(self):
         """
@@ -417,8 +425,9 @@ class GuiDecision(QtGui.QDialog):
             if self._remote.is_offer_ok(offer):
                 yield (self._remote.add_offer(offer))
             else:
-                self._display_offer_failure(
-                    trans_MRI(u"You can't make this offer"))
+                if not self._automatique:
+                    self._display_offer_failure(
+                        trans_MRI(u"You can't make this offer"))
 
     def add_offer(self, offer):
         """
@@ -570,9 +579,29 @@ class GuiDecision(QtGui.QDialog):
         :return:
         """
         # make an offer
+        def make_offer(the_list):
+            random_offer = float("{:.2f}".format(random() + randint(0, 1)))
+            the_list.spin_offer.setValue(random_offer)
+            the_list.pushbutton_send.click()
+
+        def accept_offer(the_list):
+            the_list.select_an_item()
+            the_list.pushbutton_accept.click()
+
         triangle_or_star = choice([pms.TRIANGLE, pms.STAR])
         buy_or_sell = choice([pms.BUY, pms.SELL])
-        value = randint(0, pms.OFFER_MAX)
+        selected_function = choice([make_offer, accept_offer])
+
+        if triangle_or_star == pms.TRIANGLE:
+            if buy_or_sell == pms.BUY:
+                selected_function(self._triangle_purchase_zone)
+            else:
+                selected_function(self._triangle_sell_zone)
+        else:
+            if buy_or_sell == pms.BUY:
+                selected_function(self._star_purchase_zone)
+            else:
+                selected_function(self._star_sell_zone)
 
 
 class DConfigure(QtGui.QDialog):
@@ -656,6 +685,5 @@ if __name__ == "__main__":
         remote=None
     )
     my_screen.show()
-    my_item = MyStandardItem(25.5)
-    my_screen.triangle_purchase_zone.model.appendRow(my_item)
+    my_screen.add_offer({"MRI_offer_sender": "me", "MRI_offer_price": 25.5})
     sys.exit(app.exec_())
