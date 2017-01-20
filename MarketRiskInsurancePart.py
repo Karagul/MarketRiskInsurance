@@ -64,7 +64,7 @@ class PartieMRI(Partie, pb.Referenceable):
         """
         logger.debug(u"{} Decision".format(self.joueur))
         yield(self.remote.callRemote("display_decision"))
-        self.joueur.info(u"Ok")
+        self.joueur.info(u"Market closed")
         self.joueur.remove_waitmode()
 
     @defer.inlineCallbacks
@@ -333,7 +333,7 @@ class RepetitionsMRI(Base):
 
 
 class OffersMRI(Base):
-    __tablename__ = 'partie_MarketRiskInsurance_repetitions_propositions'
+    __tablename__ = 'partie_MarketRiskInsurance_repetitions_offers'
     id = Column(Integer, primary_key=True, autoincrement=True)
     repetitions_id = Column(
         Integer, ForeignKey("partie_MarketRiskInsurance_repetitions.id"))
