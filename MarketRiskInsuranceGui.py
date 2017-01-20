@@ -539,12 +539,26 @@ class GuiDecision(QtGui.QDialog):
             str(balance_if_triangle))
         self._information.label_balance_if_star.setText(str(balance_if_star))
 
-        # todo: test the existing the player's existing offers
         triangle_purchase_sender_offer = \
             self._triangle_purchase_zone.get_sender_offer(self._remote.le2mclt.uid)
         if triangle_purchase_sender_offer:
             if not self._remote.is_offer_ok(triangle_purchase_sender_offer):
                 yield (self._remove_offer(pms.TRIANGLE, pms.BUY))
+        triangle_sell_sender_offer = \
+            self._triangle_sell_zone.get_sender_offer(self._remote.le2mclt.uid)
+        if triangle_sell_sender_offer:
+            if not self._remote.is_offer_ok(triangle_sell_sender_offer):
+                yield (self._remove_offer(pms.TRIANGLE, pms.SELL))
+        star_purchase_sender_offer = \
+            self._star_purchase_zone.get_sender_offer(self._remote.le2mclt.uid)
+        if star_purchase_sender_offer:
+            if not self._remote.is_offer_ok(star_purchase_sender_offer):
+                yield (self._remove_offer(pms.STAR, pms.BUY))
+        star_sell_sender_offer = \
+            self._star_sell_zone.get_sender_offer(self._remote.le2mclt.uid)
+        if star_sell_sender_offer:
+            if not self._remote.is_offer_ok(star_sell_sender_offer):
+                yield (self._remove_offer(pms.STAR, pms.SELL))
 
     def _display_offer_failure(self, message):
         QtGui.QMessageBox.warning(self, trans_MRI(u"Be careful"), message)

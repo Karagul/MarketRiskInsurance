@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import division
 import logging
-from datetime import datetime
 from twisted.internet import defer
 from twisted.spread import pb
 from sqlalchemy.orm import relationship
@@ -48,7 +48,8 @@ class PartieMRI(Partie, pb.Referenceable):
         self.le2mserv.gestionnaire_base.ajouter(self.currentperiod)
         self.repetitions.append(self.currentperiod)
         self.currentperiod.MRI_random_value = random_value
-        self.currentperiod.MRI_event = pms.TRIANGLE if random_value < 51 else \
+        self.currentperiod.MRI_event = pms.TRIANGLE if \
+            random_value < (pms.PROB_TRIANGLE + 1) else \
             pms.STAR
         self.currentperiod.MRI_group = self.joueur.group
         yield (self.remote.callRemote("newperiod", period))
@@ -199,7 +200,37 @@ class PartieMRI(Partie, pb.Referenceable):
         :return:
         """
         logger.debug(u"{} Period Payoff".format(self.joueur))
-        self.currentperiod.MRI_periodpayoff = 0
+        self.currentperiod.MRI_periodpayoff = self.currentperiod.MRI_endowment
+
+        # transactions
+        self.currentperiod.MRI_periodpayoff += \
+            self.currentperiod.MRI_triangle_sum_of_sell + \
+            self.currentperiod.MRI_star_sum_of_sell - \
+            self.currentperiod.MRI_triangle_sum_of_purchase - \
+            self.currentperiod.MRI_star_sum_of_purchase
+
+        # balance of event
+        if self.currentperiod.MRI_event == pms.TRIANGLE:
+            self.currentperiod.MRI_event_balance = \
+                (self.currentperiod.MRI_triangle_number_of_purchase -
+                self.currentperiod.MRI_triangle_number_of_sell) * pms.TRIANGLE_PAY
+        else:
+            self.currentperiod.MRI_event_balance = \
+                (self.currentperiod.MRI_star_number_of_purchase -
+                self.currentperiod.MRI_star_number_of_sell) * pms.STAR_PAY
+        self.currentperiod.MRI_periodpayoff += \
+            self.currentperiod.MRI_event_balance
+
+        # price activity indicator
+        nb_offers = len(self.currentperiod.MRI_offers)
+        nb_price_maker = len([o for o in self.currentperiod.MRI_offers if
+                              o.MRI_offer_sender_type == pms.PRICE_MAKER])
+        try:
+            self.currentperiod.MRI_price_active = nb_price_maker / nb_offers
+        except ZeroDivisionError:
+            self.currentperiod.MRI_price_active = None
+        logger.debug(u"{}: price activity {}".format(
+            self.joueur, self.currentperiod.MRI_price_active))
 
         # cumulative payoff since the first period
         if self.currentperiod.MRI_period < 2:
@@ -274,6 +305,8 @@ class RepetitionsMRI(Base):
     MRI_star_number_of_sell = Column(Integer)
     MRI_star_sum_of_purchase = Column(Float)
     MRI_star_sum_of_sell = Column(Float)
+    MRI_event_balance = Column(Float)
+    MRI_price_active = Column(Float)
     MRI_periodpayoff = Column(Float)
     MRI_cumulativepayoff = Column(Float)
 

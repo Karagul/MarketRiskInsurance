@@ -24,6 +24,8 @@ class RemoteMRI(IRemote):
         self.balance = 0
         self.balance_if_triangle = 0
         self.balance_if_star = 0
+        self.histo.append(texts_MRI.get_histo_head())
+        self.histo_vars = texts_MRI.get_histo_vars()
 
     def remote_configure(self, params, server_part):
         """
@@ -45,7 +47,8 @@ class RemoteMRI(IRemote):
         logger.info(u"{} Period {}".format(self._le2mclt.uid, period))
         self.currentperiod = period
         if self.currentperiod == 1:
-            self.balance = self.balance_if_triangle = self.balance_if_star = pms.ENDOWMENT
+            self.balance = self.balance_if_triangle = \
+                self.balance_if_star = pms.ENDOWMENT
             del self.histo[1:]
 
     def remote_display_decision(self):
@@ -131,13 +134,21 @@ class RemoteMRI(IRemote):
     @defer.inlineCallbacks
     def remote_update_balance(self, balance, balance_if_triangle,
                               balance_if_star):
+        """
+        Update the information zone and also remove the offers in the player's
+        lists that are no more possible
+        :param balance:
+        :param balance_if_triangle:
+        :param balance_if_star:
+        :return:
+        """
         logger.debug(u"Update of balance: {} - {} - {}".format(
             balance, balance_if_triangle, balance_if_star))
         self.balance = balance
         self.balance_if_triangle = balance_if_triangle
         self.balance_if_star = balance_if_star
-        yield (self._decision_screen.update_balance(balance, balance_if_triangle,
-                                             balance_if_star))
+        yield (self._decision_screen.update_balance(
+            balance, balance_if_triangle, balance_if_star))
 
     def is_offer_ok(self, offer):
         """
@@ -171,15 +182,18 @@ class RemoteMRI(IRemote):
         :return: deferred
         """
         logger.info(u"{} Summary".format(self._le2mclt.uid))
-        return 1
-        # self.histo.append([period_content.get(k) for k in self._histo_vars])
-        # if self._le2mclt.simulation:
-        #     return 1
-        # else:
-        #     defered = defer.Deferred()
-        #     ecran_recap = GuiRecapitulatif(
-        #         defered, self._le2mclt.automatique, self._le2mclt.screen,
-        #         self.currentperiod, self.histo,
-        #         texts_MRI.get_text_summary(period_content))
-        #     ecran_recap.show()
-        #     return defered
+        self.histo.append([period_content.get(k) for k in self.histo_vars])
+        # replace event code by text
+        self.histo[-1][10] = texts_MRI.get_event_str(self.histo[-1][10])
+        logger.debug(u"Ligne histo: {}".format(self.histo[-1]))
+        if self._le2mclt.simulation:
+            return 1
+        else:
+            defered = defer.Deferred()
+            ecran_recap = GuiRecapitulatif(
+                defered, self._le2mclt.automatique, self._le2mclt.screen,
+                self.currentperiod, self.histo,
+                texts_MRI.get_text_summary(period_content),
+                size_histo=(1200, 100))
+            ecran_recap.show()
+            return defered
