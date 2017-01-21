@@ -104,7 +104,31 @@ class Serveur(object):
             # period payoffs
             self._le2mserv.gestionnaire_experience.compute_periodpayoffs(
                 "MarketRiskInsurance")
-        
+
+            # for each group we collect all the transaction made during
+            # the period
+            self._le2mserv.gestionnaire_graphique.infoserv(u"Transactions")
+            keys = ["MRI_trans_time", "MRI_trans_contract", "MRI_trans_buyer",
+                    "MRI_trans_seller", "MRI_trans_price"]
+            for g, m in self._le2mserv.gestionnaire_groupes.get_groupes(
+                    "MarketRiskInsurance").viewitems():
+                transactions_list = list()
+                for j in m:
+                    transactions_list.extend(j.get_transactions())
+                transactions_set = list()
+                for t in transactions_list:
+                    if t not in transactions_set:
+                        transactions_set.append(dict(zip(keys, t)))
+                self._le2mserv.gestionnaire_graphique.infoserv(
+                    u"G{}".format(g.split("_")[2]))
+                self._le2mserv.gestionnaire_graphique.infoserv(
+                    [u"{MRI_trans_time}: {MRI_trans_contract}, "
+                     u"{MRI_trans_price}, {MRI_trans_buyer}, "
+                     u"{MRI_trans_seller}".format(**t) for t in
+                     transactions_set])
+                for j in m:
+                    setattr(j, "_transactions_group", transactions_set)
+
             # summary
             yield(self._le2mserv.gestionnaire_experience.run_step(
                 le2mtrans(u"Summary"), self._tous, "display_summary"))

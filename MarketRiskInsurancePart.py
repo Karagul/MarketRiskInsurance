@@ -250,7 +250,7 @@ class PartieMRI(Partie, pb.Referenceable):
             self.currentperiod.MRI_periodpayoff))
 
     @defer.inlineCallbacks
-    def display_summary(self, *args):
+    def display_summary(self):
         """
         Send a dictionary with the period content values to the remote.
         The remote creates the text and the history
@@ -259,7 +259,8 @@ class PartieMRI(Partie, pb.Referenceable):
         """
         logger.debug(u"{} Summary".format(self.joueur))
         yield(self.remote.callRemote(
-            "display_summary", self.currentperiod.todict()))
+            "display_summary", self.currentperiod.todict(),
+            self._transactions_group))
         self.joueur.info("Ok")
         self.joueur.remove_waitmode()
 
@@ -280,6 +281,9 @@ class PartieMRI(Partie, pb.Referenceable):
 
         logger.info(u'{} Payoff ecus {} Payoff euros {:.2f}'.format(
             self.joueur, self.MRI_gain_ecus, self.MRI_gain_euros))
+
+    def get_transactions(self):
+        return [t.to_list() for t in self.currentperiod.MRI_transactions]
 
 
 class RepetitionsMRI(Base):
@@ -380,3 +384,8 @@ class TransactionsMRI(Base):
 
     def todict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def to_list(self):
+        return [self.MRI_trans_time, self.MRI_trans_contract,
+                self.MRI_trans_buyer, self.MRI_trans_seller,
+                self.MRI_trans_price]

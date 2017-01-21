@@ -174,7 +174,7 @@ class RemoteMRI(IRemote):
                     return False
         return True
 
-    def remote_display_summary(self, period_content):
+    def remote_display_summary(self, period_content, transactions_group):
         """
         Display the summary screen
         :param period_content: dictionary with the content of the current period
