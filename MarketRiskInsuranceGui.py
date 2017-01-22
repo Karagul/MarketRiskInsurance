@@ -684,17 +684,18 @@ class GuiRecapitulatif(QtGui.QDialog):
     If ecran_historique is set it replaces the default GuiHistorique
     """
 
-    def __init__(self, defered, automatique, parent, periode, historique,
-                 texte_recap, ecran_historique=None, size_histo=(500, 90)):
+    def __init__(self, defered, automatique, parent, period, historique,
+                 summary_text, transactions_group,
+                 size_histo=(500, 90)):
         """
 
         :param defered:
         :param automatique:
         :param parent:
-        :param periode:
+        :param period:
         :param historique:
-        :param texte_recap:
-        :param ecran_historique:
+        :param summary_text:
+        :param history_screen:
         :param size_histo: the size of the history table. The width of the
         explanation area will be the same than the width of the history table
         :return:
@@ -708,16 +709,15 @@ class GuiRecapitulatif(QtGui.QDialog):
 
         # the history screen. Displayed when the subject clicks on the
         # corresponding button in widperiod below
-        self.ecran_historique = \
-            ecran_historique or GuiHistorique(self, historique,
-                                              size=(size_histo[0], 500))
-        if periode:
+        self.ecran_historique = GuiHistorique(self, historique,
+                                            size=(size_histo[0], 500))
+        if period:
             self.widperiod = WPeriod(
-                period=periode, ecran_historique=self.ecran_historique,
+                period=period, ecran_historique=self.ecran_historique,
                 parent=self)
             layout.addWidget(self.widperiod)
 
-        self.widexplication = WExplication(text=texte_recap, parent=self,
+        self.widexplication = WExplication(text=summary_text, parent=self,
                                            size=(size_histo[0], 80))
         layout.addWidget(self.widexplication)
 

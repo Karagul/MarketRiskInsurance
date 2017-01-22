@@ -193,6 +193,7 @@ class RemoteMRI(IRemote):
                 defered, self._le2mclt.automatique, self._le2mclt.screen,
                 self.currentperiod, self.histo,
                 texts_MRI.get_text_summary(period_content),
+                transactions_group,
                 size_histo=(1200, 100))
             ecran_recap.show()
             return defered
