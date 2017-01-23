@@ -16,7 +16,8 @@ from client.cltgui.cltguidialogs import GuiHistorique
 from client.cltgui.cltguiwidgets import WPeriod, WExplication, WCompterebours, \
     WTableview
 from client.cltgui.cltguitablemodels import TableModelHistorique
-
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 
 logger = logging.getLogger("le2m")
@@ -250,6 +251,26 @@ class TransactionZone(QtGui.QWidget):
 
     def clear(self):
         self.model.clear()
+
+
+class GraphicalZone(QtGui.QWidget):
+    def __init__(self, transactions, title):
+        QtGui.QWidget.__init__(self)
+
+        layout = QtGui.QVBoxLayout()
+        self.setLayout(layout)
+
+        figure, graph = plt.subplots(figsize=(10, 6))
+        canvas = FigureCanvas(figure)
+        layout.addWidget(canvas)
+
+        graph.plot(range(len(transactions)), [t[1] for t in transactions], "*b")
+        graph.set_xlabel(trans_MRI(u"Time"))
+        graph.set_ylabel(trans_MRI(u"Prices"))
+        graph.set_xticklabels([t[0] for t in transactions])
+        graph.set_title(title)
+
+        self.setFixedWidth(350)
 
 
 class GuiDecision(QtGui.QDialog):
@@ -685,7 +706,7 @@ class GuiRecapitulatif(QtGui.QDialog):
     """
 
     def __init__(self, defered, automatique, parent, period, historique,
-                 summary_text, transactions_group,
+                 summary_text, triangle_transactions, star_transactions,
                  size_histo=(500, 90)):
         """
 
@@ -720,6 +741,11 @@ class GuiRecapitulatif(QtGui.QDialog):
         self.widexplication = WExplication(text=summary_text, parent=self,
                                            size=(size_histo[0], 120))
         layout.addWidget(self.widexplication)
+
+        # We give the list of transactions
+        self._triangle_transactions_graph = GraphicalZone(
+            triangle_transactions, trans_MRI(u"Triangle"))
+        layout.addWidget(self._triangle_transactions_graph)
 
         # in this screen we only keep the header and the last line of the
         # history
