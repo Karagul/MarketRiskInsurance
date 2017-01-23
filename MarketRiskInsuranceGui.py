@@ -718,7 +718,7 @@ class GuiRecapitulatif(QtGui.QDialog):
             layout.addWidget(self.widperiod)
 
         self.widexplication = WExplication(text=summary_text, parent=self,
-                                           size=(size_histo[0], 80))
+                                           size=(size_histo[0], 120))
         layout.addWidget(self.widexplication)
 
         # in this screen we only keep the header and the last line of the
