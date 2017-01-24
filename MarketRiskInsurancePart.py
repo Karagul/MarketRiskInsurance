@@ -77,7 +77,7 @@ class PartieMRI(Partie, pb.Referenceable):
         :return:
         """
         logger.info(u"{} add_offer {}".format(self.joueur, offer))
-        # create proposition
+        # create offer
         new_offer = OffersMRI(offer)
         new_offer_dict = new_offer.todict()
         logger.debug(u"Offer created: {}".format(new_offer.todict()))
@@ -226,7 +226,8 @@ class PartieMRI(Partie, pb.Referenceable):
         nb_price_maker = len([o for o in self.currentperiod.MRI_offers if
                               o.MRI_offer_sender_type == pms.PRICE_MAKER])
         try:
-            self.currentperiod.MRI_price_active = nb_price_maker / nb_offers
+            self.currentperiod.MRI_price_active = float("{:.4f}".format(
+                nb_price_maker / nb_offers))
         except ZeroDivisionError:
             self.currentperiod.MRI_price_active = None
         logger.debug(u"{}: price activity {}".format(
