@@ -286,6 +286,7 @@ class PartieMRI(Partie, pb.Referenceable):
     def get_transactions(self):
         return [t.todict() for t in self.currentperiod.MRI_transactions]
 
+
 class RepetitionsMRI(Base):
     __tablename__ = 'partie_MarketRiskInsurance_repetitions'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -330,7 +331,8 @@ class RepetitionsMRI(Base):
         self.MRI_cumulativepayoff = 0
 
     def todict(self, joueur=None):
-        temp = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        temp = {c.name: getattr(self, c.name) for c in self.__table__.columns
+                if "MRI" in c.name}
         if joueur:
             temp["joueur"] = joueur
         return temp
@@ -360,7 +362,8 @@ class OffersMRI(Base):
         self.MRI_offer_sender_type = offer["MRI_offer_sender_type"]
 
     def todict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns
+                if "MRI" in c.name}
 
 
 class TransactionsMRI(Base):
