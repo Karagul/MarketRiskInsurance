@@ -746,7 +746,7 @@ class GuiRecapitulatif(QtGui.QDialog):
 
         # explanation zone -----------------------------------------------------
         self.widexplication = WExplication(text=summary_text, parent=self,
-                                           size=(size_histo[0], 120))
+                                           size=(size_histo[0], 110))
         layout.addWidget(self.widexplication)
 
         # transactions ---------------------------------------------------------
