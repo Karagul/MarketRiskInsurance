@@ -287,7 +287,7 @@ class GuiDecision(QtGui.QDialog):
         # variables
         self._defered = defered
         self._automatique = automatique
-        self._historique = GuiHistorique(self, historique)
+        self._historique = GuiHistorique(self, historique, size=(500, 500))
         self._remote = remote
 
         layout = QtGui.QVBoxLayout(self)
