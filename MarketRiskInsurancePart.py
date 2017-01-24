@@ -283,8 +283,7 @@ class PartieMRI(Partie, pb.Referenceable):
             self.joueur, self.MRI_gain_ecus, self.MRI_gain_euros))
 
     def get_transactions(self):
-        return [t.to_list() for t in self.currentperiod.MRI_transactions]
-
+        return [t.todict() for t in self.currentperiod.MRI_transactions]
 
 class RepetitionsMRI(Base):
     __tablename__ = 'partie_MarketRiskInsurance_repetitions'
@@ -383,9 +382,6 @@ class TransactionsMRI(Base):
         self.MRI_trans_price = transaction["MRI_trans_price"]
 
     def todict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns
+                if "MRI" in c.name}
 
-    def to_list(self):
-        return [self.MRI_trans_time, self.MRI_trans_contract,
-                self.MRI_trans_buyer, self.MRI_trans_seller,
-                self.MRI_trans_price]

@@ -178,34 +178,20 @@ class RemoteMRI(IRemote):
         """
         Display the summary screen
         :param period_content: dictionary with the content of the current period
+        :param transactions_group
         :return: deferred
         """
-        logger.info(u"{} Summary".format(self._le2mclt.uid))
-
-        def get_sorted_list(transactions):
-            """
-            Creates a list of tuples and then sorts it chronologically
-            :param transactions:
-            :return:
-            """
-            the_list = [(t["MRI_trans_time"], t["MRI_trans_price"]) for t
-                        in transactions]
-            the_list.sort(key=lambda x: x[0])
-            return the_list
+        logger.info(u"{} Summary - transactions_group: {}".format(
+            self._le2mclt.uid, transactions_group))
 
         # transactions
         triangle_transactions = [t for t in transactions_group if
                                  t["MRI_trans_contract"] == pms.TRIANGLE]
+        logger.debug(u"triangle_transactions: {}".format(triangle_transactions))
         star_transactions = [t for t in transactions_group if
                              t["MRI_trans_contract"] == pms.STAR]
-        triangle_transactions_prices_chrono = get_sorted_list(triangle_transactions)
-        logger.debug(u"Triangle_prices_chrono: {}".format(
-            triangle_transactions_prices_chrono))
-        star_transactions_price_chrono = get_sorted_list(star_transactions)
-        logger.debug(u"Star_prices_chrono: {}".format(
-            star_transactions_price_chrono))
 
-        # historic
+        # history
         self.histo.append([period_content.get(k) for k in self.histo_vars])
         # replace event code by text
         self.histo[-1][10] = texts_MRI.get_event_str(self.histo[-1][10])
@@ -220,8 +206,7 @@ class RemoteMRI(IRemote):
                 defered, self._le2mclt.automatique, self._le2mclt.screen,
                 self.currentperiod, self.histo,
                 texts_MRI.get_text_summary(period_content),
-                triangle_transactions_prices_chrono,
-                star_transactions_price_chrono,
+                triangle_transactions, star_transactions,
                 size_histo=(1200, 100))
             ecran_recap.show()
             return defered

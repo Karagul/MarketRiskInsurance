@@ -112,13 +112,20 @@ class Serveur(object):
                     "MRI_trans_seller", "MRI_trans_price"]
             for g, m in self._le2mserv.gestionnaire_groupes.get_groupes(
                     "MarketRiskInsurance").viewitems():
+                # a list with all the transactions in the group
                 transactions_list = list()
                 for j in m:
                     transactions_list.extend(j.get_transactions())
-                transactions_set = list()
-                for t in transactions_list:
-                    if t not in transactions_set:
-                        transactions_set.append(dict(zip(keys, t)))
+                logger.debug(u"transactions_list: {}".format(transactions_list))
+
+                # we eliminate the duplicates
+                transactions_set = [dict(t) for t in
+                                    set([tuple(sorted(d.viewitems())) for d in
+                                         transactions_list])]
+                transactions_set.sort(key=lambda x: x["MRI_trans_time"])
+                logger.debug(u"transactions_set: {}".format(transactions_set))
+
+                # display on the server list
                 self._le2mserv.gestionnaire_graphique.infoserv(
                     u"G{}".format(g.split("_")[2]))
                 self._le2mserv.gestionnaire_graphique.infoserv(
@@ -126,6 +133,8 @@ class Serveur(object):
                      u"{MRI_trans_price}, {MRI_trans_buyer}, "
                      u"{MRI_trans_seller}".format(**t) for t in
                      transactions_set])
+
+                # set the list of transactions in each player
                 for j in m:
                     setattr(j, "_transactions_group", transactions_set)
 

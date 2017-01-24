@@ -79,7 +79,7 @@ class InformationZone(QtGui.QWidget):
 
 
 class OfferZone(QtGui.QWidget):
-    def __init__(self, purchase_or_sell):
+    def __init__(self, purchase_or_sell, zone_size=(400, 300)):
         QtGui.QWidget.__init__(self)
 
         self.current_offer = None
@@ -99,7 +99,6 @@ class OfferZone(QtGui.QWidget):
         self.list = QtGui.QListView()
         self.model = QtGui.QStandardItemModel()
         self.list.setModel(self.model)
-        self.list.setFixedSize(350, 250)
         self.layout_main.addWidget(self.list)
 
         self.layout_offer = QtGui.QHBoxLayout()
@@ -143,6 +142,8 @@ class OfferZone(QtGui.QWidget):
 
         # connections
         self.list.clicked.connect(self._set_current_offer)
+
+        self.setFixedSize(*zone_size)
 
     @QtCore.pyqtSlot(QtCore.QModelIndex)
     def _set_current_offer(self, index):
@@ -225,17 +226,18 @@ class OfferZone(QtGui.QWidget):
 
 
 class TransactionZone(QtGui.QWidget):
-    def __init__(self):
+    def __init__(self, zone_size=(400, 200)):
         QtGui.QWidget.__init__(self)
         self.layout = QtGui.QVBoxLayout()
         self.setLayout(self.layout)
         self.label = QtGui.QLabel(trans_MRI(u"Transactions"))
         self.layout.addWidget(self.label)
         self.list = QtGui.QListView()
-        self.list.setFixedSize(400, 200)
         self.layout.addWidget(self.list)
         self.model = QtGui.QStandardItemModel()
         self.list.setModel(self.model)
+
+        self.setFixedSize(*zone_size)
 
     def add_transaction(self, price, buyer_seller, color):
         if buyer_seller == pms.BUYER:
@@ -254,23 +256,28 @@ class TransactionZone(QtGui.QWidget):
 
 
 class GraphicalZone(QtGui.QWidget):
-    def __init__(self, transactions, title):
+    def __init__(self, transactions, max_price, zone_size=(400, 200)):
         QtGui.QWidget.__init__(self)
 
         layout = QtGui.QVBoxLayout()
         self.setLayout(layout)
 
-        figure, graph = plt.subplots(figsize=(10, 6))
+        figure, graph = plt.subplots()
         canvas = FigureCanvas(figure)
         layout.addWidget(canvas)
 
-        graph.plot(range(len(transactions)), [t[1] for t in transactions], "*b")
-        graph.set_xlabel(trans_MRI(u"Time"))
-        graph.set_ylabel(trans_MRI(u"Prices"))
-        graph.set_xticklabels([t[0] for t in transactions])
-        graph.set_title(title)
+        try:
+            graph.plot(range(1, len(transactions)+1),
+                       [t["MRI_trans_price"] for t in transactions], "*b")
+            graph.set_xlabel("")
+            graph.set_xticklabels([])
+            graph.set_ylabel(trans_MRI(u"Price"))
+            graph.set_xlim(0, len(transactions) + 2)
+            graph.set_ylim(0, max_price + 0.5)
+        except ValueError:  # no transactions
+            pass
 
-        self.setFixedWidth(350)
+        self.setFixedSize(*zone_size)
 
 
 class GuiDecision(QtGui.QDialog):
@@ -530,8 +537,9 @@ class GuiDecision(QtGui.QDialog):
                     yield (self._remote.add_transaction(existing_offer,
                                                         new_offer))
                 else:
-                    self._display_offer_failure(
-                        trans_MRI(u"You can't accept this offer"))
+                    if not self._automatique:
+                        self._display_offer_failure(
+                            trans_MRI(u"You can't accept this offer"))
         except (TypeError, KeyError):  # if no item selected
             pass
 
@@ -728,25 +736,73 @@ class GuiRecapitulatif(QtGui.QDialog):
 
         layout = QtGui.QVBoxLayout(self)
 
-        # the history screen. Displayed when the subject clicks on the
-        # corresponding button in widperiod below
-        self.ecran_historique = GuiHistorique(self, historique,
-                                            size=(size_histo[0], 500))
-        if period:
-            self.widperiod = WPeriod(
-                period=period, ecran_historique=self.ecran_historique,
-                parent=self)
-            layout.addWidget(self.widperiod)
+        # period label and history button --------------------------------------
+        self.ecran_historique = GuiHistorique(
+            self, historique, size=(size_histo[0], 500))
+        self.widperiod = WPeriod(
+            period=period, ecran_historique=self.ecran_historique,
+            parent=self)
+        layout.addWidget(self.widperiod)
 
+        # explanation zone -----------------------------------------------------
         self.widexplication = WExplication(text=summary_text, parent=self,
                                            size=(size_histo[0], 120))
         layout.addWidget(self.widexplication)
 
-        # We give the list of transactions
-        self._triangle_transactions_graph = GraphicalZone(
-            triangle_transactions, trans_MRI(u"Triangle"))
-        layout.addWidget(self._triangle_transactions_graph)
+        # transactions ---------------------------------------------------------
+        try:
+            max_triangle_price = max(
+                [t["MRI_trans_price"] for t in triangle_transactions])
+        except ValueError:  # no transaction
+            max_triangle_price = 0
+        try:
+            max_star_price = max([t["MRI_trans_price"] for t in
+                                  star_transactions])
+        except ValueError:
+            max_star_price = 0
+        max_price = max(max_triangle_price, max_star_price)
 
+        transactions_layout = QtGui.QGridLayout()
+        layout.addLayout(transactions_layout)
+
+        # triangle ---
+        triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
+        triangle_label.setStyleSheet("font-weight: bold;")
+        transactions_layout.addWidget(triangle_label, 0, 0)
+        self._triangle_transaction_zone = TransactionZone()
+        try:
+            for t in triangle_transactions:
+                self._triangle_transaction_zone.add_transaction(
+                    t["MRI_trans_price"], None, "black")
+        except ValueError:  # no transactions
+            pass
+        transactions_layout.addWidget(self._triangle_transaction_zone, 1, 0)
+        self._triangle_transactions_graph = GraphicalZone(
+            triangle_transactions, max_price)
+        transactions_layout.addWidget(self._triangle_transactions_graph, 2, 0)
+
+        # star ---
+        star_label = QtGui.QLabel(trans_MRI(u"Star"))
+        star_label.setStyleSheet("font-weight: bold;")
+        transactions_layout.addWidget(star_label, 0, 2)
+        self._star_transaction_zone = TransactionZone()
+        try:
+            for t in star_transactions:
+                self._star_transaction_zone.add_transaction(
+                    t["MRI_trans_price"], None, "black")
+        except ValueError:  # no transactions
+            pass
+        transactions_layout.addWidget(self._star_transaction_zone, 1, 2)
+        self._star_transactions_graph = GraphicalZone(
+            star_transactions, max_price)
+        transactions_layout.addWidget(self._star_transactions_graph, 2, 2)
+
+        separator = QtGui.QFrame()
+        separator.setFrameShape(QtGui.QFrame.VLine)
+        transactions_layout.addWidget(
+            separator, 0, 1, transactions_layout.rowCount(), 1)
+
+        # history table --------------------------------------------------------
         # in this screen we only keep the header and the last line of the
         # history
         histo_recap = [historique[0], historique[-1]]
@@ -791,14 +847,17 @@ class GuiRecapitulatif(QtGui.QDialog):
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
-    my_screen = GuiDecision(
-        defered=None,
-        automatique=False,
-        parent=None,
-        period=1,
-        historique=None,
-        remote=None
-    )
-    my_screen.show()
-    my_screen.add_offer({"MRI_offer_sender": "me", "MRI_offer_price": 25.5})
+    transactions = [
+        {'MRI_trans_contract': 0, 'MRI_trans_time': u'13:21:24',
+         'MRI_trans_price': 0.3, 'MRI_trans_seller': u'201701241320_j_1',
+         'MRI_trans_buyer': u'201701241320_j_0'},
+        {'MRI_trans_contract': 0, 'MRI_trans_time': u'13:21:34',
+         'MRI_trans_price': 0.3, 'MRI_trans_seller': u'201701241320_j_1',
+         'MRI_trans_buyer': u'201701241320_j_0'},
+        {'MRI_trans_contract': 0, 'MRI_trans_time': u'13:21:39',
+         'MRI_trans_price': 0.3, 'MRI_trans_seller': u'201701241320_j_1',
+         'MRI_trans_buyer': u'201701241320_j_0'}
+    ]
+    graph = GraphicalZone(transactions, 2.5)
+    graph.show()
     sys.exit(app.exec_())
