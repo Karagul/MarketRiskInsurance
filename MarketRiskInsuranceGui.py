@@ -298,7 +298,7 @@ class GuiDecision(QtGui.QDialog):
 
         wexplanation = WExplication(
             text=texts_MRI.get_text_explanation(),
-            size=(1200, 90), parent=self)
+            size=(1200, 80), parent=self)
         layout.addWidget(wexplanation)
 
         # Compte à rebours =====================================================
@@ -746,7 +746,7 @@ class GuiRecapitulatif(QtGui.QDialog):
 
         # explanation zone -----------------------------------------------------
         self.widexplication = WExplication(text=summary_text, parent=self,
-                                           size=(size_histo[0], 110))
+                                           size=(size_histo[0], 80))
         layout.addWidget(self.widexplication)
 
         # transactions ---------------------------------------------------------
