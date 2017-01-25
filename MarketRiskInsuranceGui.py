@@ -319,22 +319,22 @@ class GuiDecision(QtGui.QDialog):
         triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
         triangle_label.setStyleSheet("color: red;")
         market_layout.addWidget(triangle_label, 0, 0, 1, 2)
-        self._triangle_purchase_zone = OfferZone(pms.BUY, (300, 300))
+        self._triangle_purchase_zone = OfferZone(pms.BUY, zone_size=(300, 300))
         market_layout.addWidget(self._triangle_purchase_zone, 1, 0)
-        self._triangle_sell_zone = OfferZone(pms.SELL)
+        self._triangle_sell_zone = OfferZone(pms.SELL, zone_size=(300, 300))
         market_layout.addWidget(self._triangle_sell_zone, 1, 1)
-        self._triangle_transactions = TransactionZone(300, 300)
+        self._triangle_transactions = TransactionZone(zone_size=(300, 300))
         market_layout.addWidget(self._triangle_transactions, 2, 0, 1, 2)
 
         # star
         star_label = QtGui.QLabel(trans_MRI(u"Star"))
         star_label.setStyleSheet("color: red;")
         market_layout.addWidget(star_label, 0, 3, 1, 2)
-        self._star_purchase_zone = OfferZone(pms.BUY, 300, 300)
+        self._star_purchase_zone = OfferZone(pms.BUY, zone_size=(300, 300))
         market_layout.addWidget(self._star_purchase_zone, 1, 3)
-        self._star_sell_zone = OfferZone(pms.SELL)
+        self._star_sell_zone = OfferZone(pms.SELL, zone_size=(300, 300))
         market_layout.addWidget(self._star_sell_zone, 1, 4)
-        self._star_transactions = TransactionZone((300, 300))
+        self._star_transactions = TransactionZone(zone_size=(300, 300))
         market_layout.addWidget(self._star_transactions, 2, 3, 1, 2)
 
         separator = QtGui.QFrame()
@@ -769,7 +769,7 @@ class GuiRecapitulatif(QtGui.QDialog):
         triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
         triangle_label.setStyleSheet("font-weight: bold;")
         transactions_layout.addWidget(triangle_label, 0, 0)
-        self._triangle_transaction_zone = TransactionZone((300, 300))
+        self._triangle_transaction_zone = TransactionZone(zone_size=(400, 250))
         try:
             for t in triangle_transactions:
                 self._triangle_transaction_zone.add_transaction(
@@ -778,14 +778,14 @@ class GuiRecapitulatif(QtGui.QDialog):
             pass
         transactions_layout.addWidget(self._triangle_transaction_zone, 1, 0)
         self._triangle_transactions_graph = GraphicalZone(
-            triangle_transactions, max_price)
+            triangle_transactions, max_price, zone_size=(400, 300))
         transactions_layout.addWidget(self._triangle_transactions_graph, 2, 0)
 
         # star ---
         star_label = QtGui.QLabel(trans_MRI(u"Star"))
         star_label.setStyleSheet("font-weight: bold;")
         transactions_layout.addWidget(star_label, 0, 2)
-        self._star_transaction_zone = TransactionZone((300, 300))
+        self._star_transaction_zone = TransactionZone(zone_size=(400, 250))
         try:
             for t in star_transactions:
                 self._star_transaction_zone.add_transaction(
@@ -794,7 +794,7 @@ class GuiRecapitulatif(QtGui.QDialog):
             pass
         transactions_layout.addWidget(self._star_transaction_zone, 1, 2)
         self._star_transactions_graph = GraphicalZone(
-            star_transactions, max_price)
+            star_transactions, max_price, zone_size=(400, 300))
         transactions_layout.addWidget(self._star_transactions_graph, 2, 2)
 
         separator = QtGui.QFrame()
@@ -827,7 +827,7 @@ class GuiRecapitulatif(QtGui.QDialog):
         # taille et titre
         self.setWindowTitle(le2mtrans(u"Summary"))
         self.adjustSize()
-        self.setFixedSize(self.size())
+        # self.setFixedSize(self.size())
 
     def _accept(self):
         """
