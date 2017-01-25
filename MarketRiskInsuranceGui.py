@@ -298,7 +298,7 @@ class GuiDecision(QtGui.QDialog):
 
         wexplanation = WExplication(
             text=texts_MRI.get_text_explanation(),
-            size=(800, 100), parent=self)
+            size=(800, 90), parent=self)
         layout.addWidget(wexplanation)
 
         # Compte à rebours =====================================================
@@ -319,22 +319,22 @@ class GuiDecision(QtGui.QDialog):
         triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
         triangle_label.setStyleSheet("color: red;")
         market_layout.addWidget(triangle_label, 0, 0, 1, 2)
-        self._triangle_purchase_zone = OfferZone(pms.BUY)
+        self._triangle_purchase_zone = OfferZone(pms.BUY, (300, 300))
         market_layout.addWidget(self._triangle_purchase_zone, 1, 0)
         self._triangle_sell_zone = OfferZone(pms.SELL)
         market_layout.addWidget(self._triangle_sell_zone, 1, 1)
-        self._triangle_transactions = TransactionZone()
+        self._triangle_transactions = TransactionZone(300, 300)
         market_layout.addWidget(self._triangle_transactions, 2, 0, 1, 2)
 
         # star
         star_label = QtGui.QLabel(trans_MRI(u"Star"))
         star_label.setStyleSheet("color: red;")
         market_layout.addWidget(star_label, 0, 3, 1, 2)
-        self._star_purchase_zone = OfferZone(pms.BUY)
+        self._star_purchase_zone = OfferZone(pms.BUY, 300, 300)
         market_layout.addWidget(self._star_purchase_zone, 1, 3)
         self._star_sell_zone = OfferZone(pms.SELL)
         market_layout.addWidget(self._star_sell_zone, 1, 4)
-        self._star_transactions = TransactionZone()
+        self._star_transactions = TransactionZone((300, 300))
         market_layout.addWidget(self._star_transactions, 2, 3, 1, 2)
 
         separator = QtGui.QFrame()
@@ -346,7 +346,7 @@ class GuiDecision(QtGui.QDialog):
         self._make_connections()
         self.setWindowTitle(trans_MRI(u"Market"))
         self.adjustSize()
-        self.setFixedSize(self.size())
+        # self.setFixedSize(self.size())
 
         if self._automatique:
             self._timer_automatique = QtCore.QTimer()
@@ -769,7 +769,7 @@ class GuiRecapitulatif(QtGui.QDialog):
         triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
         triangle_label.setStyleSheet("font-weight: bold;")
         transactions_layout.addWidget(triangle_label, 0, 0)
-        self._triangle_transaction_zone = TransactionZone()
+        self._triangle_transaction_zone = TransactionZone((300, 300))
         try:
             for t in triangle_transactions:
                 self._triangle_transaction_zone.add_transaction(
@@ -785,7 +785,7 @@ class GuiRecapitulatif(QtGui.QDialog):
         star_label = QtGui.QLabel(trans_MRI(u"Star"))
         star_label.setStyleSheet("font-weight: bold;")
         transactions_layout.addWidget(star_label, 0, 2)
-        self._star_transaction_zone = TransactionZone()
+        self._star_transaction_zone = TransactionZone((300, 300))
         try:
             for t in star_transactions:
                 self._star_transaction_zone.add_transaction(

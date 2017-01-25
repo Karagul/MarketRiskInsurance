@@ -61,7 +61,7 @@ class RemoteMRI(IRemote):
         self._decision_screen = GuiDecision(
             defered, self._le2mclt.automatique,
             self._le2mclt.screen, self.currentperiod, self.histo, self)
-        self._decision_screen.show()
+        self._decision_screen.showFullScreen()
         self._decision_screen.update_balance(self.balance,
                                              self.balance_if_triangle,
                                              self.balance_if_star)
@@ -208,5 +208,5 @@ class RemoteMRI(IRemote):
                 texts_MRI.get_text_summary(period_content),
                 triangle_transactions, star_transactions,
                 size_histo=(1200, 100))
-            ecran_recap.show()
+            ecran_recap.showFullScreen()
             return defered
