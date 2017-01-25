@@ -112,7 +112,7 @@ class OfferZone(QtGui.QWidget):
         self.spin_offer = MyDoubleSpinBox()
         self.layout_offer.addWidget(self.spin_offer)
         self.pushbutton_send = QtGui.QPushButton(trans_MRI(u"Send"))
-        self.pushbutton_send.setMaximumWidth(100)
+        self.pushbutton_send.setFixedWidth(100)
         self.pushbutton_send.setToolTip(
             trans_MRI(u"Make an offer or replace the current one"))
         self.layout_offer.addWidget(self.pushbutton_send)
@@ -123,15 +123,15 @@ class OfferZone(QtGui.QWidget):
         self.layout_accept_remove = QtGui.QHBoxLayout()
         self.layout_main.addLayout(self.layout_accept_remove)
         self.pushbutton_accept = QtGui.QPushButton(
-            trans_MRI(u"Accept the selected offer"))
-        self.pushbutton_accept.setMinimumWidth(180)
+            trans_MRI(u"Accept selected offer"))
+        self.pushbutton_accept.setFixedWidth(150)
         self.pushbutton_accept.setToolTip(
             trans_MRI(u"Select an offer and click on this button to "
                       u"accept it"))
         self.layout_accept_remove.addWidget(self.pushbutton_accept)
 
         self.pushbutton_remove = QtGui.QPushButton(trans_MRI(u"Remove my offer"))
-        self.pushbutton_remove.setMinimumWidth(150)
+        self.pushbutton_remove.setFixedWidth(150)
         self.pushbutton_remove.setToolTip(
             trans_MRI(u"If you have an offer click here to remove it"))
         self.layout_accept_remove.addWidget(
@@ -287,18 +287,18 @@ class GuiDecision(QtGui.QDialog):
         # variables
         self._defered = defered
         self._automatique = automatique
-        self._historique = GuiHistorique(self, historique, size=(500, 500))
         self._remote = remote
 
         layout = QtGui.QVBoxLayout(self)
 
+        self._historique = GuiHistorique(self, historique, size=(1200, 500))
         wperiod = WPeriod(
             period=period, ecran_historique=self._historique)
         layout.addWidget(wperiod)
 
         wexplanation = WExplication(
             text=texts_MRI.get_text_explanation(),
-            size=(800, 90), parent=self)
+            size=(1200, 90), parent=self)
         layout.addWidget(wexplanation)
 
         # Compte à rebours =====================================================
@@ -319,22 +319,22 @@ class GuiDecision(QtGui.QDialog):
         triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
         triangle_label.setStyleSheet("color: red;")
         market_layout.addWidget(triangle_label, 0, 0, 1, 2)
-        self._triangle_purchase_zone = OfferZone(pms.BUY, zone_size=(300, 300))
+        self._triangle_purchase_zone = OfferZone(pms.BUY, zone_size=(350, 300))
         market_layout.addWidget(self._triangle_purchase_zone, 1, 0)
-        self._triangle_sell_zone = OfferZone(pms.SELL, zone_size=(300, 300))
+        self._triangle_sell_zone = OfferZone(pms.SELL, zone_size=(350, 300))
         market_layout.addWidget(self._triangle_sell_zone, 1, 1)
-        self._triangle_transactions = TransactionZone(zone_size=(300, 300))
+        self._triangle_transactions = TransactionZone(zone_size=(350, 300))
         market_layout.addWidget(self._triangle_transactions, 2, 0, 1, 2)
 
         # star
         star_label = QtGui.QLabel(trans_MRI(u"Star"))
         star_label.setStyleSheet("color: red;")
         market_layout.addWidget(star_label, 0, 3, 1, 2)
-        self._star_purchase_zone = OfferZone(pms.BUY, zone_size=(300, 300))
+        self._star_purchase_zone = OfferZone(pms.BUY, zone_size=(350, 300))
         market_layout.addWidget(self._star_purchase_zone, 1, 3)
-        self._star_sell_zone = OfferZone(pms.SELL, zone_size=(300, 300))
+        self._star_sell_zone = OfferZone(pms.SELL, zone_size=(350, 300))
         market_layout.addWidget(self._star_sell_zone, 1, 4)
-        self._star_transactions = TransactionZone(zone_size=(300, 300))
+        self._star_transactions = TransactionZone(zone_size=(350, 300))
         market_layout.addWidget(self._star_transactions, 2, 3, 1, 2)
 
         separator = QtGui.QFrame()
