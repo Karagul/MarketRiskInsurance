@@ -10,9 +10,8 @@ otherwise ask to the developer ;-)
 from datetime import time
 
 # variables --------------------------------------------------------------------
-MARKET_CONTRACT = 0
-MARKET_SWAP = 1
-TREATMENTS_NAMES = {MARKET_CONTRACT: u"Contract", MARKET_SWAP: u"Swap"}
+MARKET_CONTRACT_BASELINE = 0
+TREATMENTS_NAMES = {MARKET_CONTRACT_BASELINE: u"Contract - Baseline"}
 BUY = BUYER = 0
 SELL = SELLER = 1
 # status of propositions
@@ -28,7 +27,7 @@ PRICE_TAKER = 0
 PRICE_MAKER = 1
 
 # parameters -------------------------------------------------------------------
-TREATMENT = MARKET_CONTRACT
+TREATMENT = MARKET_CONTRACT_BASELINE
 MARKET_TIME = time(0, 1, 0)  # hour, minute, second
 ENDOWMENT = 10
 PROB_TRIANGLE = 50  # An integer between 1 and 100
