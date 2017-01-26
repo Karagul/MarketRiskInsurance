@@ -47,7 +47,19 @@ def get_histo_head():
 
 
 def get_text_explanation():
-    return trans_MRI(u"")
+    txt = trans_MRI(u"There are two possible events: triangle and star. "
+                    u"Before to know which one will occur you can make "
+                    u"transactions with the members of your group. "
+                    u"To that purpose there are two markets, one for the "
+                    u"triangle event and one for the star event. A transaction "
+                    u"between a seller and a buyer implies that the seller has "
+                    u"to transfer some money to the buyer in case the "
+                    u"corresponding event occurs. In order to make a "
+                    u"transaction a seller and a buyer (you are both at the "
+                    u"same time) have to agree on a price. To this end, each "
+                    u"one can make offers, and two offers (a purchase offer and "
+                    u"a sell offer) with the same price makes a transaction.")
+    return txt
 
 
 def get_text_summary(period_content):

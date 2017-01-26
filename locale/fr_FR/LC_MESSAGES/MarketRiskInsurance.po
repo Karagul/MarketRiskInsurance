@@ -1,0 +1,252 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:50
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-26 08:37+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:35
+msgid "Period"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:36
+msgid "Endowment"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:37
+msgid ""
+"Triangle\n"
+"purchases\n"
+"(amount)"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:38
+msgid ""
+"Triangle\n"
+"purchases\n"
+"(number)"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:39
+msgid ""
+"Triangle\n"
+"sells\n"
+"(amount)"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:40
+msgid ""
+"Triangle\n"
+"sells\n"
+"(number)"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:41
+msgid ""
+"Star\n"
+"purchases\n"
+"(amount)"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:42
+msgid ""
+"Star\n"
+"purchases\n"
+"(number)"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:43
+msgid ""
+"Star\n"
+"sells\n"
+"(amount)"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:44
+msgid ""
+"Star\n"
+"sells\n"
+"(number)"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:45
+msgid "Event"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:45
+msgid ""
+"Event\n"
+"balance"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:46
+msgid ""
+"Period\n"
+"payoff"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:55
+msgid "On the triangle market, you've made {} ({}) and {} ({})."
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:57
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:66
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:245
+msgid "purchase"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:60
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:69
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:248
+msgid "sell"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:64
+msgid "On the star market, you've made {} ({}) and {} ({})."
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:73
+msgid "It's the {} event that has been drawn."
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:82
+msgid "You therefore have transfered {} and received {}."
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:85
+msgid "Your payoff for this period is equal to {}"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:92
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:319
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:769
+msgid "Triangle"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:93
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:330
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:785
+msgid "Star"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceServ.py:39
+msgid "treatment"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceServ.py:42
+msgid "Trial periods"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceServ.py:45
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:689
+msgid "Market duration"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:66
+msgid "Your account:"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:70
+msgid "Payoff if triangle:"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:74
+msgid "Payoff if star:"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:94
+msgid "Purchase offers"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:96
+msgid "Sell offers"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:108
+msgid "Make a purchase offer"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:111
+msgid "Make a sell offer"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:114
+msgid "Send"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:117
+msgid "Make an offer or replace the current one"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:126
+msgid "Accept selected offer"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:129
+msgid "Select an offer and click on this button to accept it"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:133
+msgid "Remove my offer"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:136
+msgid "If you have an offer click here to remove it"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:233
+msgid "Transactions"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:274
+msgid "Price"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:347
+msgid "Market"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:462
+msgid "You can't make this offer"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:542
+msgid "You can't accept this offer"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:606
+msgid "Be careful"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:655
+msgid "Treatment"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:665
+msgid "Number of periods"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:670
+msgid "Trail period"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:680
+msgid "Group size"
+msgstr ""
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:697
+msgid "Configure"
+msgstr ""
