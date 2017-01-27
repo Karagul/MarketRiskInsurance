@@ -124,14 +124,14 @@ class OfferZone(QtGui.QWidget):
         self.layout_main.addLayout(self.layout_accept_remove)
         self.pushbutton_accept = QtGui.QPushButton(
             trans_MRI(u"Accept the offer"))
-        self.pushbutton_accept.setFixedWidth(150)
+        self.pushbutton_accept.setFixedWidth(160)
         self.pushbutton_accept.setToolTip(
             trans_MRI(u"Select an offer and click on this button to "
                       u"accept it"))
         self.layout_accept_remove.addWidget(self.pushbutton_accept)
 
         self.pushbutton_remove = QtGui.QPushButton(trans_MRI(u"Remove my offer"))
-        self.pushbutton_remove.setFixedWidth(150)
+        self.pushbutton_remove.setFixedWidth(160)
         self.pushbutton_remove.setToolTip(
             trans_MRI(u"If you have an offer click here to remove it"))
         self.layout_accept_remove.addWidget(
@@ -669,6 +669,17 @@ class DConfigure(QtGui.QDialog):
         self._checkbox_essai.setChecked(pms.PERIODE_ESSAI)
         form.addRow(QtGui.QLabel(trans_MRI(u"Trail period")), self._checkbox_essai)
 
+        # paid periods
+        self._spin_paid_periods = QtGui.QSpinBox()
+        self._spin_paid_periods.setMinimum(1)
+        self._spin_paid_periods.setMaximum(50)
+        self._spin_paid_periods.setSingleStep(1)
+        self._spin_paid_periods.setValue(pms.NUMBER_OF_PAID_PERIODS)
+        self._spin_paid_periods.setButtonSymbols(QtGui.QSpinBox.NoButtons)
+        self._spin_paid_periods.setMaximumWidth(50)
+        form.addRow(QtGui.QLabel(trans_MRI(u"Number of paid periods")),
+                    self._spin_paid_periods)
+
         # group size
         self._spin_groups = QtGui.QSpinBox()
         self._spin_groups.setMinimum(2)
@@ -701,6 +712,7 @@ class DConfigure(QtGui.QDialog):
     def _accept(self):
         pms.TREATMENT = self._combo_treatment.currentIndex()
         pms.PERIODE_ESSAI = self._checkbox_essai.isChecked()
+        pms.NUMBER_OF_PAID_PERIODS = self._spin_paid_periods.value()
         pms.MARKET_TIME = self._timeEdit.time().toPyTime()
         pms.NOMBRE_PERIODES = self._spin_periods.value()
         pms.TAILLE_GROUPES = self._spin_groups.value()
