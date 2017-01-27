@@ -346,7 +346,7 @@ class GuiDecision(QtGui.QDialog):
         self._make_connections()
         self.setWindowTitle(trans_MRI(u"Market"))
         self.adjustSize()
-        # self.setFixedSize(self.size())
+        self.setFixedSize(self.size())
 
         if self._automatique:
             self._timer_automatique = QtCore.QTimer()
@@ -839,7 +839,7 @@ class GuiRecapitulatif(QtGui.QDialog):
         # taille et titre
         self.setWindowTitle(le2mtrans(u"Summary"))
         self.adjustSize()
-        # self.setFixedSize(self.size())
+        self.setFixedSize(self.size())
 
     def _accept(self):
         """
