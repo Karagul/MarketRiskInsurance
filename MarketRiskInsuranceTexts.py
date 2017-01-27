@@ -106,3 +106,15 @@ def get_event_str(event):
         trans_MRI(u"Star")
 
 
+def get_payoff_text(payoff_euros, payoffs_selected_periods):
+    txt = trans_MRI(u"The periods randomly selected to be paid are periods") + \
+          u" {}.".format(
+            u", ".join(map(str, payoffs_selected_periods.viewkeys())))
+    txt += trans_MRI(u"At these periods you respectively earned ") + \
+           u"{} {}.".format(
+               u", ".join(map(str, payoffs_selected_periods.viewvalues())),
+               get_pluriel(payoff_euros, pms.MONNAIE))
+    txt += u"<br />" + trans_MRI(u"Your payoff for this experiment is "
+                                 u"therefore equal to") + u" {}".format(
+        get_pluriel(payoff_euros, pms.MONNAIE))
+    return txt
