@@ -83,7 +83,8 @@ def get_text_summary(period_content):
     )
     txt += u"<br />"
     txt += trans_MRI(u"It's the {} event that has been drawn.").format(
-        u"triangle" if period_content["MRI_event"] == pms.TRIANGLE else u"star")
+        trans_MRI(u"triangle") if period_content["MRI_event"] == pms.TRIANGLE
+        else trans_MRI(u"star"))
     txt += u" "
     sells = period_content["MRI_triangle_number_of_sell"] if \
         period_content["MRI_event"] == pms.TRIANGLE else \

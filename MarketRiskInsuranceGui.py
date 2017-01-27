@@ -123,7 +123,7 @@ class OfferZone(QtGui.QWidget):
         self.layout_accept_remove = QtGui.QHBoxLayout()
         self.layout_main.addLayout(self.layout_accept_remove)
         self.pushbutton_accept = QtGui.QPushButton(
-            trans_MRI(u"Accept selected offer"))
+            trans_MRI(u"Accept the offer"))
         self.pushbutton_accept.setFixedWidth(150)
         self.pushbutton_accept.setToolTip(
             trans_MRI(u"Select an offer and click on this button to "
