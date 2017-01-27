@@ -274,11 +274,16 @@ class PartieMRI(Partie, pb.Referenceable):
         :return:
         """
         logger.debug(u"{} Part Payoff".format(self.joueur))
-
-        self.MRI_gain_ecus = self.currentperiod.MRI_cumulativepayoff
+        payoffs_selected_periods = dict([(r.MRI_period, r.MRI_periodpayoff) for r in
+                                    self.repetitions if r.MRI_period in
+                                    self._paid_periods])
+        logger.debug(u"{} payoffs {}".format(
+            self.joueur, sorted(payoffs_selected_periods)))
+        self.MRI_gain_ecus = sum(payoffs_selected_periods.viewvalues())
         self.MRI_gain_euros = float(self.MRI_gain_ecus) * float(pms.TAUX_CONVERSION)
         yield (self.remote.callRemote(
-            "set_payoffs", self.MRI_gain_euros, self.MRI_gain_ecus))
+            "set_payoffs", self.MRI_gain_euros, self.MRI_gain_ecus,
+            payoffs_selected_periods))
 
         logger.info(u'{} Payoff ecus {} Payoff euros {:.2f}'.format(
             self.joueur, self.MRI_gain_ecus, self.MRI_gain_euros))

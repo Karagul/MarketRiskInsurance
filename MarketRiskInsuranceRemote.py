@@ -210,3 +210,11 @@ class RemoteMRI(IRemote):
                 size_histo=(1200, 100))
             ecran_recap.showFullScreen()
             return defered
+
+    @defer.inlineCallbacks
+    def remote_set_payoffs(self, in_euros, in_ecus=None,
+                           payoffs_selected_periods=None):
+        self.payoff_euros = in_euros
+        self.payoff_ecus = in_ecus
+        self.payoff_text = texts_MRI.get_payoff_text(
+            self.payoff_euros, payoffs_selected_periods)

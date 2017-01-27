@@ -3,7 +3,7 @@
 import logging
 from collections import OrderedDict
 from twisted.internet import defer
-from random import randint
+from random import randint, choice
 from util import utiltools
 from util.utili18n import le2mtrans
 import MarketRiskInsuranceParams as pms
@@ -143,5 +143,18 @@ class Serveur(object):
                 le2mtrans(u"Summary"), self._tous, "display_summary"))
         
         # End of part ==========================================================
+        # selection of paid periods
+        nb_of_periods = pms.NUMBER_OF_PAID_PERIODS if \
+                        pms.NUMBER_OF_PAID_PERIODS <= pms.NOMBRE_PERIODES else \
+                        pms.NOMBRE_PERIODES
+        possible = range(1, pms.NOMBRE_PERIODES + 1)
+        selected = list()
+        for i in range(nb_of_periods):
+            selected.append(choice(possible))
+            possible.remove(selected[-1])
+        self._le2mserv.gestionnaire_graphique.infoserv(
+            [trans_MRI(u"Paid periods"), u"{}".format(selected)])
+        for j in self._tous:
+            setattr(j, "_paid_periods", selected)
         yield (self._le2mserv.gestionnaire_experience.finalize_part(
             "MarketRiskInsurance"))
