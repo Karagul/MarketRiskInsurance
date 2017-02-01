@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import logging
 from collections import OrderedDict
 from twisted.internet import defer
@@ -7,7 +8,7 @@ from random import randint, choice
 from util import utiltools
 from util.utili18n import le2mtrans
 import MarketRiskInsuranceParams as pms
-from MarketRiskInsuranceGui import DConfigure
+from MarketRiskInsuranceGui import DConfigure, DWebView
 from MarketRiskInsuranceTexts import trans_MRI
 
 logger = logging.getLogger("le2m.{}".format(__name__))
@@ -20,6 +21,7 @@ class Serveur(object):
         # creation of the menu (will be placed in the "part" menu on the
         # server screen)
         actions = OrderedDict()
+        actions[trans_MRI(u"Help")] = self._display_help
         actions[le2mtrans(u"Configure")] = self._configure
         actions[le2mtrans(u"Display parameters")] = \
             lambda _: self._le2mserv.gestionnaire_graphique. \
@@ -158,3 +160,10 @@ class Serveur(object):
             setattr(j, "_paid_periods", selected)
         yield (self._le2mserv.gestionnaire_experience.finalize_part(
             "MarketRiskInsurance"))
+
+    def _display_help(self):
+        help_file = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "ReadMe.html"))
+        logger.debug(u"Help file path: {}".format(help_file))
+        self._screen = DWebView(help_file)
+        self._screen.show()

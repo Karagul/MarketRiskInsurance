@@ -5,7 +5,7 @@ This module contains the GUI
 
 import sys
 import logging
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui, QtCore, QtWebKit
 from twisted.internet import defer
 from random import random, randint, choice
 from util.utili18n import le2mtrans
@@ -855,6 +855,27 @@ class GuiRecapitulatif(QtGui.QDialog):
 
     def reject(self):
         pass
+
+
+class DWebView(QtGui.QDialog):
+    def __init__(self, html_file):
+        QtGui.QDialog.__init__(self)
+
+        layout = QtGui.QVBoxLayout()
+        self.setLayout(layout)
+
+        browser = QtWebKit.QWebView()
+        layout.addWidget(browser)
+
+        html_url = QtCore.QUrl.fromLocalFile(html_file)
+        browser.load(html_url)
+
+        button = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok)
+        button.accepted.connect(self.accept)
+        layout.addWidget(button)
+
+        self.setWindowTitle(u"WebView")
+        self.adjustSize()
 
 
 if __name__ == "__main__":
