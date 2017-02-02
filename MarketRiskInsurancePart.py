@@ -51,8 +51,12 @@ class PartieMRI(Partie, pb.Referenceable):
         self.currentperiod.MRI_event = pms.TRIANGLE if \
             random_value < (pms.PROB_TRIANGLE + 1) else \
             pms.STAR
+        self.currentperiod.MRI_endowment_triangle = pms.ENDOWMENTS[0][0]
+        self.currentperiod.MRI_endowment_star = pms.ENDOWMENTS[0][1]
         self.currentperiod.MRI_group = self.joueur.group
-        yield (self.remote.callRemote("newperiod", period))
+        yield (self.remote.callRemote(
+            "newperiod", period, (self.currentperiod.MRI_endowment_triangle,
+                                  self.currentperiod.MRI_endowment_star)))
         logger.info(u"{} Ready for period {}".format(self.joueur, period))
 
     @defer.inlineCallbacks
@@ -176,23 +180,31 @@ class PartieMRI(Partie, pb.Referenceable):
 
     @defer.inlineCallbacks
     def update_balance(self):
-        balance = self.currentperiod.MRI_endowment - \
-                self.currentperiod.MRI_triangle_sum_of_purchase + \
-                self.currentperiod.MRI_triangle_sum_of_sell - \
-                self.currentperiod.MRI_star_sum_of_purchase + \
-                self.currentperiod.MRI_star_sum_of_sell
-        balance_if_triangle = balance + \
+        balance_transactions = \
+            self.currentperiod.MRI_triangle_sum_of_purchase + \
+            self.currentperiod.MRI_triangle_sum_of_sell - \
+            self.currentperiod.MRI_star_sum_of_purchase + \
+            self.currentperiod.MRI_star_sum_of_sell
+
+        balance_triangle = self.currentperiod.MRI_endowment_triangle + \
+            balance_transactions
+
+        balance_star = self.currentperiod.MRI_endowment_star + \
+            balance_transactions
+
+        balance_if_triangle = balance_triangle + \
                               (self.currentperiod.MRI_triangle_number_of_purchase *
                               pms.TRIANGLE_PAY) - \
                               (self.currentperiod.MRI_triangle_number_of_sell *
                               pms.TRIANGLE_PAY)
-        balance_if_star = balance + \
+
+        balance_if_star = balance_star + \
                           (self.currentperiod.MRI_star_number_of_purchase *
                            pms.STAR_PAY) - \
                           (self.currentperiod.MRI_star_number_of_sell *
                           pms.STAR_PAY)
-        yield (self.remote.callRemote("update_balance", balance,
-                                      balance_if_triangle, balance_if_star))
+        yield (self.remote.callRemote("update_balance", balance_if_triangle,
+                                      balance_if_star))
 
     def compute_periodpayoff(self):
         """
@@ -200,7 +212,12 @@ class PartieMRI(Partie, pb.Referenceable):
         :return:
         """
         logger.debug(u"{} Period Payoff".format(self.joueur))
-        self.currentperiod.MRI_periodpayoff = self.currentperiod.MRI_endowment
+
+        # endowment
+        self.currentperiod.MRI_periodpayoff = \
+            self.currentperiod.MRI_endowment_triangle if \
+                self.currentperiod.MRI_event == pms.TRIANGLE else \
+                self.currentperiod.MRI_endowment_star
 
         # transactions
         self.currentperiod.MRI_periodpayoff += \
@@ -214,10 +231,12 @@ class PartieMRI(Partie, pb.Referenceable):
             self.currentperiod.MRI_event_balance = \
                 (self.currentperiod.MRI_triangle_number_of_purchase -
                 self.currentperiod.MRI_triangle_number_of_sell) * pms.TRIANGLE_PAY
+
         else:
             self.currentperiod.MRI_event_balance = \
                 (self.currentperiod.MRI_star_number_of_purchase -
                 self.currentperiod.MRI_star_number_of_sell) * pms.STAR_PAY
+
         self.currentperiod.MRI_periodpayoff += \
             self.currentperiod.MRI_event_balance
 
@@ -306,7 +325,8 @@ class RepetitionsMRI(Base):
     MRI_group = Column(Integer)
     MRI_random_value = Column(Integer)
     MRI_event = Column(Integer)
-    MRI_endowment = Column(Integer)
+    MRI_endowment_triangle = Column(Integer)
+    MRI_endowment_star = Column(Integer)
     MRI_triangle_number_of_purchase = Column(Integer)
     MRI_triangle_number_of_sell = Column(Integer)
     MRI_triangle_sum_of_purchase = Column(Float)
@@ -323,7 +343,6 @@ class RepetitionsMRI(Base):
     def __init__(self, period):
         self.MRI_period = period
         self.MRI_treatment = pms.TREATMENT
-        self.MRI_endowment = pms.ENDOWMENT
         self.MRI_triangle_number_of_purchase = 0
         self.MRI_triangle_number_of_sell = 0
         self.MRI_triangle_sum_of_purchase = 0

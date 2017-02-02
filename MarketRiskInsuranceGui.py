@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 
+SIZE_HISTO = (1250, 500)
 logger = logging.getLogger("le2m")
 
 
@@ -61,10 +62,6 @@ class InformationZone(QtGui.QWidget):
 
         self.form = QtGui.QFormLayout()
         self.layout.addLayout(self.form)
-        self.label_balance = QtGui.QLabel(u"...")
-        self.label_balance.setAlignment(QtCore.Qt.AlignRight)
-        self.form.addRow(QtGui.QLabel(trans_MRI(u"Your account:")),
-                         self.label_balance)
         self.label_balance_if_triangle = QtGui.QLabel(u"...")
         self.label_balance_if_triangle.setAlignment(QtCore.Qt.AlignRight)
         self.form.addRow(QtGui.QLabel(trans_MRI(u"Payoff if triangle:")),
@@ -291,14 +288,14 @@ class GuiDecision(QtGui.QDialog):
 
         layout = QtGui.QVBoxLayout(self)
 
-        self._historique = GuiHistorique(self, historique, size=(1200, 500))
+        self._historique = GuiHistorique(self, historique, size=SIZE_HISTO)
         wperiod = WPeriod(
             period=period, ecran_historique=self._historique)
         layout.addWidget(wperiod)
 
         wexplanation = WExplication(
             text=texts_MRI.get_text_explanation(),
-            size=(1200, 80), parent=self)
+            size=(SIZE_HISTO[0], 80), parent=self)
         layout.addWidget(wexplanation)
 
         # Compte à rebours =====================================================
@@ -567,7 +564,7 @@ class GuiDecision(QtGui.QDialog):
                                                     color)
 
     @defer.inlineCallbacks
-    def update_balance(self, balance, balance_if_triangle, balance_if_star):
+    def update_balance(self, balance_if_triangle, balance_if_star):
         """
         Display the new balances and test each player's offers in the list.
         If an offer is no more possible then removes it
@@ -576,7 +573,6 @@ class GuiDecision(QtGui.QDialog):
         :param balance_if_star:
         :return:
         """
-        self._information.label_balance.setText(str(balance))
         self._information.label_balance_if_triangle.setText(
             str(balance_if_triangle))
         self._information.label_balance_if_star.setText(str(balance_if_star))
@@ -726,8 +722,7 @@ class GuiRecapitulatif(QtGui.QDialog):
     """
 
     def __init__(self, defered, automatique, parent, period, historique,
-                 summary_text, triangle_transactions, star_transactions,
-                 size_histo=(500, 90)):
+                 summary_text, triangle_transactions, star_transactions):
         """
 
         :param defered:
@@ -750,7 +745,7 @@ class GuiRecapitulatif(QtGui.QDialog):
 
         # period label and history button --------------------------------------
         self.ecran_historique = GuiHistorique(
-            self, historique, size=(size_histo[0], 500))
+            self, historique, size=SIZE_HISTO)
         self.widperiod = WPeriod(
             period=period, ecran_historique=self.ecran_historique,
             parent=self)
@@ -758,7 +753,7 @@ class GuiRecapitulatif(QtGui.QDialog):
 
         # explanation zone -----------------------------------------------------
         self.widexplication = WExplication(text=summary_text, parent=self,
-                                           size=(size_histo[0], 80))
+                                           size=(SIZE_HISTO[0], 80))
         layout.addWidget(self.widexplication)
 
         # transactions ---------------------------------------------------------
@@ -820,7 +815,7 @@ class GuiRecapitulatif(QtGui.QDialog):
         histo_recap = [historique[0], historique[-1]]
         self.tablemodel = TableModelHistorique(histo_recap)
         self.widtableview = WTableview(parent=self, tablemodel=self.tablemodel,
-                                       size=size_histo)
+                                       size=(SIZE_HISTO[0], 100))
         self.widtableview.ui.tableView.verticalHeader().setResizeMode(
             QtGui.QHeaderView.Stretch)
         layout.addWidget(self.widtableview)

@@ -23,7 +23,7 @@ except (AttributeError, IOError):
 
 
 def get_histo_vars():
-    return ["MRI_period", "MRI_endowment",
+    return ["MRI_period", "MRI_endowment_triangle", "MRI_endowment_star",
             "MRI_triangle_sum_of_purchase", "MRI_triangle_number_of_purchase",
             "MRI_triangle_sum_of_sell", "MRI_triangle_number_of_sell",
             "MRI_star_sum_of_purchase", "MRI_star_number_of_purchase",
@@ -33,7 +33,8 @@ def get_histo_vars():
 
 def get_histo_head():
     return [trans_MRI(u"Period"),
-            trans_MRI(u"Endowment"),
+            trans_MRI(u"Endowment\nTriangle"),
+            trans_MRI(u"Endowment\nStar"),
             trans_MRI(u"Triangle\npurchases\n(amount)"),
             trans_MRI(u"Triangle\npurchases\n(number)"),
             trans_MRI(u"Triangle\nsells\n(amount)"),
@@ -108,10 +109,10 @@ def get_event_str(event):
 
 def get_payoff_text(payoff_euros, payoffs_selected_periods):
     txt = trans_MRI(u"At the periods randomly selected to be paid") + \
-          u" ({}) ".format(list(payoffs_selected_periods.viewkeys())) + \
-          trans_MRI(u"you have earned respectively") + u" {} {}.".format(
-          list(payoffs_selected_periods.viewvalues()),
-          get_pluriel(payoff_euros, pms.MONNAIE))
+          u" ({}) ".format(
+              u", ".join(map(str, list(payoffs_selected_periods.viewkeys())))) + \
+          trans_MRI(u"you have earned respectively") + u" {}.".format(
+          u", ".join(map(str, list(payoffs_selected_periods.viewvalues()))))
     txt += u"<br />" + trans_MRI(u"Your payoff for this experiment is "
                                  u"therefore equal to") + u" {}.".format(
         get_pluriel(payoff_euros, pms.MONNAIE))

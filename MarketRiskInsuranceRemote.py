@@ -13,14 +13,12 @@ import MarketRiskInsuranceTexts as texts_MRI
 
 logger = logging.getLogger("le2m")
 
-
 class RemoteMRI(IRemote):
     """
     Class remote, remote_ methods can be called by the server
     """
     def __init__(self, le2mclt):
         IRemote.__init__(self, le2mclt)
-        self.balance = 0
         self.balance_if_triangle = 0
         self.balance_if_star = 0
         self.histo.append(texts_MRI.get_histo_head())
@@ -37,7 +35,7 @@ class RemoteMRI(IRemote):
             setattr(pms, k, v)
         self._server_part = server_part
 
-    def remote_newperiod(self, period):
+    def remote_newperiod(self, period, endowments):
         """
         Set the current period and delete the history
         :param period: the current period
@@ -45,9 +43,9 @@ class RemoteMRI(IRemote):
         """
         logger.info(u"{} Period {}".format(self._le2mclt.uid, period))
         self.currentperiod = period
+        self.balance_if_triangle = endowments[0]
+        self.balance_if_star = endowments[1]
         if self.currentperiod == 1:
-            self.balance = self.balance_if_triangle = \
-                self.balance_if_star = pms.ENDOWMENT
             del self.histo[1:]
 
     def remote_display_decision(self):
@@ -62,9 +60,8 @@ class RemoteMRI(IRemote):
             defered, self._le2mclt.automatique,
             self._le2mclt.screen, self.currentperiod, self.histo, self)
         self._decision_screen.show()
-        self._decision_screen.update_balance(self.balance,
-                                             self.balance_if_triangle,
-                                             self.balance_if_star)
+        self._decision_screen.update_balance(
+            self.balance_if_triangle, self.balance_if_star)
         return defered
 
     @defer.inlineCallbacks
@@ -131,8 +128,7 @@ class RemoteMRI(IRemote):
         self._decision_screen.add_transaction(transaction)
 
     @defer.inlineCallbacks
-    def remote_update_balance(self, balance, balance_if_triangle,
-                              balance_if_star):
+    def remote_update_balance(self, balance_if_triangle, balance_if_star):
         """
         Update the information zone and also remove the offers in the player's
         lists that are no more possible
@@ -141,13 +137,12 @@ class RemoteMRI(IRemote):
         :param balance_if_star:
         :return:
         """
-        logger.debug(u"Update of balance: {} - {} - {}".format(
-            balance, balance_if_triangle, balance_if_star))
-        self.balance = balance
+        logger.debug(u"Update of balance: {} - {}".format(
+            balance_if_triangle, balance_if_star))
         self.balance_if_triangle = balance_if_triangle
         self.balance_if_star = balance_if_star
         yield (self._decision_screen.update_balance(
-            balance, balance_if_triangle, balance_if_star))
+            balance_if_triangle, balance_if_star))
 
     def is_offer_ok(self, offer):
         """
@@ -162,15 +157,20 @@ class RemoteMRI(IRemote):
         :return:
         """
         if offer["MRI_offer_type"] == pms.BUY:
-            if self.balance - offer["MRI_offer_price"] < pms.BALANCE_THRESHOLD:
+            if self.balance_if_triangle - offer["MRI_offer_price"] < \
+                    pms.BALANCE_THRESHOLD or \
+                self.balance_if_star - offer["MRI_offer_price"] < \
+                    pms.BALANCE_THRESHOLD:
                 return False
+
         else:
             if offer["MRI_offer_contract"] == pms.TRIANGLE:
-                if self.balance_if_triangle - pms.TRIANGLE_PAY < \
-                        pms.BALANCE_THRESHOLD:
+                if self.balance_if_triangle + offer["MRI_offer_price"] - \
+                        pms.TRIANGLE_PAY < pms.BALANCE_THRESHOLD:
                     return False
             else:
-                if self.balance_if_star - pms.STAR_PAY < pms.BALANCE_THRESHOLD:
+                if self.balance_if_star + offer["MRI_offer_price"] - \
+                        pms.STAR_PAY < pms.BALANCE_THRESHOLD:
                     return False
         return True
 
@@ -206,8 +206,7 @@ class RemoteMRI(IRemote):
                 defered, self._le2mclt.automatique, self._le2mclt.screen,
                 self.currentperiod, self.histo,
                 texts_MRI.get_text_summary(period_content),
-                triangle_transactions, star_transactions,
-                size_histo=(1200, 100))
+                triangle_transactions, star_transactions)
             ecran_recap.show()
             return defered
 
