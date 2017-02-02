@@ -194,7 +194,7 @@ class RemoteMRI(IRemote):
         # history
         self.histo.append([period_content.get(k) for k in self.histo_vars])
         # replace event code by text
-        self.histo[-1][10] = texts_MRI.get_event_str(self.histo[-1][10])
+        self.histo[-1][11] = texts_MRI.get_event_str(self.histo[-1][11])
         logger.debug(u"Ligne histo: {}".format(self.histo[-1]))
 
         # screen

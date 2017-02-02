@@ -4,7 +4,7 @@ import os
 import logging
 from collections import OrderedDict
 from twisted.internet import defer
-from random import randint, choice
+from random import randint, choice, shuffle
 from util import utiltools
 from util.utili18n import le2mtrans
 import MarketRiskInsuranceParams as pms
@@ -46,6 +46,8 @@ class Serveur(object):
             self._le2mserv.gestionnaire_graphique.infoserv(
                 trans_MRI(u"Market duration") + u": {}".format(
                 pms.MARKET_TIME))
+            self._le2mserv.gestionnaire_graphique.infoserv(
+                trans_MRI(u"Endowments:") + u" {}".format(pms.ENDOWMENTS))
 
     @defer.inlineCallbacks
     def _demarrer(self):
@@ -96,8 +98,13 @@ class Serveur(object):
 
             # random value
             random_value = randint(1, 100)
+            if pms.TREATMENT == pms.FIVE_TEN_RANDOM:
+                pms.ENDOWMENTS = pms.get_endowments()
+            shuffle(pms.ENDOWMENTS)
             yield (self._le2mserv.gestionnaire_experience.run_func(
                 self._tous, "newperiod", period, random_value))
+            self._le2mserv.gestionnaire_graphique.infoserv(
+                u"Endowments: {}".format(pms.ENDOWMENTS))
             
             # decision
             yield(self._le2mserv.gestionnaire_experience.run_step(
@@ -155,7 +162,7 @@ class Serveur(object):
             selected.append(choice(possible))
             possible.remove(selected[-1])
         self._le2mserv.gestionnaire_graphique.infoserv(
-            [trans_MRI(u"Paid periods"), u"{}".format(selected)])
+            trans_MRI(u"Paid periods") + u": {}".format(selected))
         for j in self._tous:
             setattr(j, "_paid_periods", selected)
         yield (self._le2mserv.gestionnaire_experience.finalize_part(

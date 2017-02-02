@@ -8,10 +8,12 @@ If you need to change some parameters below please be sure of what you do,
 otherwise ask to the developer ;-)
 ============================================================================="""
 from datetime import time
+from random import randint
 
 # variables --------------------------------------------------------------------
-MARKET_CONTRACT_BASELINE = 0
-TREATMENTS_NAMES = {MARKET_CONTRACT_BASELINE: u"Contract - Baseline"}
+FIVE_TEN_FIX = 0
+FIVE_TEN_RANDOM = 1
+TREATMENTS_NAMES = {FIVE_TEN_FIX: u"5_10_FIX", FIVE_TEN_RANDOM: u"5_10_RANDOM"}
 BUY = BUYER = 0
 SELL = SELLER = 1
 # status of propositions
@@ -27,9 +29,8 @@ PRICE_TAKER = 0
 PRICE_MAKER = 1
 
 # parameters -------------------------------------------------------------------
-TREATMENT = MARKET_CONTRACT_BASELINE
+TREATMENT = FIVE_TEN_FIX
 MARKET_TIME = time(0, 1, 0)  # hour, minute, second
-ENDOWMENTS = [(10, 20)]  # list of endowment (Triangle, Star)
 PROB_TRIANGLE = 50  # An integer between 1 and 100
 TRIANGLE_PAY = 1  # amount payed by the seller if the event is TRIANGLE
 STAR_PAY = 1  # amount payed by the seller if the event is STAR
@@ -46,3 +47,22 @@ TAUX_CONVERSION = 1
 MONNAIE = u"euro"
 
 
+# Endowments
+def get_endowments():
+    endowments = list()
+    if TREATMENT == FIVE_TEN_FIX:
+        endowments = zip((5, 10) * (TAILLE_GROUPES / 2),
+                         (10, 5) * (TAILLE_GROUPES / 2))
+
+    elif TREATMENT == FIVE_TEN_RANDOM:
+        def get_values():
+            values = []
+            while sum(values) != (7.5 * TAILLE_GROUPES):
+                del values[:]
+                for _ in range(TAILLE_GROUPES):
+                    values.append(randint(5, 10))
+            return values
+        endowments = zip(get_values(), get_values())
+    return endowments
+
+ENDOWMENTS = get_endowments()

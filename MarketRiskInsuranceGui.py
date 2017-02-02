@@ -712,6 +712,7 @@ class DConfigure(QtGui.QDialog):
         pms.MARKET_TIME = self._timeEdit.time().toPyTime()
         pms.NOMBRE_PERIODES = self._spin_periods.value()
         pms.TAILLE_GROUPES = self._spin_groups.value()
+        pms.ENDOWMENTS = pms.get_endowments()
         self.accept()
 
 

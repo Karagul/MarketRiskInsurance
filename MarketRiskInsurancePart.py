@@ -51,9 +51,10 @@ class PartieMRI(Partie, pb.Referenceable):
         self.currentperiod.MRI_event = pms.TRIANGLE if \
             random_value < (pms.PROB_TRIANGLE + 1) else \
             pms.STAR
-        self.currentperiod.MRI_endowment_triangle = pms.ENDOWMENTS[0][0]
-        self.currentperiod.MRI_endowment_star = pms.ENDOWMENTS[0][1]
         self.currentperiod.MRI_group = self.joueur.group
+        player_endowments = pms.ENDOWMENTS[self.joueur.group_composition.index(self.joueur)]
+        self.currentperiod.MRI_endowment_triangle = player_endowments[0]
+        self.currentperiod.MRI_endowment_star = player_endowments[1]
         yield (self.remote.callRemote(
             "newperiod", period, (self.currentperiod.MRI_endowment_triangle,
                                   self.currentperiod.MRI_endowment_star)))
