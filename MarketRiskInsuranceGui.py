@@ -64,11 +64,11 @@ class InformationZone(QtGui.QWidget):
         self.layout.addLayout(self.form)
         self.label_balance_if_triangle = QtGui.QLabel(u"...")
         self.label_balance_if_triangle.setAlignment(QtCore.Qt.AlignRight)
-        self.form.addRow(QtGui.QLabel(trans_MRI(u"Payoff if triangle:")),
+        self.form.addRow(QtGui.QLabel(trans_MRI(u"Income if triangle:")),
                          self.label_balance_if_triangle)
         self.label_balance_if_star = QtGui.QLabel(u"...")
         self.label_balance_if_star.setAlignment(QtCore.Qt.AlignRight)
-        self.form.addRow(QtGui.QLabel(trans_MRI(u"Payoff if star:")),
+        self.form.addRow(QtGui.QLabel(trans_MRI(u"Income if star:")),
                          self.label_balance_if_star)
 
         self.layout.addSpacerItem(QtGui.QSpacerItem(

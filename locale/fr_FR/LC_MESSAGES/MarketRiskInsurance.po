@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-05 12:50+0100\n"
-"PO-Revision-Date: 2017-02-05 12:51+0100\n"
+"POT-Creation-Date: 2017-02-05 18:35+0100\n"
+"PO-Revision-Date: 2017-02-05 18:36+0100\n"
 "Last-Translator: Dimitri DUBOIS <dimitri.dubois@umontpellier.fr>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -248,12 +248,12 @@ msgid "Paid periods"
 msgstr "Périodes rémunérées"
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:67
-msgid "Payoff if triangle:"
-msgstr "Gain si Triangle:"
+msgid "Income if triangle:"
+msgstr "Revenu si Triangle"
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:71
-msgid "Payoff if star:"
-msgstr "Gain si Etoile:"
+msgid "Income if star:"
+msgstr "Revenu si Etoile"
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:91
 msgid "Purchase offers"
@@ -338,6 +338,12 @@ msgstr "Taille de groupe"
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:705
 msgid "Configure"
 msgstr "Configurer"
+
+#~ msgid "Payoff if triangle:"
+#~ msgstr "Gain si Triangle:"
+
+#~ msgid "Payoff if star:"
+#~ msgstr "Gain si Etoile:"
 
 #~ msgid ""
 #~ "There are two possible events: Triangle and Star. In you don't make any "
