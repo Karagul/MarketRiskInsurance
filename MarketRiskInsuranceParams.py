@@ -13,7 +13,8 @@ from random import randint
 # variables --------------------------------------------------------------------
 FIVE_TEN_FIX = 0
 FIVE_TEN_RANDOM = 1
-TREATMENTS_NAMES = {FIVE_TEN_FIX: u"5_10_FIX", FIVE_TEN_RANDOM: u"5_10_RANDOM"}
+P_2 = 2
+TREATMENTS_NAMES = {P_2: u"P2", FIVE_TEN_FIX: u"5_10_FIX", FIVE_TEN_RANDOM: u"5_10_RANDOM"}
 BUY = BUYER = 0
 SELL = SELLER = 1
 # status of propositions
@@ -29,7 +30,7 @@ PRICE_TAKER = 0
 PRICE_MAKER = 1
 
 # parameters -------------------------------------------------------------------
-TREATMENT = FIVE_TEN_FIX
+TREATMENT = P_2
 MARKET_TIME = time(0, 1, 0)  # hour, minute, second
 PROB_TRIANGLE = 50  # An integer between 1 and 100
 TRIANGLE_PAY = 1  # amount payed by the seller if the event is TRIANGLE
@@ -50,7 +51,11 @@ MONNAIE = u"euro"
 # Endowments
 def get_endowments():
     endowments = list()
-    if TREATMENT == FIVE_TEN_FIX:
+    if TREATMENT == P_2:
+        endowments = zip((10.14, 3.38) * (TAILLE_GROUPES / 2),
+                         (3.38, 10.14) * (TAILLE_GROUPES / 2))
+
+    elif TREATMENT == FIVE_TEN_FIX:
         endowments = zip((5, 10) * (TAILLE_GROUPES / 2),
                          (10, 5) * (TAILLE_GROUPES / 2))
 
