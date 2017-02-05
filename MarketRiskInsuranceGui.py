@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 
-SIZE_HISTO = (1250, 500)
+SIZE_HISTO = (1300, 500)
 logger = logging.getLogger("le2m")
 
 
@@ -294,7 +294,8 @@ class GuiDecision(QtGui.QDialog):
         layout.addWidget(wperiod)
 
         wexplanation = WExplication(
-            text=texts_MRI.get_text_explanation(),
+            text=texts_MRI.get_text_explanation(
+                self._remote.balance_if_triangle, self._remote.balance_if_star),
             size=(SIZE_HISTO[0], 80), parent=self)
         layout.addWidget(wexplanation)
 
@@ -660,10 +661,10 @@ class DConfigure(QtGui.QDialog):
         self._spin_periods.setMaximumWidth(50)
         form.addRow(QtGui.QLabel(trans_MRI(u"Number of periods")), self._spin_periods)
 
-        # trial
-        self._checkbox_essai = QtGui.QCheckBox()
-        self._checkbox_essai.setChecked(pms.PERIODE_ESSAI)
-        form.addRow(QtGui.QLabel(trans_MRI(u"Trail period")), self._checkbox_essai)
+        # # trial
+        # self._checkbox_essai = QtGui.QCheckBox()
+        # self._checkbox_essai.setChecked(pms.PERIODE_ESSAI)
+        # form.addRow(QtGui.QLabel(trans_MRI(u"Trail period")), self._checkbox_essai)
 
         # paid periods
         self._spin_paid_periods = QtGui.QSpinBox()
@@ -707,7 +708,7 @@ class DConfigure(QtGui.QDialog):
 
     def _accept(self):
         pms.TREATMENT = self._combo_treatment.currentIndex()
-        pms.PERIODE_ESSAI = self._checkbox_essai.isChecked()
+        # pms.PERIODE_ESSAI = self._checkbox_essai.isChecked()
         pms.NUMBER_OF_PAID_PERIODS = self._spin_paid_periods.value()
         pms.MARKET_TIME = self._timeEdit.time().toPyTime()
         pms.NOMBRE_PERIODES = self._spin_periods.value()
