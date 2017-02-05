@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-02 10:22+0100\n"
-"PO-Revision-Date: 2017-02-02 10:22+0100\n"
+"POT-Creation-Date: 2017-02-05 12:50+0100\n"
+"PO-Revision-Date: 2017-02-05 12:51+0100\n"
 "Last-Translator: Dimitri DUBOIS <dimitri.dubois@umontpellier.fr>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -23,18 +23,18 @@ msgstr "Période"
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:36
 msgid ""
-"Endowment\n"
-"Triangle"
+"Triangle\n"
+"income"
 msgstr ""
-"Dotation\n"
+"Revenu\n"
 "Triangle"
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:37
 msgid ""
-"Endowment\n"
-"Star"
+"Star\n"
+"income"
 msgstr ""
-"Dotation\n"
+"Revenu\n"
 "Etoile"
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:38
@@ -139,87 +139,86 @@ msgstr ""
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:51
 msgid ""
-"There are two possible events: triangle and star. Before to know which one "
-"will occur you can make transactions with the members of your group. To that "
-"purpose there are two markets, one for the triangle event and one for the "
-"star event. A transaction between a seller and a buyer implies that the "
-"seller has to transfer some money to the buyer in case the corresponding "
-"event occurs. In order to make a transaction a seller and a buyer (you are "
-"both at the same time) have to agree on a price. To this end, each one can "
-"make offers, and two offers (a purchase offer and a sell offer) with the "
-"same price makes a transaction."
+"There are two possible states: Triangle and Star. In you don't make any "
+"transaction, your income in the Triangle state will be {} and your income "
+"the Star state will be {}. Before to know which one will occur you can make "
+"transactions with the members of your group. A transaction implies that the "
+"seller will transfer {} to the buyer in case the corresponding state occurs. "
+"In order to make a transaction a seller and a buyer have to agree on a "
+"price. To this end, each group member can make purchase offers and sell "
+"offers for each possible state. Two offers (a purchase offer and a sell "
+"offer) with the same price makes a transaction."
 msgstr ""
-"Il y a deux événements possibles: Triangle et Etoile. Avant le tirage de "
-"l'événement, vous pouvez faire des transactions aves les membres de votre "
-"groupe. Pour cela, il y a deux marchés, un pour l'événement Triangle et un "
-"pour l'événement Etoile. Lorsqu'une transaction a lieu entre un acheteur et "
-"un vendeur, le vendeur doit transférer de l'argent à l'acheteur si "
-"l'événement correspondant survient. Pour faire une transaction un acheteur "
-"et un vendeur (chacun tient les deux rôles sur les deux marchés) doivent "
-"s'entendre sur un prix. Cette entente se fait à travers des offres, deux "
-"offres (une d'achat et une de vente) à un même prix crée une transaction."
+"Il y a deux états possibles: Triangle et Etoile. Si vous ne faites pas de "
+"transaction, votre revenu dans l'état Triangle sera {} et votre revenu dans "
+"l'état Etoile sera {}. Avant de connaître l'état pour la période en cours "
+"vous pouvez faire des transactions avec les membres de votre groupe. Une "
+"transaction implique que le vendeur versera {} à l'acheteur si l'état "
+"correspondant se produit. Pour faire une transaction un vendeur et un "
+"acheteur doivent s'entendre sur un prix. Pour se faire chaque membre du "
+"groupe peut faire des offres d'achat et de vente pour chacun des deux états "
+"possibles. Deux offres (une d'achat et une de vente) au même prix font une "
+"transaction."
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:68
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:72
 msgid "On the triangle market, you've made {} ({}) and {} ({})."
 msgstr "Sur le marché Triangle, vous avez fait {} ({}) et {} ({})."
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:70
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:79
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:74
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:83
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:242
 msgid "purchase"
 msgstr "achat"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:73
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:82
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:77
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:86
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:245
 msgid "sell"
 msgstr "vente"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:77
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:81
 msgid "On the star market, you've made {} ({}) and {} ({})."
 msgstr "Sur le marché Etoile, vous avez fait {} ({}) et {} ({})."
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:86
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:90
 msgid "It's the {} event that has been drawn."
 msgstr "C'est l'événement {} qui a été tiré au sort."
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:87
-msgid "triangle"
-msgstr "triangle"
-
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:88
-msgid "star"
-msgstr "étoile"
-
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:96
-msgid "You therefore have transfered {} and received {}."
-msgstr "Vous avez donc transféré {} et reçu {}."
-
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:99
-msgid "Your payoff for this period is equal to {}"
-msgstr "Votre gain pour la période est de {}"
-
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:106
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:316
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:776
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:91
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:124
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:317
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:779
 msgid "Triangle"
 msgstr "Triangle"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:107
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:327
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:792
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:92
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:125
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:328
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:805
 msgid "Star"
 msgstr "Etoile"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:111
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:100
+msgid "You therefore have transferred {} and received {}."
+msgstr "Vous avez donc versé {} et reçu {}."
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:109
+msgid "{} + {} (sells) - {} (purchases) + {} (received) - {} (transferred)"
+msgstr "{} + {} (ventes) - {} (achats) + {} (reçu) - {} (versé)"
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:116
+msgid "Your payoff for this period is equal to {} ({})."
+msgstr "Votre gain pour cette période est égal à {} ({})."
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:129
 msgid "At the periods randomly selected to be paid"
 msgstr "Aux périodes tirées au sort pour la rémunération"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:114
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:132
 msgid "you have earned respectively"
 msgstr "vous avez respectivement gagné"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:116
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:134
 msgid "Your payoff for this experiment is therefore equal to"
 msgstr "Votre gain pour l'expérience est de "
 
@@ -236,11 +235,15 @@ msgid "Trial periods"
 msgstr "Périodes d'essai"
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceServ.py:47
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:696
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:697
 msgid "Market duration"
 msgstr "Temps de marché"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceServ.py:158
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceServ.py:50
+msgid "Endowments:"
+msgstr "Dotations:"
+
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceServ.py:165
 msgid "Paid periods"
 msgstr "Périodes rémunérées"
 
@@ -285,7 +288,7 @@ msgid "Select an offer and click on this button to accept it"
 msgstr "Selectionner une offre et cliquer sur ce bouton pour l'accepter"
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:130
-msgid "Remove my offer"
+msgid "Remove my bid"
 msgstr "Supprimer mon offre"
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:133
@@ -300,45 +303,140 @@ msgstr "Transactions"
 msgid "Price"
 msgstr "Prix"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:344
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:345
 msgid "Market"
 msgstr "Marché"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:459
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:460
 msgid "You can't make this offer"
 msgstr "Vous ne pouvez pas faire cette offre"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:539
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:540
 msgid "You can't accept this offer"
 msgstr "Vous ne pouvez pas accepter cette offre"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:602
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:603
 msgid "Be careful"
 msgstr "Attention"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:651
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:652
 msgid "Treatment"
 msgstr "Traitement"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:661
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:662
 msgid "Number of periods"
 msgstr "Nombre de périodes"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:666
-msgid "Trail period"
-msgstr "Période d'essai"
-
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:676
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:677
 msgid "Number of paid periods"
 msgstr "Nombre de périodes rémunérées"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:687
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:688
 msgid "Group size"
 msgstr "Taille de groupe"
 
-#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:704
+#: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:705
 msgid "Configure"
 msgstr "Configurer"
+
+#~ msgid ""
+#~ "There are two possible events: Triangle and Star. In you don't make any "
+#~ "transaction, your income in the Triangle state will be {} and your income "
+#~ "the Star state will be {}. Before to know which one will occur you can "
+#~ "make transactions with the members of your group. A transaction implies "
+#~ "that the seller will transfer {} to the buyer in case the corresponding "
+#~ "state occurs. In order to make a transaction a seller and a buyer have to "
+#~ "agree on a price. To this end, each group member can make offers, and two "
+#~ "offers (a purchase offer and a sell offer) with the same price makes a "
+#~ "transaction."
+#~ msgstr ""
+#~ "Il y a deux états possibles: Triangle et Etoile. Si vous ne faites pas de "
+#~ "transaction, votre revenu dans l'état Triangle sera {} et votre revenu "
+#~ "dans l'état Etoile sera {}. Avant de connaître l'état pour la période en "
+#~ "cours vous pouvez faire des transactions avec les membres de votre "
+#~ "groupe. Une transaction implique que le vendeur versera {} à l'acheteur "
+#~ "si l'état correspondant se produit. Pour faire une transaction un vendeur "
+#~ "et un acheteur doivent s'entendre sur un prix. Pour se faire chaque "
+#~ "membre du groupe peut faire des offres d'achat et de vente pour chacun "
+#~ "des deux états possibles. Deux offres (une d'achat et une de vente) au "
+#~ "même prix font une transaction."
+
+#~ msgid ""
+#~ "Triangle\n"
+#~ "income\n"
+#~ "(no transaction)"
+#~ msgstr ""
+#~ "Revenu\n"
+#~ "Triangle\n"
+#~ "(si pas de\n"
+#~ "transaction)"
+
+#~ msgid ""
+#~ "Star\n"
+#~ "income\n"
+#~ "(no transaction)"
+#~ msgstr ""
+#~ "Revenu\n"
+#~ "Etoile\n"
+#~ "(si pas de\n"
+#~ "transaction)"
+
+#~ msgid "Trail period"
+#~ msgstr "Période d'essai"
+
+#~ msgid ""
+#~ "Endowment\n"
+#~ "Triangle"
+#~ msgstr ""
+#~ "Dotation\n"
+#~ "Triangle"
+
+#~ msgid ""
+#~ "Endowment\n"
+#~ "Star"
+#~ msgstr ""
+#~ "Dotation\n"
+#~ "Etoile"
+
+#~ msgid ""
+#~ "There are two possible events: triangle and star. Before to know which "
+#~ "one will occur you can make transactions with the members of your group. "
+#~ "To that purpose there are two markets, one for the triangle event and one "
+#~ "for the star event. A transaction between a seller and a buyer implies "
+#~ "that the seller has to transfer some money to the buyer in case the "
+#~ "corresponding event occurs. In order to make a transaction a seller and a "
+#~ "buyer (you are both at the same time) have to agree on a price. To this "
+#~ "end, each one can make offers, and two offers (a purchase offer and a "
+#~ "sell offer) with the same price makes a transaction."
+#~ msgstr ""
+#~ "Il y a deux événements possibles: Triangle et Etoile. Avant le tirage de "
+#~ "l'événement, vous pouvez faire des transactions aves les membres de votre "
+#~ "groupe. Pour cela, il y a deux marchés, un pour l'événement Triangle et "
+#~ "un pour l'événement Etoile. Lorsqu'une transaction a lieu entre un "
+#~ "acheteur et un vendeur, le vendeur doit transférer de l'argent à "
+#~ "l'acheteur si l'événement correspondant survient. Pour faire une "
+#~ "transaction un acheteur et un vendeur (chacun tient les deux rôles sur "
+#~ "les deux marchés) doivent s'entendre sur un prix. Cette entente se fait à "
+#~ "travers des offres, deux offres (une d'achat et une de vente) à un même "
+#~ "prix crée une transaction."
+
+#~ msgid "triangle"
+#~ msgstr "triangle"
+
+#~ msgid "star"
+#~ msgstr "étoile"
+
+#~ msgid "Your payoff for this period is equal to {} ({})"
+#~ msgstr "Votre gain pour cette période est égal à {} ({})."
+
+#~ msgid "You therefore have transfered {} and received {}."
+#~ msgstr "Vous avez donc transféré {} et reçu {}."
+
+#~ msgid "Your payoff for this period is equal to {}"
+#~ msgstr "Votre gain pour la période est de {}"
+
+#~ msgid "Remove my offer"
+#~ msgstr "Supprimer mon offre"
 
 #~ msgid "Endowment"
 #~ msgstr "Dotation"

@@ -33,8 +33,8 @@ def get_histo_vars():
 
 def get_histo_head():
     return [trans_MRI(u"Period"),
-            trans_MRI(u"Endowment\nTriangle"),
-            trans_MRI(u"Endowment\nStar"),
+            trans_MRI(u"Triangle\nincome"),
+            trans_MRI(u"Star\nincome"),
             trans_MRI(u"Triangle\npurchases\n(amount)"),
             trans_MRI(u"Triangle\npurchases\n(number)"),
             trans_MRI(u"Triangle\nsells\n(amount)"),
@@ -47,19 +47,23 @@ def get_histo_head():
             trans_MRI(u"Period\npayoff")]
 
 
-def get_text_explanation():
-    txt = trans_MRI(u"There are two possible events: triangle and star. "
-                    u"Before to know which one will occur you can make "
-                    u"transactions with the members of your group. "
-                    u"To that purpose there are two markets, one for the "
-                    u"triangle event and one for the star event. A transaction "
-                    u"between a seller and a buyer implies that the seller has "
-                    u"to transfer some money to the buyer in case the "
-                    u"corresponding event occurs. In order to make a "
-                    u"transaction a seller and a buyer (you are both at the "
-                    u"same time) have to agree on a price. To this end, each "
-                    u"one can make offers, and two offers (a purchase offer and "
-                    u"a sell offer) with the same price makes a transaction.")
+def get_text_explanation(triangle_income, star_income):
+    txt = trans_MRI(u"There are two possible states: Triangle and Star. "
+                    u"In you don't make any transaction, your income in the "
+                    u"Triangle state will be {} and your income the Star state "
+                    u"will be {}. Before to know which one will occur you can "
+                    u"make transactions with the members of your group. "
+                    u"A transaction implies that the seller will transfer {} "
+                    u"to the buyer in case the corresponding state occurs. In "
+                    u"order to make a transaction a seller and a buyer "
+                    u"have to agree on a price. To this end, each "
+                    u"group member can make purchase offers and sell offers for "
+                    u"each possible state. Two offers (a "
+                    u"purchase offer and a sell offer) with the same price "
+                    u"makes a transaction.").format(
+        get_pluriel(triangle_income, pms.MONNAIE),
+        get_pluriel(star_income, pms.MONNAIE),
+        get_pluriel(pms.TRIANGLE_PAY, pms.MONNAIE))
     return txt
 
 
@@ -84,8 +88,8 @@ def get_text_summary(period_content):
     )
     txt += u"<br />"
     txt += trans_MRI(u"It's the {} event that has been drawn.").format(
-        trans_MRI(u"triangle") if period_content["MRI_event"] == pms.TRIANGLE
-        else trans_MRI(u"star"))
+        trans_MRI(u"Triangle") if period_content["MRI_event"] == pms.TRIANGLE
+        else trans_MRI(u"Star"))
     txt += u" "
     sells = period_content["MRI_triangle_number_of_sell"] if \
         period_content["MRI_event"] == pms.TRIANGLE else \
@@ -93,11 +97,25 @@ def get_text_summary(period_content):
     purchases = period_content["MRI_triangle_number_of_purchase"] if \
         period_content["MRI_event"] == pms.TRIANGLE else \
         period_content["MRI_star_number_of_purchase"]
-    txt += trans_MRI(u"You therefore have transfered {} and received {}.").format(
+    txt += trans_MRI(u"You therefore have transferred {} and received {}.").format(
         get_pluriel(sells, pms.MONNAIE), get_pluriel(purchases, pms.MONNAIE))
     txt += u"<br />"
-    txt += trans_MRI(u"Your payoff for this period is equal to {}").format(
-        get_pluriel(period_content["MRI_periodpayoff"], pms.MONNAIE))
+
+    # detail period payoff
+    sum_purchases = period_content["MRI_triangle_sum_of_purchase"] + \
+                    period_content["MRI_star_sum_of_purchase"]
+    sum_sells = period_content["MRI_triangle_sum_of_sell"] + \
+                period_content["MRI_star_sum_of_sell"]
+    txt_detail_payoff = trans_MRI(u"{} + {} (sells) - {} (purchases) + "
+                                  u"{} (received) - {} (transferred)").format(
+        period_content["MRI_endowment_triangle"] if
+        period_content["MRI_event"] == pms.TRIANGLE else
+        period_content["MRI_endowment_star"],
+        sum_sells, sum_purchases, purchases, sells)
+
+    txt += trans_MRI(u"Your payoff for this period is equal to {} ({}).").format(
+        get_pluriel(period_content["MRI_periodpayoff"], pms.MONNAIE),
+        txt_detail_payoff)
     logger.debug(txt)
     return txt
 
