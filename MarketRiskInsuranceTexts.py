@@ -24,10 +24,10 @@ except (AttributeError, IOError):
 
 def get_histo_vars():
     return ["MRI_period", "MRI_endowment_triangle", "MRI_endowment_star",
-            "MRI_triangle_sum_of_purchase", "MRI_triangle_number_of_purchase",
-            "MRI_triangle_sum_of_sell", "MRI_triangle_number_of_sell",
-            "MRI_star_sum_of_purchase", "MRI_star_number_of_purchase",
-            "MRI_star_sum_of_sell", "MRI_star_number_of_sell",
+            "MRI_triangle_number_of_purchase", "MRI_triangle_sum_of_purchase",
+            "MRI_triangle_number_of_sell", "MRI_triangle_sum_of_sell",
+            "MRI_star_number_of_purchase", "MRI_star_sum_of_purchase",
+            "MRI_star_number_of_sell", "MRI_star_sum_of_sell",
             "MRI_event", "MRI_event_balance", "MRI_periodpayoff"]
 
 
@@ -35,15 +35,15 @@ def get_histo_head():
     return [trans_MRI(u"Period"),
             trans_MRI(u"Triangle\nincome"),
             trans_MRI(u"Star\nincome"),
-            trans_MRI(u"Triangle\npurchases\n(amount)"),
-            trans_MRI(u"Triangle\npurchases\n(number)"),
-            trans_MRI(u"Triangle\nsells\n(amount)"),
-            trans_MRI(u"Triangle\nsells\n(number)"),
-            trans_MRI(u"Star\npurchases\n(amount)"),
-            trans_MRI(u"Star\npurchases\n(number)"),
-            trans_MRI(u"Star\nsells\n(amount)"),
-            trans_MRI(u"Star\nsells\n(number)"),
-            trans_MRI(u"Event"), trans_MRI(u"Event\nbalance"),
+            trans_MRI(u"Number of\nTriangle\npurchases"),
+            trans_MRI(u"Sum of\nTriangle\npurchases"),
+            trans_MRI(u"Number of\nTriangle\nsells"),
+            trans_MRI(u"Sum of\nTriangle\nsells"),
+            trans_MRI(u"Number of\nStar\npurchases"),
+            trans_MRI(u"Sum of\nStar\npurchases"),
+            trans_MRI(u"Number of\nStar\nsells"),
+            trans_MRI(u"Sum of\nStar\nsells"),
+            trans_MRI(u"State"), trans_MRI(u"State\nbalance"),
             trans_MRI(u"Period\npayoff")]
 
 
