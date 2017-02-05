@@ -127,7 +127,7 @@ class OfferZone(QtGui.QWidget):
                       u"accept it"))
         self.layout_accept_remove.addWidget(self.pushbutton_accept)
 
-        self.pushbutton_remove = QtGui.QPushButton(trans_MRI(u"Remove my offer"))
+        self.pushbutton_remove = QtGui.QPushButton(trans_MRI(u"Remove my bid"))
         self.pushbutton_remove.setFixedWidth(160)
         self.pushbutton_remove.setToolTip(
             trans_MRI(u"If you have an offer click here to remove it"))
@@ -722,7 +722,7 @@ class GuiRecapitulatif(QtGui.QDialog):
     If ecran_historique is set it replaces the default GuiHistorique
     """
 
-    def __init__(self, defered, automatique, parent, period, historique,
+    def __init__(self, remote, defered, automatique, parent, period, historique,
                  summary_text, triangle_transactions, star_transactions):
         """
 
@@ -739,6 +739,7 @@ class GuiRecapitulatif(QtGui.QDialog):
         """
         super(GuiRecapitulatif, self).__init__(parent)
 
+        self._remote = remote
         self._defered = defered
         self._automatique = automatique
 
@@ -780,8 +781,18 @@ class GuiRecapitulatif(QtGui.QDialog):
         self._triangle_transaction_zone = TransactionZone(zone_size=(400, 250))
         try:
             for t in triangle_transactions:
+                price = t["MRI_trans_price"]
+                buyer = t["MRI_trans_buyer"]
+                seller = t["MRI_trans_seller"]
+                implied, buyer_or_seller = False, None
+                if buyer == self._remote.le2mclt.uid or \
+                                seller == self._remote.le2mclt.uid:
+                    implied = True
+                    buyer_or_seller = pms.BUYER if \
+                        buyer == self._remote.le2mclt.uid else pms.SELLER
+                color = "blue" if implied else "black"
                 self._triangle_transaction_zone.add_transaction(
-                    t["MRI_trans_price"], None, "black")
+                    price, buyer_or_seller, color)
         except ValueError:  # no transactions
             pass
         transactions_layout.addWidget(self._triangle_transaction_zone, 1, 0)
@@ -796,8 +807,18 @@ class GuiRecapitulatif(QtGui.QDialog):
         self._star_transaction_zone = TransactionZone(zone_size=(400, 250))
         try:
             for t in star_transactions:
+                price = t["MRI_trans_price"]
+                buyer = t["MRI_trans_buyer"]
+                seller = t["MRI_trans_seller"]
+                implied, buyer_or_seller = False, None
+                if buyer == self._remote.le2mclt.uid or \
+                                seller == self._remote.le2mclt.uid:
+                    implied = True
+                    buyer_or_seller = pms.BUYER if \
+                        buyer == self._remote.le2mclt.uid else pms.SELLER
+                color = "blue" if implied else "black"
                 self._star_transaction_zone.add_transaction(
-                    t["MRI_trans_price"], None, "black")
+                    price, buyer_or_seller, color)
         except ValueError:  # no transactions
             pass
         transactions_layout.addWidget(self._star_transaction_zone, 1, 2)

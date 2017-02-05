@@ -203,7 +203,7 @@ class RemoteMRI(IRemote):
         else:
             defered = defer.Deferred()
             ecran_recap = GuiRecapitulatif(
-                defered, self._le2mclt.automatique, self._le2mclt.screen,
+                self, defered, self._le2mclt.automatique, self._le2mclt.screen,
                 self.currentperiod, self.histo,
                 texts_MRI.get_text_summary(period_content),
                 triangle_transactions, star_transactions)
