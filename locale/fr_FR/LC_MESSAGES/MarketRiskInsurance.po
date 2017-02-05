@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-05 18:35+0100\n"
-"PO-Revision-Date: 2017-02-05 18:36+0100\n"
+"POT-Creation-Date: 2017-02-05 18:52+0100\n"
+"PO-Revision-Date: 2017-02-05 18:52+0100\n"
 "Last-Translator: Dimitri DUBOIS <dimitri.dubois@umontpellier.fr>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -181,8 +181,8 @@ msgid "On the star market, you've made {} ({}) and {} ({})."
 msgstr "Sur le marché Etoile, vous avez fait {} ({}) et {} ({})."
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:90
-msgid "It's the {} event that has been drawn."
-msgstr "C'est l'événement {} qui a été tiré au sort."
+msgid "It's the {} state that has been drawn."
+msgstr "C'est l'état {} qui a été tiré au sort."
 
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:91
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceTexts.py:124
@@ -338,6 +338,9 @@ msgstr "Taille de groupe"
 #: /home/dimitri/Documents/travail/programmes/le2m-v2.1/le2m/parts/MarketRiskInsurance/MarketRiskInsuranceGui.py:705
 msgid "Configure"
 msgstr "Configurer"
+
+#~ msgid "It's the {} event that has been drawn."
+#~ msgstr "C'est l'événement {} qui a été tiré au sort."
 
 #~ msgid "Payoff if triangle:"
 #~ msgstr "Gain si Triangle:"

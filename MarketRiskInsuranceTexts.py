@@ -87,7 +87,7 @@ def get_text_summary(period_content):
         get_pluriel(period_content["MRI_star_sum_of_sell"], pms.MONNAIE)
     )
     txt += u"<br />"
-    txt += trans_MRI(u"It's the {} event that has been drawn.").format(
+    txt += trans_MRI(u"It's the {} state that has been drawn.").format(
         trans_MRI(u"Triangle") if period_content["MRI_event"] == pms.TRIANGLE
         else trans_MRI(u"Star"))
     txt += u" "
