@@ -152,11 +152,11 @@ class Serveur(object):
                 le2mtrans(u"Summary"), self._tous, "display_summary"))
         
         # End of part ==========================================================
-        # selection of paid periods
+        # selection of paid periods - possibles periods: 2 to 10
         nb_of_periods = pms.NUMBER_OF_PAID_PERIODS if \
-                        pms.NUMBER_OF_PAID_PERIODS <= pms.NOMBRE_PERIODES else \
-                        pms.NOMBRE_PERIODES
-        possible = range(1, pms.NOMBRE_PERIODES + 1)
+                        pms.NUMBER_OF_PAID_PERIODS <= (pms.NOMBRE_PERIODES-1) else \
+                        (pms.NOMBRE_PERIODES-1)
+        possible = range(2, pms.NOMBRE_PERIODES + 1)
         selected = list()
         for i in range(nb_of_periods):
             selected.append(choice(possible))
