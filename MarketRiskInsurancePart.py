@@ -182,10 +182,10 @@ class PartieMRI(Partie, pb.Referenceable):
     @defer.inlineCallbacks
     def update_balance(self):
         balance_transactions = \
-            self.currentperiod.MRI_triangle_sum_of_purchase + \
-            self.currentperiod.MRI_triangle_sum_of_sell - \
-            self.currentperiod.MRI_star_sum_of_purchase + \
-            self.currentperiod.MRI_star_sum_of_sell
+            (self.currentperiod.MRI_triangle_sum_of_sell +
+             self.currentperiod.MRI_star_sum_of_sell) - \
+            (self.currentperiod.MRI_triangle_sum_of_purchase +
+            self.currentperiod.MRI_star_sum_of_purchase)
 
         balance_triangle = self.currentperiod.MRI_endowment_triangle + \
             balance_transactions
