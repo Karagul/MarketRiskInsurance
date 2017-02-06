@@ -297,7 +297,7 @@ class GuiDecision(QtGui.QDialog):
         wexplanation = WExplication(
             text=texts_MRI.get_text_explanation(
                 self._remote.balance_if_triangle, self._remote.balance_if_star),
-            size=(SIZE_HISTO[0], 80), parent=self)
+            size=(SIZE_HISTO[0], 70), parent=self)
         layout.addWidget(wexplanation)
 
         # Compte à rebours =====================================================
@@ -344,7 +344,7 @@ class GuiDecision(QtGui.QDialog):
         layout.addSpacing(50)
         self._make_connections()
         self.setWindowTitle(trans_MRI(u"Market"))
-        self.adjustSize()
+        # self.adjustSize()
         # self.setFixedSize(self.size())
 
         if self._automatique:
@@ -717,7 +717,7 @@ class DConfigure(QtGui.QDialog):
 
         self.setWindowTitle(trans_MRI(u"Configure"))
         self.adjustSize()
-        # self.setFixedSize(self.size())
+        self.setFixedSize(self.size())
 
     def _accept(self):
         pms.TREATMENT = self._combo_treatment.currentIndex()
@@ -870,8 +870,8 @@ class GuiRecapitulatif(QtGui.QDialog):
 
         # taille et titre
         self.setWindowTitle(le2mtrans(u"Summary"))
-        self.adjustSize()
-        self.setFixedSize(self.size())
+        # self.adjustSize()
+        # self.setFixedSize(self.size())
 
     def _accept(self):
         """
