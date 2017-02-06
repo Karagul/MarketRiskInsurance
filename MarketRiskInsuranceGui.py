@@ -701,13 +701,24 @@ class DConfigure(QtGui.QDialog):
         form.addRow(QtGui.QLabel(trans_MRI(u"Group size")), self._spin_groups)
 
         # market duration
-        self._timeEdit = QtGui.QTimeEdit()
-        self._timeEdit.setDisplayFormat("hh:mm:ss")
-        self._timeEdit.setTime(QtCore.QTime(pms.MARKET_TIME.hour,
-                                            pms.MARKET_TIME.minute,
-                                            pms.MARKET_TIME.second))
-        self._timeEdit.setMaximumWidth(100)
-        form.addRow(QtGui.QLabel(trans_MRI(u"Market duration")), self._timeEdit)
+        self._timeEdit_market = QtGui.QTimeEdit()
+        self._timeEdit_market.setDisplayFormat("hh:mm:ss")
+        self._timeEdit_market.setTime(QtCore.QTime(pms.MARKET_TIME.hour,
+                                                   pms.MARKET_TIME.minute,
+                                                   pms.MARKET_TIME.second))
+        self._timeEdit_market.setMaximumWidth(100)
+        form.addRow(QtGui.QLabel(trans_MRI(u"Market duration")),
+                    self._timeEdit_market)
+
+        # summary duration
+        self._timeEdit_summary = QtGui.QTimeEdit()
+        self._timeEdit_summary.setDisplayFormat("hh:mm:ss")
+        self._timeEdit_summary.setTime(QtCore.QTime(pms.SUMMARY_TIME.hour,
+                                                    pms.SUMMARY_TIME.minute,
+                                                    pms.SUMMARY_TIME.second))
+        self._timeEdit_summary.setMaximumWidth(100)
+        form.addRow(QtGui.QLabel(trans_MRI(u"Summary duration")),
+                    self._timeEdit_summary)
 
         button = QtGui.QDialogButtonBox(
             QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
@@ -724,7 +735,8 @@ class DConfigure(QtGui.QDialog):
         pms.AMOUNT_TO_SUBTRACT = self._spin_amount_to_substract.value()
         # pms.PERIODE_ESSAI = self._checkbox_essai.isChecked()
         # pms.NUMBER_OF_PAID_PERIODS = self._spin_paid_periods.value()
-        pms.MARKET_TIME = self._timeEdit.time().toPyTime()
+        pms.MARKET_TIME = self._timeEdit_market.time().toPyTime()
+        pms.SUMMARY_TIME = self._timeEdit_summary.time().toPyTime()
         pms.NOMBRE_PERIODES = self._spin_periods.value()
         pms.TAILLE_GROUPES = self._spin_groups.value()
         self.accept()
@@ -766,6 +778,11 @@ class GuiRecapitulatif(QtGui.QDialog):
             period=period, ecran_historique=self.ecran_historique,
             parent=self)
         layout.addWidget(self.widperiod)
+
+        # timer
+        self._compte_rebours = WCompterebours(
+            parent=self, temps=pms.SUMMARY_TIME, actionfin=self._display_warning)
+        layout.addWidget(self._compte_rebours)
 
         # explanation zone -----------------------------------------------------
         self.widexplication = WExplication(text=summary_text, parent=self,
@@ -880,12 +897,19 @@ class GuiRecapitulatif(QtGui.QDialog):
             self._timer_automatique.stop()
         except AttributeError:
             pass
+        try:
+            self._compte_rebours.stop()
+        except AttributeError:
+            pass
         logger.info(u"callback: Ok summary")
         self._defered.callback(1)
         self.accept()
 
     def reject(self):
         pass
+
+    def _display_warning(self):
+        self._compte_rebours.setStyleSheet("color: red;")
 
 
 class DWebView(QtGui.QDialog):

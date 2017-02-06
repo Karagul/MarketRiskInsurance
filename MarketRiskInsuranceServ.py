@@ -41,13 +41,19 @@ class Serveur(object):
                 trans_MRI(u"treatment") + u": {}".format(
                 pms.TREATMENTS_NAMES.get(pms.TREATMENT)))
             self._le2mserv.gestionnaire_graphique.infoserv(
+                trans_MRI(u"Groups size") + u": {}".format(pms.TAILLE_GROUPES))
+            self._le2mserv.gestionnaire_graphique.infoserv(
+                trans_MRI(u"Number of periods") + u": {}".format(
+                    pms.NOMBRE_PERIODES))
+            self._le2mserv.gestionnaire_graphique.infoserv(
                 trans_MRI(u"Amount to subtract to the cumulative payoff") +
                 u": {}".format(pms.AMOUNT_TO_SUBTRACT))
             self._le2mserv.gestionnaire_graphique.infoserv(
                 trans_MRI(u"Market duration") + u": {}".format(
                 pms.MARKET_TIME))
             self._le2mserv.gestionnaire_graphique.infoserv(
-                trans_MRI(u"Endowments:") + u" {}".format(pms.ENDOWMENTS))
+                trans_MRI(u"Summary duration") + u": {}".format(
+                    pms.SUMMARY_TIME))
 
     @defer.inlineCallbacks
     def _demarrer(self):
