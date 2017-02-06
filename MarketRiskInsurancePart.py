@@ -254,10 +254,14 @@ class PartieMRI(Partie, pb.Referenceable):
             self.joueur, self.currentperiod.MRI_price_active))
 
         # cumulative payoff since the second period (the first one is a trial)
-        if self.currentperiod.MRI_period < 3:
+        if self.currentperiod.MRI_period == 1:
+            self.currentperiod.MRI_cumulativepayoff = 0
+
+        elif self.currentperiod.MRI_period == 2:
             self.currentperiod.MRI_cumulativepayoff = \
                 self.currentperiod.MRI_periodpayoff
-        else: 
+
+        else:
             previousperiod = self.periods[self.currentperiod.MRI_period - 1]
             self.currentperiod.MRI_cumulativepayoff = \
                 previousperiod.MRI_cumulativepayoff + \
