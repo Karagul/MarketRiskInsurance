@@ -98,13 +98,17 @@ class Serveur(object):
 
             # random value
             random_value = randint(1, 100)
-            if pms.TREATMENT == pms.FIVE_TEN_RANDOM:
-                pms.ENDOWMENTS = pms.get_endowments()
-            shuffle(pms.ENDOWMENTS)
+            for g in self._le2mserv.gestionnaire_groupes.get_groupes().viewkeys():
+                pms.ENDOWMENTS[g] = pms.get_endowments()
+                shuffle(pms.ENDOWMENTS[g])
+
             yield (self._le2mserv.gestionnaire_experience.run_func(
                 self._tous, "newperiod", period, random_value))
-            self._le2mserv.gestionnaire_graphique.infoserv(
-                u"Endowments: {}".format(pms.ENDOWMENTS))
+
+            self._le2mserv.gestionnaire_graphique.infoserv(u"Incomes")
+            for g in self._le2mserv.gestionnaire_groupes.get_groupes().viewkeys():
+                self._le2mserv.gestionnaire_graphique.infoserv(
+                    u"G{} {}".format(g.split("_")[2], pms.ENDOWMENTS[g]))
             
             # decision
             yield(self._le2mserv.gestionnaire_experience.run_step(

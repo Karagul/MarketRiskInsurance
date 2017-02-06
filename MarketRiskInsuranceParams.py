@@ -8,13 +8,12 @@ If you need to change some parameters below please be sure of what you do,
 otherwise ask to the developer ;-)
 ============================================================================="""
 from datetime import time
-from random import randint
+from random import random, randint
 
-# variables --------------------------------------------------------------------
-FIVE_TEN_FIX = 0
-FIVE_TEN_RANDOM = 1
-P_2 = 2
-TREATMENTS_NAMES = {P_2: u"P2", FIVE_TEN_FIX: u"5_10_FIX", FIVE_TEN_RANDOM: u"5_10_RANDOM"}
+# variables DO NOT TOUCH -------------------------------------------------------
+P_2 = 0
+P_2_RANDOM = 1
+TREATMENTS_NAMES = {P_2: u"P2", P_2_RANDOM: u"P_2_RANDOM"}
 BUY = BUYER = 0
 SELL = SELLER = 1
 # status of propositions
@@ -28,6 +27,8 @@ STAR = 1
 # sender_type
 PRICE_TAKER = 0
 PRICE_MAKER = 1
+# dictionary that will store the endowments of each group
+ENDOWMENTS = dict()
 
 # parameters -------------------------------------------------------------------
 TREATMENT = P_2
@@ -56,19 +57,20 @@ def get_endowments():
         endowments = zip((10.14, 3.38) * (TAILLE_GROUPES / 2),
                          (3.38, 10.14) * (TAILLE_GROUPES / 2))
 
-    elif TREATMENT == FIVE_TEN_FIX:
-        endowments = zip((5, 10) * (TAILLE_GROUPES / 2),
-                         (10, 5) * (TAILLE_GROUPES / 2))
-
-    elif TREATMENT == FIVE_TEN_RANDOM:
+    elif TREATMENT == P_2_RANDOM:
         def get_values():
             values = []
-            while sum(values) != (7.5 * TAILLE_GROUPES):
-                del values[:]
-                for _ in range(TAILLE_GROUPES):
-                    values.append(randint(5, 10))
+            for _ in range(TAILLE_GROUPES):
+                individual_values = [0, 0]
+                while sum(individual_values) != 13.52:
+                    for i in range(2):
+                        val = 0
+                        while val < 3.38 or val > 10.14:
+                            val = randint(3, 10) + random()
+                        val = float("{:.2f}".format(val))
+                        individual_values[i] = val
+                values.append(tuple(individual_values))
             return values
-        endowments = zip(get_values(), get_values())
+        endowments = get_values()
     return endowments
 
-ENDOWMENTS = get_endowments()
