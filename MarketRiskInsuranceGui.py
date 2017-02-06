@@ -344,7 +344,7 @@ class GuiDecision(QtGui.QDialog):
         self._make_connections()
         self.setWindowTitle(trans_MRI(u"Market"))
         self.adjustSize()
-        self.setFixedSize(self.size())
+        # self.setFixedSize(self.size())
 
         if self._automatique:
             self._timer_automatique = QtCore.QTimer()
@@ -704,7 +704,7 @@ class DConfigure(QtGui.QDialog):
 
         self.setWindowTitle(trans_MRI(u"Configure"))
         self.adjustSize()
-        self.setFixedSize(self.size())
+        # self.setFixedSize(self.size())
 
     def _accept(self):
         pms.TREATMENT = self._combo_treatment.currentIndex()

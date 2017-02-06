@@ -59,7 +59,7 @@ class RemoteMRI(IRemote):
         self._decision_screen = GuiDecision(
             defered, self._le2mclt.automatique,
             self._le2mclt.screen, self.currentperiod, self.histo, self)
-        self._decision_screen.show()
+        self._decision_screen.showFullScreen()
         self._decision_screen.update_balance(
             self.balance_if_triangle, self.balance_if_star)
         return defered
@@ -207,7 +207,7 @@ class RemoteMRI(IRemote):
                 self.currentperiod, self.histo,
                 texts_MRI.get_text_summary(period_content),
                 triangle_transactions, star_transactions)
-            ecran_recap.show()
+            ecran_recap.showFullScreen()
             return defered
 
     def remote_set_payoffs(self, in_euros, in_ecus=None,
