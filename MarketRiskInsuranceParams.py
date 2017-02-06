@@ -31,7 +31,7 @@ PRICE_MAKER = 1
 
 # parameters -------------------------------------------------------------------
 TREATMENT = P_2
-MARKET_TIME = time(0, 1, 0)  # hour, minute, second
+MARKET_TIME = time(0, 3, 0)  # hour, minute, second
 PROB_TRIANGLE = 50  # An integer between 1 and 100
 TRIANGLE_PAY = 1  # amount payed by the seller if the event is TRIANGLE
 STAR_PAY = 1  # amount payed by the seller if the event is STAR
@@ -40,9 +40,10 @@ OFFER_MAX = 100
 BALANCE_THRESHOLD = 0
 PERIODE_ESSAI = False
 
-NOMBRE_PERIODES = 5
+NOMBRE_PERIODES = 11
 TAILLE_GROUPES = 8
-NUMBER_OF_PAID_PERIODS = 3
+#NUMBER_OF_PAID_PERIODS = 3
+AMOUNT_TO_SUBTRACT = 25
 
 TAUX_CONVERSION = 1
 MONNAIE = u"euro"

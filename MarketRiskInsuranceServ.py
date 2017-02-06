@@ -41,8 +41,8 @@ class Serveur(object):
                 trans_MRI(u"treatment") + u": {}".format(
                 pms.TREATMENTS_NAMES.get(pms.TREATMENT)))
             self._le2mserv.gestionnaire_graphique.infoserv(
-                trans_MRI(u"Trial periods") + u": {}".format(
-                le2mtrans(u"yes") if pms.PERIODE_ESSAI else le2mtrans(u"no")))
+                trans_MRI(u"Amount to subtract to the cumulative payoff") +
+                u": {}".format(pms.AMOUNT_TO_SUBTRACT))
             self._le2mserv.gestionnaire_graphique.infoserv(
                 trans_MRI(u"Market duration") + u": {}".format(
                 pms.MARKET_TIME))
@@ -153,18 +153,18 @@ class Serveur(object):
         
         # End of part ==========================================================
         # selection of paid periods - possibles periods: 2 to 10
-        nb_of_periods = pms.NUMBER_OF_PAID_PERIODS if \
-                        pms.NUMBER_OF_PAID_PERIODS <= (pms.NOMBRE_PERIODES-1) else \
-                        (pms.NOMBRE_PERIODES-1)
-        possible = range(2, pms.NOMBRE_PERIODES + 1)
-        selected = list()
-        for i in range(nb_of_periods):
-            selected.append(choice(possible))
-            possible.remove(selected[-1])
-        self._le2mserv.gestionnaire_graphique.infoserv(
-            trans_MRI(u"Paid periods") + u": {}".format(selected))
-        for j in self._tous:
-            setattr(j, "_paid_periods", selected)
+        # nb_of_periods = pms.NUMBER_OF_PAID_PERIODS if \
+        #                 pms.NUMBER_OF_PAID_PERIODS <= (pms.NOMBRE_PERIODES-1) else \
+        #                 (pms.NOMBRE_PERIODES-1)
+        # possible = range(2, pms.NOMBRE_PERIODES + 1)
+        # selected = list()
+        # for i in range(nb_of_periods):
+        #     selected.append(choice(possible))
+        #     possible.remove(selected[-1])
+        # self._le2mserv.gestionnaire_graphique.infoserv(
+        #     trans_MRI(u"Paid periods") + u": {}".format(selected))
+        # for j in self._tous:
+        #     setattr(j, "_paid_periods", selected)
         yield (self._le2mserv.gestionnaire_experience.finalize_part(
             "MarketRiskInsurance"))
 

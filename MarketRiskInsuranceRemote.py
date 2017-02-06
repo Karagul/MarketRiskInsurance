@@ -210,9 +210,9 @@ class RemoteMRI(IRemote):
             ecran_recap.showFullScreen()
             return defered
 
-    def remote_set_payoffs(self, in_euros, in_ecus=None,
-                           payoffs_selected_periods=None):
-        self.payoff_euros = in_euros
-        self.payoff_ecus = in_ecus
-        self.payoff_text = texts_MRI.get_payoff_text(
-            self.payoff_euros, payoffs_selected_periods)
+    # def remote_set_payoffs(self, in_euros, in_ecus=None,
+    #                        payoffs_selected_periods=None):
+    #     self.payoff_euros = in_euros
+    #     self.payoff_ecus = in_ecus
+    #     self.payoff_text = texts_MRI.get_payoff_text(
+    #         self.payoff_euros, payoffs_selected_periods)

@@ -28,7 +28,8 @@ def get_histo_vars():
             "MRI_triangle_number_of_sell", "MRI_triangle_sum_of_sell",
             "MRI_star_number_of_purchase", "MRI_star_sum_of_purchase",
             "MRI_star_number_of_sell", "MRI_star_sum_of_sell",
-            "MRI_event", "MRI_event_balance", "MRI_periodpayoff"]
+            "MRI_event", "MRI_event_balance", "MRI_periodpayoff",
+            "MRI_cumulativepayoff"]
 
 
 def get_histo_head():
@@ -44,26 +45,31 @@ def get_histo_head():
             trans_MRI(u"Number of\nStar\nsells"),
             trans_MRI(u"Sum of\nStar\nsells"),
             trans_MRI(u"State"), trans_MRI(u"State\nbalance"),
-            trans_MRI(u"Period\npayoff")]
+            trans_MRI(u"Period\npayoff"), trans_MRI(u"Cumulative\npayoff")]
 
 
 def get_text_explanation(triangle_income, star_income):
-    txt = trans_MRI(u"There are two possible states: Triangle and Star. "
-                    u"In you don't make any transaction, your income in the "
+    # txt = trans_MRI(u"There are two possible states: Triangle and Star. "
+    #                 u"If you don't make any transaction, your income in the "
+    #                 u"Triangle state will be {} and your income the Star state "
+    #                 u"will be {}. Before to know which one will occur you can "
+    #                 u"make transactions with the members of your group. "
+    #                 u"A transaction implies that the seller will transfer {} "
+    #                 u"to the buyer in case the corresponding state occurs. In "
+    #                 u"order to make a transaction a seller and a buyer "
+    #                 u"have to agree on a price. To this end, each "
+    #                 u"group member can make purchase offers and sell offers for "
+    #                 u"each possible state. Two offers (a "
+    #                 u"purchase offer and a sell offer) with the same price "
+    #                 u"makes a transaction.").format(
+    #     get_pluriel(triangle_income, pms.MONNAIE),
+    #     get_pluriel(star_income, pms.MONNAIE),
+    #     get_pluriel(pms.TRIANGLE_PAY, pms.MONNAIE))
+    txt = trans_MRI(u"If you don't make any transaction your income in the "
                     u"Triangle state will be {} and your income the Star state "
-                    u"will be {}. Before to know which one will occur you can "
-                    u"make transactions with the members of your group. "
-                    u"A transaction implies that the seller will transfer {} "
-                    u"to the buyer in case the corresponding state occurs. In "
-                    u"order to make a transaction a seller and a buyer "
-                    u"have to agree on a price. To this end, each "
-                    u"group member can make purchase offers and sell offers for "
-                    u"each possible state. Two offers (a "
-                    u"purchase offer and a sell offer) with the same price "
-                    u"makes a transaction.").format(
+                    u"will be {}.").format(
         get_pluriel(triangle_income, pms.MONNAIE),
-        get_pluriel(star_income, pms.MONNAIE),
-        get_pluriel(pms.TRIANGLE_PAY, pms.MONNAIE))
+        get_pluriel(star_income, pms.MONNAIE))
     return txt
 
 

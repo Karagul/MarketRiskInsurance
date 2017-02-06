@@ -271,6 +271,7 @@ class GraphicalZone(QtGui.QWidget):
             graph.set_ylabel(trans_MRI(u"Price"))
             graph.set_xlim(0, len(transactions) + 2)
             graph.set_ylim(0, max_price + 0.5)
+            graph.get_yaxis().grid(True)
         except ValueError:  # no transactions
             pass
 
@@ -667,15 +668,27 @@ class DConfigure(QtGui.QDialog):
         # form.addRow(QtGui.QLabel(trans_MRI(u"Trail period")), self._checkbox_essai)
 
         # paid periods
-        self._spin_paid_periods = QtGui.QSpinBox()
-        self._spin_paid_periods.setMinimum(1)
-        self._spin_paid_periods.setMaximum(50)
-        self._spin_paid_periods.setSingleStep(1)
-        self._spin_paid_periods.setValue(pms.NUMBER_OF_PAID_PERIODS)
-        self._spin_paid_periods.setButtonSymbols(QtGui.QSpinBox.NoButtons)
-        self._spin_paid_periods.setMaximumWidth(50)
-        form.addRow(QtGui.QLabel(trans_MRI(u"Number of paid periods")),
-                    self._spin_paid_periods)
+        # self._spin_paid_periods = QtGui.QSpinBox()
+        # self._spin_paid_periods.setMinimum(1)
+        # self._spin_paid_periods.setMaximum(50)
+        # self._spin_paid_periods.setSingleStep(1)
+        # self._spin_paid_periods.setValue(pms.NUMBER_OF_PAID_PERIODS)
+        # self._spin_paid_periods.setButtonSymbols(QtGui.QSpinBox.NoButtons)
+        # self._spin_paid_periods.setMaximumWidth(50)
+        # form.addRow(QtGui.QLabel(trans_MRI(u"Number of paid periods")),
+        #             self._spin_paid_periods)
+
+        # Amount to substract from the cumulative payoff
+        self._spin_amount_to_substract = QtGui.QSpinBox()
+        self._spin_amount_to_substract.setMinimumWidth(0)
+        self._spin_amount_to_substract.setMaximumWidth(200)
+        self._spin_amount_to_substract.setSingleStep(1)
+        self._spin_amount_to_substract.setValue(pms.AMOUNT_TO_SUBTRACT)
+        self._spin_amount_to_substract.setButtonSymbols(QtGui.QSpinBox.NoButtons)
+        self._spin_amount_to_substract.setMaximumWidth(50)
+        form.addRow(QtGui.QLabel(
+            trans_MRI(u"Amount to subtract to the cumulative payoff")),
+            self._spin_amount_to_substract)
 
         # group size
         self._spin_groups = QtGui.QSpinBox()
@@ -708,8 +721,9 @@ class DConfigure(QtGui.QDialog):
 
     def _accept(self):
         pms.TREATMENT = self._combo_treatment.currentIndex()
+        pms.AMOUNT_TO_SUBTRACT = self._spin_amount_to_substract.value()
         # pms.PERIODE_ESSAI = self._checkbox_essai.isChecked()
-        pms.NUMBER_OF_PAID_PERIODS = self._spin_paid_periods.value()
+        # pms.NUMBER_OF_PAID_PERIODS = self._spin_paid_periods.value()
         pms.MARKET_TIME = self._timeEdit.time().toPyTime()
         pms.NOMBRE_PERIODES = self._spin_periods.value()
         pms.TAILLE_GROUPES = self._spin_groups.value()

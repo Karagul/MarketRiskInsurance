@@ -253,8 +253,8 @@ class PartieMRI(Partie, pb.Referenceable):
         logger.debug(u"{}: price activity {}".format(
             self.joueur, self.currentperiod.MRI_price_active))
 
-        # cumulative payoff since the first period
-        if self.currentperiod.MRI_period < 2:
+        # cumulative payoff since the second period (the first one is a trial)
+        if self.currentperiod.MRI_period < 3:
             self.currentperiod.MRI_cumulativepayoff = \
                 self.currentperiod.MRI_periodpayoff
         else: 
@@ -263,7 +263,7 @@ class PartieMRI(Partie, pb.Referenceable):
                 previousperiod.MRI_cumulativepayoff + \
                 self.currentperiod.MRI_periodpayoff
 
-        # we store the period in the self.periodes dictionnary
+        # we store the period in the self.periods dictionary
         self.periods[self.currentperiod.MRI_period] = self.currentperiod
 
         logger.debug(u"{} Period Payoff {}".format(
@@ -294,16 +294,22 @@ class PartieMRI(Partie, pb.Referenceable):
         :return:
         """
         logger.debug(u"{} Part Payoff".format(self.joueur))
-        payoffs_selected_periods = dict([(r.MRI_period, r.MRI_periodpayoff) for r in
-                                    self.repetitions if r.MRI_period in
-                                    self._paid_periods])
-        logger.debug(u"{} payoffs {}".format(
-            self.joueur, sorted(payoffs_selected_periods)))
-        self.MRI_gain_ecus = sum(payoffs_selected_periods.viewvalues())
+        # payoffs_selected_periods = dict([(r.MRI_period, r.MRI_periodpayoff) for r in
+        #                             self.repetitions if r.MRI_period in
+        #                             self._paid_periods])
+        # logger.debug(u"{} payoffs {}".format(
+        #     self.joueur, sorted(payoffs_selected_periods)))
+        # self.MRI_gain_ecus = sum(payoffs_selected_periods.viewvalues())
+        # self.MRI_gain_euros = float(self.MRI_gain_ecus) * float(pms.TAUX_CONVERSION)
+        # yield (self.remote.callRemote(
+        #     "set_payoffs", self.MRI_gain_euros, self.MRI_gain_ecus,
+        #     payoffs_selected_periods))
+
+        self.MRI_gain_ecus = self.currentperiod.MRI_cumulativepayoff
         self.MRI_gain_euros = float(self.MRI_gain_ecus) * float(pms.TAUX_CONVERSION)
+        self.MRI_gain_euros -= pms.AMOUNT_TO_SUBTRACT
         yield (self.remote.callRemote(
-            "set_payoffs", self.MRI_gain_euros, self.MRI_gain_ecus,
-            payoffs_selected_periods))
+            "set_payoffs", self.MRI_gain_euros))
 
         logger.info(u'{} Payoff ecus {} Payoff euros {:.2f}'.format(
             self.joueur, self.MRI_gain_ecus, self.MRI_gain_euros))
