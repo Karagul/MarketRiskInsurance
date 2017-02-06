@@ -7,8 +7,10 @@ by clicking on the configure sub-menu at the server screen.
 If you need to change some parameters below please be sure of what you do,
 otherwise ask to the developer ;-)
 ============================================================================="""
+from __future__ import division
 from datetime import time
-from random import random, randint
+from random import random
+
 
 # variables DO NOT TOUCH -------------------------------------------------------
 P_2 = 0
@@ -28,7 +30,7 @@ STAR = 1
 PRICE_TAKER = 0
 PRICE_MAKER = 1
 # dictionary that will store the endowments of each group
-ENDOWMENTS = dict()
+INCOMES = dict()
 
 # parameters -------------------------------------------------------------------
 TREATMENT = P_2
@@ -46,32 +48,39 @@ NOMBRE_PERIODES = 11
 TAILLE_GROUPES = 8
 #NUMBER_OF_PAID_PERIODS = 3
 AMOUNT_TO_SUBTRACT = 25
-
 TAUX_CONVERSION = 1
 MONNAIE = u"euro"
 
 
+def format_value(val):
+    return float("{:.2f}".format(val))
+
+
 # Endowments
-def get_endowments():
-    endowments = list()
+def get_incomes():
+    incomes = list()
     if TREATMENT == P_2:
-        endowments = zip((10.14, 3.38) * (TAILLE_GROUPES / 2),
-                         (3.38, 10.14) * (TAILLE_GROUPES / 2))
+        incomes = zip((10.14, 3.38) * (TAILLE_GROUPES // 2),
+                         (3.38, 10.14) * (TAILLE_GROUPES // 2))
 
     elif TREATMENT == P_2_RANDOM:
-        def get_values():
-            values = []
-            for _ in range(TAILLE_GROUPES):
-                individual_values = [0, 0]
-                while sum(individual_values) != 13.52:
-                    for i in range(2):
-                        val = 0
-                        while val < 3.38 or val > 10.14:
-                            val = randint(3, 10) + random()
-                        val = float("{:.2f}".format(val))
-                        individual_values[i] = val
-                values.append(tuple(individual_values))
-            return values
-        endowments = get_values()
-    return endowments
-
+        def get_random_values():
+            radius = 4.3
+            my_list = [0]
+            my_list.extend(
+                sorted([random() for _ in range(TAILLE_GROUPES // 2 - 1)]))
+            my_list.append(1)
+            my_list_diff = [my_list[i] - my_list[i - 1] for i in
+                            range(1, TAILLE_GROUPES // 2 + 1)]
+            my_list_norm = [e - 1 / (TAILLE_GROUPES // 2) for e in my_list_diff]
+            my_list_incomes = list()
+            for i in range(TAILLE_GROUPES // 2):
+                my_list_incomes.append(
+                    (format_value(10.14 + radius * my_list_norm[i]),
+                     format_value(3.38 - radius * my_list_norm[i])))
+                my_list_incomes.append((format_value(
+                    3.38 - radius * my_list_norm[i]), format_value(
+                    10.14 + radius * my_list_norm[i])))
+            return my_list_incomes
+        incomes = get_random_values()
+    return incomes

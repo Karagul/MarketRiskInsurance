@@ -102,11 +102,11 @@ class Serveur(object):
                 [None, le2mtrans(u"Period") + u" {}".format(period)],
                 fg="white", bg="gray")
 
-            # random value
+            # random value and incomes
             random_value = randint(1, 100)
             for g in self._le2mserv.gestionnaire_groupes.get_groupes().viewkeys():
-                pms.ENDOWMENTS[g] = pms.get_endowments()
-                shuffle(pms.ENDOWMENTS[g])
+                pms.INCOMES[g] = pms.get_incomes()
+                shuffle(pms.INCOMES[g])
 
             yield (self._le2mserv.gestionnaire_experience.run_func(
                 self._tous, "newperiod", period, random_value))
@@ -114,7 +114,7 @@ class Serveur(object):
             self._le2mserv.gestionnaire_graphique.infoserv(u"Incomes")
             for g in self._le2mserv.gestionnaire_groupes.get_groupes().viewkeys():
                 self._le2mserv.gestionnaire_graphique.infoserv(
-                    u"G{} {}".format(g.split("_")[2], pms.ENDOWMENTS[g]))
+                    u"G{} {}".format(g.split("_")[2], pms.INCOMES[g]))
             
             # decision
             yield(self._le2mserv.gestionnaire_experience.run_step(

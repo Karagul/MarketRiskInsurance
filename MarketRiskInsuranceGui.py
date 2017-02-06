@@ -648,7 +648,8 @@ class DConfigure(QtGui.QDialog):
         # treatment
         self._combo_treatment = QtGui.QComboBox()
         self._combo_treatment.addItems(
-            list(sorted(pms.TREATMENTS_NAMES.viewvalues())))
+            [pms.TREATMENTS_NAMES[k] for k in
+             sorted(pms.TREATMENTS_NAMES.viewkeys())])
         self._combo_treatment.setCurrentIndex(pms.TREATMENT)
         form.addRow(QtGui.QLabel(trans_MRI(u"Treatment")), self._combo_treatment)
 
