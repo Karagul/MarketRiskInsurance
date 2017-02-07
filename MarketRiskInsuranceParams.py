@@ -53,7 +53,10 @@ MONNAIE = u"euro"
 
 
 def format_value(val):
-    return float("{:.2f}".format(val))
+    try:
+        return float("{:.2f}".format(val))
+    except ValueError:
+        return val
 
 
 # Endowments
