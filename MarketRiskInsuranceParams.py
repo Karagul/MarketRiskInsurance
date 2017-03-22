@@ -15,7 +15,16 @@ from random import random
 # variables DO NOT TOUCH -------------------------------------------------------
 P_2 = 0
 P_2_RANDOM = 1
-TREATMENTS_NAMES = {P_2: u"P2", P_2_RANDOM: u"P_2_RANDOM"}
+P_6 = 2
+P_6_RANDOM = 3
+TREATMENTS_NAMES = {
+    P_2: u"P2", P_2_RANDOM: u"P_2_RANDOM",
+    P_6: u"P_6", P_6_RANDOM: u"P_6_RANDOM"
+}
+TREATMENTS_PROFILES = {
+    P_2: [(10.14, 3.38), (3.38, 10.14)],
+    P_6: [(8.07, 5.19), (10.06, 3.62)]
+}
 BUY = BUYER = 0
 SELL = SELLER = 1
 # status of propositions
@@ -52,38 +61,59 @@ TAUX_CONVERSION = 1
 MONNAIE = u"euro"
 
 
-def format_value(val):
+def __format_value(val):
     try:
         return float("{:.2f}".format(val))
     except ValueError:
         return val
 
 
+def __get_fixed_incomes(profil_A, profil_B):
+    half_groups = TAILLE_GROUPES // 2
+    return [profil_A for _ in range(half_groups)] + \
+           [profil_B for _ in range(half_groups)]
+
+
+def __get_random_incomes(profil_A, profil_B, radius):
+    try:
+        radius_A, radius_B = radius
+    except ValueError:
+        radius_A = radius_B = radius[0]
+    except TypeError:
+        radius_A = radius_B = radius
+    my_list = [0]
+    my_list.extend(
+        sorted([random() for _ in range(TAILLE_GROUPES // 2 - 1)]))
+    my_list.append(1)
+    my_list_diff = [my_list[i] - my_list[i - 1] for i in
+                    range(1, TAILLE_GROUPES // 2 + 1)]
+    my_list_norm = [e - 1 / (TAILLE_GROUPES // 2) for e in my_list_diff]
+    my_list_incomes = list()
+    for i in range(TAILLE_GROUPES // 2):
+        my_list_incomes.append(
+            (__format_value(profil_A[0] + radius_A * my_list_norm[i]),
+             __format_value(profil_A[1] - radius_A * my_list_norm[i])))
+        my_list_incomes.append((__format_value(
+            profil_B[0] - radius_B * my_list_norm[i]), __format_value(
+            profil_B[1] + radius_B * my_list_norm[i])))
+    return my_list_incomes
+
+
 # Endowments
 def get_incomes():
     incomes = list()
     if TREATMENT == P_2:
-        incomes = zip((10.14, 3.38) * (TAILLE_GROUPES // 2),
-                         (3.38, 10.14) * (TAILLE_GROUPES // 2))
+        incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_2])
+    elif TREATMENT == P_6:
+        incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_6])
 
     elif TREATMENT == P_2_RANDOM:
-        def get_random_values():
-            radius = 4.3
-            my_list = [0]
-            my_list.extend(
-                sorted([random() for _ in range(TAILLE_GROUPES // 2 - 1)]))
-            my_list.append(1)
-            my_list_diff = [my_list[i] - my_list[i - 1] for i in
-                            range(1, TAILLE_GROUPES // 2 + 1)]
-            my_list_norm = [e - 1 / (TAILLE_GROUPES // 2) for e in my_list_diff]
-            my_list_incomes = list()
-            for i in range(TAILLE_GROUPES // 2):
-                my_list_incomes.append(
-                    (format_value(10.14 + radius * my_list_norm[i]),
-                     format_value(3.38 - radius * my_list_norm[i])))
-                my_list_incomes.append((format_value(
-                    3.38 - radius * my_list_norm[i]), format_value(
-                    10.14 + radius * my_list_norm[i])))
-            return my_list_incomes
-        incomes = get_random_values()
+        incomes = __get_random_incomes(
+            profil_A=TREATMENTS_PROFILES[P_2][0],
+            profil_B=TREATMENTS_PROFILES[P_2][1], radius=4.3)
+    elif TREATMENT == P_6_RANDOM:
+        incomes = __get_random_incomes(
+            profil_A=TREATMENTS_PROFILES[P_6][0],
+            profil_B=TREATMENTS_PROFILES[P_6][1],
+            radius=(2, 4))
     return incomes
