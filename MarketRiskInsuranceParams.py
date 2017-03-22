@@ -51,11 +51,8 @@ STAR_PAY = 1  # amount payed by the seller if the event is STAR
 DECIMALS = 2
 OFFER_MAX = 100
 BALANCE_THRESHOLD = 0
-PERIODE_ESSAI = False
-
 NOMBRE_PERIODES = 11
 TAILLE_GROUPES = 8
-#NUMBER_OF_PAID_PERIODS = 3
 AMOUNT_TO_SUBTRACT = 27
 TAUX_CONVERSION = 1
 MONNAIE = u"euro"
@@ -99,14 +96,12 @@ def __get_random_incomes(profil_A, profil_B, radius):
     return my_list_incomes
 
 
-# Endowments
 def get_incomes():
     incomes = list()
     if TREATMENT == P_2:
         incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_2])
     elif TREATMENT == P_6:
         incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_6])
-
     elif TREATMENT == P_2_RANDOM:
         incomes = __get_random_incomes(
             profil_A=TREATMENTS_PROFILES[P_2][0],

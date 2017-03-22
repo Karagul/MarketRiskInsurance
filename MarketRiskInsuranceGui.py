@@ -734,8 +734,6 @@ class DConfigure(QtGui.QDialog):
     def _accept(self):
         pms.TREATMENT = self._combo_treatment.currentIndex()
         pms.AMOUNT_TO_SUBTRACT = self._spin_amount_to_substract.value()
-        # pms.PERIODE_ESSAI = self._checkbox_essai.isChecked()
-        # pms.NUMBER_OF_PAID_PERIODS = self._spin_paid_periods.value()
         pms.MARKET_TIME = self._timeEdit_market.time().toPyTime()
         pms.SUMMARY_TIME = self._timeEdit_summary.time().toPyTime()
         pms.NOMBRE_PERIODES = self._spin_periods.value()
