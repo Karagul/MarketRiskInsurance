@@ -827,7 +827,7 @@ class GuiRecapitulatif(QtGui.QDialog):
             pass
         transactions_layout.addWidget(self._triangle_transaction_zone, 1, 0)
         self._triangle_transactions_graph = GraphicalZone(
-            triangle_transactions, max_price, zone_size=(400, 300))
+            triangle_transactions, max_price, zone_size=(400, 250))
         transactions_layout.addWidget(self._triangle_transactions_graph, 2, 0)
 
         # star ---
@@ -853,7 +853,7 @@ class GuiRecapitulatif(QtGui.QDialog):
             pass
         transactions_layout.addWidget(self._star_transaction_zone, 1, 2)
         self._star_transactions_graph = GraphicalZone(
-            star_transactions, max_price, zone_size=(400, 300))
+            star_transactions, max_price, zone_size=(400, 250))
         transactions_layout.addWidget(self._star_transactions_graph, 2, 2)
 
         separator = QtGui.QFrame()
