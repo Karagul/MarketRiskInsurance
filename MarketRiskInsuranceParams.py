@@ -17,13 +17,16 @@ P_2 = 0
 P_2_RANDOM = 1
 P_6 = 2
 P_6_RANDOM = 3
+P_10 = 4
 TREATMENTS_NAMES = {
     P_2: u"P2", P_2_RANDOM: u"P_2_RANDOM",
-    P_6: u"P_6", P_6_RANDOM: u"P_6_RANDOM"
+    P_6: u"P_6", P_6_RANDOM: u"P_6_RANDOM",
+    P_10: u"P_10"
 }
 TREATMENTS_PROFILES = {
     P_2: [(10.14, 3.38), (3.38, 10.14)],
-    P_6: [(8.07, 5.19), (10.06, 3.62)]
+    P_6: [(8.07, 5.19), (10.06, 3.62)],
+    P_10: [(10.14, 3.38), (3.38, 10.14), (6.76, 6.76)]
 }
 BUY = BUYER = 0
 SELL = SELLER = 1
@@ -65,10 +68,15 @@ def __format_value(val):
         return val
 
 
-def __get_fixed_incomes(profil_A, profil_B):
+def __get_fixed_incomes(profil_A, profil_B, *args):
     half_groups = TAILLE_GROUPES // 2
-    return [profil_A for _ in range(half_groups)] + \
-           [profil_B for _ in range(half_groups)]
+    if TREATMENT == P_2 or TREATMENT == P_6:
+        return [profil_A for _ in range(half_groups)] + \
+               [profil_B for _ in range(half_groups)]
+    elif TREATMENT == P_10:
+        return [profil_A for _ in range(half_groups-1)] + \
+               [profil_B for _ in range(half_groups-1)] + \
+               [args[0] for _ in range(2)]
 
 
 def __get_random_incomes(profil_A, profil_B, radius):
@@ -100,15 +108,22 @@ def get_incomes():
     incomes = list()
     if TREATMENT == P_2:
         incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_2])
+
     elif TREATMENT == P_6:
         incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_6])
+
+    elif TREATMENT == P_10:
+        incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_10])
+
     elif TREATMENT == P_2_RANDOM:
         incomes = __get_random_incomes(
             profil_A=TREATMENTS_PROFILES[P_2][0],
             profil_B=TREATMENTS_PROFILES[P_2][1], radius=4.3)
+
     elif TREATMENT == P_6_RANDOM:
         incomes = __get_random_incomes(
             profil_A=TREATMENTS_PROFILES[P_6][0],
             profil_B=TREATMENTS_PROFILES[P_6][1],
             radius=(2, 4))
+
     return incomes
