@@ -106,7 +106,8 @@ class Serveur(object):
             random_value = randint(1, 100)
             for g in self._le2mserv.gestionnaire_groupes.get_groupes().viewkeys():
                 pms.INCOMES[g] = pms.get_incomes()
-                shuffle(pms.INCOMES[g])
+                if pms.TREATMENT != pms.P_2_FIX_6:
+                    shuffle(pms.INCOMES[g])
 
             yield (self._le2mserv.gestionnaire_experience.run_func(
                 self._tous, "newperiod", period, random_value))

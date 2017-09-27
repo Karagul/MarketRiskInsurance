@@ -18,10 +18,11 @@ P_2_RANDOM = 1
 P_6 = 2
 P_6_RANDOM = 3
 P_10 = 4
+P_2_FIX_6 = 5
 TREATMENTS_NAMES = {
-    P_2: u"P2", P_2_RANDOM: u"P_2_RANDOM",
-    P_6: u"P_6", P_6_RANDOM: u"P_6_RANDOM",
-    P_10: u"P_10"
+    P_2: "P_2", P_2_RANDOM: "P_2_RANDOM",
+    P_6: "P_6", P_6_RANDOM: "P_6_RANDOM",
+    P_10: "P_10", P_2_FIX_6: "P_2_FIX_6"
 }
 TREATMENTS_PROFILES = {
     P_2: [(10.14, 3.38), (3.38, 10.14)],
@@ -45,8 +46,8 @@ PRICE_MAKER = 1
 INCOMES = dict()
 
 # parameters -------------------------------------------------------------------
-TREATMENT = P_2
-MARKET_TIME = time(0, 3, 0)  # hour, minute, second
+TREATMENT = P_2_FIX_6
+MARKET_TIME = time(0, 2, 0)  # hour, minute, second
 SUMMARY_TIME = time(0, 1, 30)  # timer on the summary screen
 PROB_TRIANGLE = 50  # An integer between 1 and 100
 TRIANGLE_PAY = 1  # amount payed by the seller if the event is TRIANGLE
@@ -54,8 +55,8 @@ STAR_PAY = 1  # amount payed by the seller if the event is STAR
 DECIMALS = 2
 OFFER_MAX = 100
 BALANCE_THRESHOLD = 0
-NOMBRE_PERIODES = 11
-TAILLE_GROUPES = 8
+NOMBRE_PERIODES = 2
+TAILLE_GROUPES = 2
 AMOUNT_TO_SUBTRACT = 27
 TAUX_CONVERSION = 1
 MONNAIE = u"euro"
@@ -70,7 +71,7 @@ def __format_value(val):
 
 def __get_fixed_incomes(profil_A, profil_B, *args):
     half_groups = TAILLE_GROUPES // 2
-    if TREATMENT == P_2 or TREATMENT == P_6:
+    if TREATMENT == P_2 or TREATMENT == P_6 or TREATMENT == P_2_FIX_6:
         return [profil_A for _ in range(half_groups)] + \
                [profil_B for _ in range(half_groups)]
     elif TREATMENT == P_10:
@@ -106,7 +107,7 @@ def __get_random_incomes(profil_A, profil_B, radius):
 
 def get_incomes():
     incomes = list()
-    if TREATMENT == P_2:
+    if TREATMENT == P_2 or TREATMENT == P_2_FIX_6:
         incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_2])
 
     elif TREATMENT == P_6:

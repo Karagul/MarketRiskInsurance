@@ -76,6 +76,14 @@ class InformationZone(QtGui.QWidget):
 
 
 class OfferZone(QtGui.QWidget):
+
+    font_normale = QtGui.QFont()
+    font_bold = QtGui.QFont()
+    font_bold.setWeight(QtGui.QFont.Bold)
+    font_bold.setPointSize(font_normale.pointSize() + 1)
+    offer_selected = QtCore.pyqtSignal()
+
+
     def __init__(self, purchase_or_sell, zone_size=(400, 300)):
         QtGui.QWidget.__init__(self)
 
@@ -149,6 +157,7 @@ class OfferZone(QtGui.QWidget):
             if v[0] == current_item:
                 self.current_offer = v[1]
                 break
+        self.offer_selected.emit()
 
     def add_offer(self, sender, offer, color):
         # remove the current offer
@@ -179,6 +188,10 @@ class OfferZone(QtGui.QWidget):
             self.model.sort(0, QtCore.Qt.DescendingOrder)
         else:
             self.model.sort(0, QtCore.Qt.AscendingOrder)
+
+        for i in range(self.model.rowCount()):
+            self.model.item(i).setFont(
+                self.font_bold if i == 0 else self.font_normale)
 
     def clear(self):
         """
@@ -359,23 +372,55 @@ class GuiDecision(QtGui.QDialog):
         :return:
         """
         # send offer ===========================================================
+        # TRIANGLE
         self._triangle_purchase_zone.pushbutton_send.clicked.connect(
             lambda _: self._add_offer(
                 pms.TRIANGLE, pms.BUY,
-                self._triangle_purchase_zone.spin_offer.value()))
+                self._triangle_purchase_zone.spin_offer.value(),
+        self._triangle_purchase_zone.spin_offer))
+        self._triangle_purchase_zone.spin_offer.valueChanged.connect(
+            lambda _: self._triangle_purchase_zone.pushbutton_send.setToolTip(
+                self._remote.get_hypothetical_balance(
+                    {"MRI_offer_contract": pms.TRIANGLE,
+                     "MRI_offer_type": pms.BUY,
+                     "MRI_offer_price": self._triangle_purchase_zone.spin_offer.value()})
+            ))
         self._triangle_sell_zone.pushbutton_send.clicked.connect(
             lambda _: self._add_offer(
                 pms.TRIANGLE, pms.SELL,
-                self._triangle_sell_zone.spin_offer.value()))
-
+                self._triangle_sell_zone.spin_offer.value(),
+                self._triangle_sell_zone.spin_offer))
+        self._triangle_sell_zone.spin_offer.valueChanged.connect(
+            lambda _: self._triangle_sell_zone.pushbutton_send.setToolTip(
+                self._remote.get_hypothetical_balance(
+                    {"MRI_offer_contract": pms.TRIANGLE,
+                     "MRI_offer_type": pms.SELL,
+                     "MRI_offer_price": self._triangle_sell_zone.spin_offer.value()}
+                )))
+        # STAR
         self._star_purchase_zone.pushbutton_send.clicked.connect(
             lambda _: self._add_offer(
                 pms.STAR, pms.BUY,
-                self._star_purchase_zone.spin_offer.value()))
-
+                self._star_purchase_zone.spin_offer.value(),
+                self._star_purchase_zone.spin_offer))
+        self._star_purchase_zone.spin_offer.valueChanged.connect(
+            lambda _: self._star_purchase_zone.pushbutton_send.setToolTip(
+                self._remote.get_hypothetical_balance(
+                    {"MRI_offer_contract": pms.STAR,
+                     "MRI_offer_type": pms.BUY,
+                     "MRI_offer_price": self._star_purchase_zone.spin_offer.value()}
+                )))
         self._star_sell_zone.pushbutton_send.clicked.connect(
             lambda _: self._add_offer(
-                pms.STAR, pms.SELL, self._star_sell_zone.spin_offer.value()))
+                pms.STAR, pms.SELL, self._star_sell_zone.spin_offer.value(),
+                self._star_sell_zone.spin_offer))
+        self._star_sell_zone.spin_offer.valueChanged.connect(
+            lambda _: self._star_sell_zone.pushbutton_send.setToolTip(
+                self._remote.get_hypothetical_balance(
+                    {"MRI_offer_contract": pms.STAR,
+                     "MRI_offer_type": pms.SELL,
+                     "MRI_offer_price": self._star_sell_zone.spin_offer.value()}
+                )))
         
         # remove offer =========================================================
         self._triangle_purchase_zone.pushbutton_remove.clicked.connect(
@@ -391,6 +436,12 @@ class GuiDecision(QtGui.QDialog):
         self._triangle_purchase_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.TRIANGLE, self._triangle_purchase_zone.current_offer))
+        # todo: finish the connection
+        self._triangle_purchase_zone.offer_selected.connect(
+            lambda _: self._triangle_purchase_zone.setToolTip(
+                self._remote.get_hypothetical_balance(
+                    self._triangle_purchase_zone.current_offer)))
+
         self._triangle_sell_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.TRIANGLE, self._triangle_sell_zone.current_offer))
@@ -414,7 +465,8 @@ class GuiDecision(QtGui.QDialog):
         self._defered.callback(True)
 
     @defer.inlineCallbacks
-    def _add_offer(self, triangle_or_star, buy_or_sell, price):
+    def _add_offer(self, triangle_or_star, buy_or_sell, price,
+                   spin_offer_sender=None):
         """
         send the offer to the server
         called by pushbutton_send of the offer zone
@@ -459,6 +511,10 @@ class GuiDecision(QtGui.QDialog):
                 if not self._automatique:
                     self._display_offer_failure(
                         trans_MRI(u"You can't make this offer"))
+        try:
+            spin_offer_sender.setValue(0)
+        except AttributeError:
+            pass
 
     def add_offer(self, offer):
         """

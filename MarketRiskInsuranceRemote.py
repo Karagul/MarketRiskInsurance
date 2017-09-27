@@ -2,7 +2,8 @@
 
 import logging
 import random
-from time import strftime, localtime
+import datetime
+#from time import strftime, localtime
 from twisted.internet import defer
 from twisted.spread import pb
 from client.cltremote import IRemote
@@ -23,6 +24,7 @@ class RemoteMRI(IRemote):
         self.balance_if_star = 0
         self.histo.append(texts_MRI.get_histo_head())
         self.histo_vars = texts_MRI.get_histo_vars()
+        self.currentperiod_start_time = 0
 
     def remote_configure(self, params, server_part):
         """
@@ -43,6 +45,7 @@ class RemoteMRI(IRemote):
         """
         logger.info(u"{} Period {}".format(self._le2mclt.uid, period))
         self.currentperiod = period
+        self.currentperiod_start_time = datetime.datetime.now()
         self.balance_if_triangle = endowments[0]
         self.balance_if_star = endowments[1]
         if self.currentperiod == 1:
@@ -73,7 +76,7 @@ class RemoteMRI(IRemote):
         :return:
         """
         offer["MRI_offer_sender"] = self.le2mclt.uid
-        offer["MRI_offer_time"] = strftime("%X", localtime())
+        offer["MRI_offer_time"] = datetime.datetime.now().strftime("%H:%M:%S")
         yield (self._server_part.callRemote("add_offer", offer))
 
     def remote_add_offer(self, offer):
@@ -119,7 +122,7 @@ class RemoteMRI(IRemote):
         :return:
         """
         new_offer["MRI_offer_sender"] = self.le2mclt.uid
-        new_offer["MRI_offer_time"] = strftime("%X", localtime())
+        new_offer["MRI_offer_time"] = datetime.datetime.now().strftime("%H:%M:%S")
         yield(self._server_part.callRemote("add_transaction",
                                            existing_offer, new_offer))
 
@@ -173,6 +176,43 @@ class RemoteMRI(IRemote):
                         pms.STAR_PAY < pms.BALANCE_THRESHOLD:
                     return False
         return True
+
+    def get_hypothetical_balance(self, offer):
+        """
+        Give the hypothetical income in the two states depending on the
+        contract the offer is about and whether it is a BUY or a SELL
+        :param offer:
+        :return:
+        """
+        if offer["MRI_offer_type"] == pms.BUY:
+            if offer["MRI_offer_contract"] == pms.TRIANGLE:
+                return "Si Triangle: {:.2f} et si Etoile: {:.2f}".format(
+                    self.balance_if_triangle - offer["MRI_offer_price"] +
+                    pms.TRIANGLE_PAY,
+                    self.balance_if_star - offer["MRI_offer_price"]
+                )
+            else:
+                return "Si Triangle: {:.2f} et si Etoile: {:.2f}".format(
+                    self.balance_if_triangle - offer["MRI_offer_price"],
+                    self.balance_if_star - offer["MRI_offer_price"] +
+                    pms.STAR_PAY
+                )
+
+        else:
+            if offer["MRI_offer_contract"] == pms.TRIANGLE:
+                if offer["MRI_offer_contract"] == pms.TRIANGLE:
+                    return "Si Triangle: {:.2f} et si Etoile: {:.2f}".format(
+                        self.balance_if_triangle + offer["MRI_offer_price"] -
+                        pms.TRIANGLE_PAY,
+                        self.balance_if_star + offer["MRI_offer_price"]
+                    )
+            else:
+                return "Si Triangle: {:.2f} si Etoile: {:.2f}".format(
+                    self.balance_if_triangle + offer["MRI_offer_price"],
+                    self.balance_if_star + offer["MRI_offer_price"] -
+                    pms.STAR_PAY
+                )
+
 
     def remote_display_summary(self, period_content, transactions_group):
         """
