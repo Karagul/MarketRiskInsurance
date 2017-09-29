@@ -81,8 +81,6 @@ class OfferZone(QtGui.QWidget):
     font_bold = QtGui.QFont()
     font_bold.setWeight(QtGui.QFont.Bold)
     font_bold.setPointSize(font_normale.pointSize() + 1)
-    offer_selected = QtCore.pyqtSignal()
-
 
     def __init__(self, purchase_or_sell, zone_size=(400, 300)):
         QtGui.QWidget.__init__(self)
@@ -101,10 +99,10 @@ class OfferZone(QtGui.QWidget):
             self.label.setText(trans_MRI(u"Sell offers"))
         self.layout_main.addWidget(self.label)
 
-        self.list = QtGui.QListView()
+        self.list_view = QtGui.QListView()
         self.model = QtGui.QStandardItemModel()
-        self.list.setModel(self.model)
-        self.layout_main.addWidget(self.list)
+        self.list_view.setModel(self.model)
+        self.layout_main.addWidget(self.list_view)
 
         self.layout_offer = QtGui.QHBoxLayout()
         self.layout_main.addLayout(self.layout_offer)
@@ -146,7 +144,7 @@ class OfferZone(QtGui.QWidget):
                               QtGui.QSizePolicy.Minimum))
 
         # connections
-        self.list.clicked.connect(self._set_current_offer)
+        self.list_view.clicked.connect(self._set_current_offer)
 
         self.setFixedSize(*zone_size)
 
@@ -157,7 +155,6 @@ class OfferZone(QtGui.QWidget):
             if v[0] == current_item:
                 self.current_offer = v[1]
                 break
-        self.offer_selected.emit()
 
     def add_offer(self, sender, offer, color):
         # remove the current offer
@@ -231,7 +228,7 @@ class OfferZone(QtGui.QWidget):
         if self._offers:
             random_item = choice([v[0] for v in self._offers.viewvalues()])
             index = self.model.indexFromItem(random_item)
-            self.list.setCurrentIndex(index)
+            self.list_view.setCurrentIndex(index)
             self._set_current_offer(index)
 
 
@@ -368,7 +365,7 @@ class GuiDecision(QtGui.QDialog):
     def _make_connections(self):
         """
         Connect the pushbutton of the different offer zones to the method
-        of GUIDecision (add
+        of GUIDecision (_add_offer)
         :return:
         """
         # send offer ===========================================================
@@ -436,21 +433,31 @@ class GuiDecision(QtGui.QDialog):
         self._triangle_purchase_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.TRIANGLE, self._triangle_purchase_zone.current_offer))
-        # todo: finish the connection
-        self._triangle_purchase_zone.offer_selected.connect(
-            lambda _: self._triangle_purchase_zone.setToolTip(
+        self._triangle_purchase_zone.list_view.clicked.connect(
+            lambda _: self._triangle_purchase_zone.pushbutton_accept.setToolTip(
                 self._remote.get_hypothetical_balance(
-                    self._triangle_purchase_zone.current_offer)))
-
+                    self._triangle_purchase_zone.current_offer, accept=True)))
         self._triangle_sell_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.TRIANGLE, self._triangle_sell_zone.current_offer))
+        self._triangle_sell_zone.list_view.clicked.connect(
+            lambda _: self._triangle_sell_zone.pushbutton_accept.setToolTip(
+                self._remote.get_hypothetical_balance(
+                    self._triangle_sell_zone.current_offer, accept=True)))
         self._star_purchase_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.STAR, self._star_purchase_zone.current_offer))
+        self._star_purchase_zone.list_view.clicked.connect(
+            lambda _: self._star_purchase_zone.pushbutton_accept.setToolTip(
+                self._remote.get_hypothetical_balance(
+                    self._star_purchase_zone.current_offer, accept=True)))
         self._star_sell_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.STAR, self._star_sell_zone.current_offer))
+        self._star_sell_zone.list_view.clicked.connect(
+            lambda _: self._star_sell_zone.pushbutton_accept.setToolTip(
+                self._remote.get_hypothetical_balance(
+                    self._star_sell_zone.current_offer, accept=True)))
 
     def reject(self):
         pass

@@ -177,13 +177,18 @@ class RemoteMRI(IRemote):
                     return False
         return True
 
-    def get_hypothetical_balance(self, offer):
+    def get_hypothetical_balance(self, offer, accept=False):
         """
         Give the hypothetical income in the two states depending on the
         contract the offer is about and whether it is a BUY or a SELL
         :param offer:
+        :param accept
         :return:
         """
+        if accept: # if accept an offer then that offer is not the same type
+            offer["MRI_offer_type"] = pms.BUY if \
+                offer["MRI_offer_type"] == pms.SELL else pms.SELL
+
         if offer["MRI_offer_type"] == pms.BUY:
             if offer["MRI_offer_contract"] == pms.TRIANGLE:
                 return "Si Triangle: {:.2f} et si Etoile: {:.2f}".format(
