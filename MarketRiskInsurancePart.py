@@ -2,6 +2,7 @@
 
 from __future__ import division
 import logging
+import datetime
 from twisted.internet import defer
 from twisted.spread import pb
 from sqlalchemy.orm import relationship
@@ -352,9 +353,11 @@ class RepetitionsMRI(Base):
     MRI_price_active = Column(Float)
     MRI_periodpayoff = Column(Float)
     MRI_cumulativepayoff = Column(Float)
+    MRI_time_start = Column(String)
 
     def __init__(self, period):
         self.MRI_period = period
+        self.MRI_time_start = datetime.datetime.now().strftime("%H:%M:%S")
         self.MRI_treatment = pms.TREATMENT
         self.MRI_triangle_number_of_purchase = 0
         self.MRI_triangle_number_of_sell = 0
