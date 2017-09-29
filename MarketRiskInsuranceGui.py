@@ -81,6 +81,7 @@ class OfferZone(QtGui.QWidget):
     font_bold = QtGui.QFont()
     font_bold.setWeight(QtGui.QFont.Bold)
     font_bold.setPointSize(font_normale.pointSize() + 1)
+    offer_selected = QtCore.pyqtSignal(dict)
 
     def __init__(self, purchase_or_sell, zone_size=(400, 300)):
         QtGui.QWidget.__init__(self)
@@ -155,6 +156,7 @@ class OfferZone(QtGui.QWidget):
             if v[0] == current_item:
                 self.current_offer = v[1]
                 break
+        self.offer_selected.emit(self.current_offer.copy())
 
     def add_offer(self, sender, offer, color):
         # remove the current offer
@@ -189,6 +191,7 @@ class OfferZone(QtGui.QWidget):
         for i in range(self.model.rowCount()):
             self.model.item(i).setFont(
                 self.font_bold if i == 0 else self.font_normale)
+        self.current_offer = None
 
     def clear(self):
         """
@@ -429,35 +432,33 @@ class GuiDecision(QtGui.QDialog):
         self._star_sell_zone.pushbutton_remove.clicked.connect(
             lambda _: self._remove_offer(pms.STAR, pms.SELL))
 
+        # offer selected =======================================================
+        self._triangle_purchase_zone.offer_selected.connect(
+            lambda offer: self._triangle_purchase_zone.pushbutton_accept.setToolTip(
+                self._remote.get_hypothetical_balance(offer, accept=True)))
+        self._triangle_sell_zone.offer_selected.connect(
+            lambda offer: self._triangle_sell_zone.pushbutton_accept.setToolTip(
+                self._remote.get_hypothetical_balance(offer, accept=True)))
+        self._star_purchase_zone.offer_selected.connect(
+            lambda offer: self._star_purchase_zone.pushbutton_accept.setToolTip(
+                self._remote.get_hypothetical_balance(offer, accept=True)))
+        self._star_sell_zone.offer_selected.connect(
+            lambda offer: self._star_sell_zone.pushbutton_accept.setToolTip(
+                self._remote.get_hypothetical_balance(offer, accept=True)))
+
         # accept selected offer ================================================
         self._triangle_purchase_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.TRIANGLE, self._triangle_purchase_zone.current_offer))
-        self._triangle_purchase_zone.list_view.clicked.connect(
-            lambda _: self._triangle_purchase_zone.pushbutton_accept.setToolTip(
-                self._remote.get_hypothetical_balance(
-                    self._triangle_purchase_zone.current_offer, accept=True)))
         self._triangle_sell_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.TRIANGLE, self._triangle_sell_zone.current_offer))
-        self._triangle_sell_zone.list_view.clicked.connect(
-            lambda _: self._triangle_sell_zone.pushbutton_accept.setToolTip(
-                self._remote.get_hypothetical_balance(
-                    self._triangle_sell_zone.current_offer, accept=True)))
         self._star_purchase_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.STAR, self._star_purchase_zone.current_offer))
-        self._star_purchase_zone.list_view.clicked.connect(
-            lambda _: self._star_purchase_zone.pushbutton_accept.setToolTip(
-                self._remote.get_hypothetical_balance(
-                    self._star_purchase_zone.current_offer, accept=True)))
         self._star_sell_zone.pushbutton_accept.clicked.connect(
             lambda _: self._accept_selected_offer(
                 pms.STAR, self._star_sell_zone.current_offer))
-        self._star_sell_zone.list_view.clicked.connect(
-            lambda _: self._star_sell_zone.pushbutton_accept.setToolTip(
-                self._remote.get_hypothetical_balance(
-                    self._star_sell_zone.current_offer, accept=True)))
 
     def reject(self):
         pass
@@ -583,6 +584,8 @@ class GuiDecision(QtGui.QDialog):
         :param existing_offer:
         :return:
         """
+        if existing_offer is None:
+            return
         try:
             if existing_offer["MRI_offer_sender"] != self._remote.le2mclt.uid:
                 existing_offer["MRI_offer_contract"] = triangle_or_star
