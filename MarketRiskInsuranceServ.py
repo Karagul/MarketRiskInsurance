@@ -10,6 +10,8 @@ from util.utili18n import le2mtrans
 import MarketRiskInsuranceParams as pms
 from MarketRiskInsuranceGui import DConfigure, DWebView
 from MarketRiskInsuranceTexts import trans_MRI
+import pandas as pd
+
 
 logger = logging.getLogger("le2m.{}".format(__name__))
 
@@ -154,11 +156,27 @@ class Serveur(object):
                 # display on the server list
                 self._le2mserv.gestionnaire_graphique.infoserv(
                     u"G{}".format(g.split("_")[2]))
+                df_trans_group = pd.DataFrame(transactions_set)
+                df_trans_group_contract_count = df_trans_group.groupby(
+                    df_trans_group.MRI_trans_contract).count()
+                df_trans_group_contract_mean = df_trans_group.groupby(
+                    df_trans_group.MRI_trans_contract).mean()
                 self._le2mserv.gestionnaire_graphique.infoserv(
-                    [u"{MRI_trans_time}: {MRI_trans_contract}, "
-                     u"{MRI_trans_price}, {MRI_trans_buyer}, "
-                     u"{MRI_trans_seller}".format(**t) for t in
-                     transactions_set])
+                    u"Triangle: {} trans., av. price {:.2f}€".format(
+                        df_trans_group_contract_count.loc[pms.TRIANGLE].MRI_trans_time,
+                        df_trans_group_contract_mean.loc[pms.TRIANGLE].MRI_trans_price
+                ))
+                self._le2mserv.gestionnaire_graphique.infoserv(
+                    u"Star: {} trans., av. price {:.2f}€".format(
+                        df_trans_group_contract_count.loc[pms.STAR].MRI_trans_time,
+                        df_trans_group_contract_mean.loc[pms.STAR].MRI_trans_price
+                ))
+
+                # self._le2mserv.gestionnaire_graphique.infoserv(
+                #     [u"{MRI_trans_time}: {MRI_trans_contract}, "
+                #      u"{MRI_trans_price}, {MRI_trans_buyer}, "
+                #      u"{MRI_trans_seller}".format(**t) for t in
+                #      transactions_set])
 
                 # set the list of transactions in each player
                 for j in m:
@@ -169,19 +187,6 @@ class Serveur(object):
                 le2mtrans(u"Summary"), self._tous, "display_summary"))
         
         # End of part ==========================================================
-        # selection of paid periods - possibles periods: 2 to 10
-        # nb_of_periods = pms.NUMBER_OF_PAID_PERIODS if \
-        #                 pms.NUMBER_OF_PAID_PERIODS <= (pms.NOMBRE_PERIODES-1) else \
-        #                 (pms.NOMBRE_PERIODES-1)
-        # possible = range(2, pms.NOMBRE_PERIODES + 1)
-        # selected = list()
-        # for i in range(nb_of_periods):
-        #     selected.append(choice(possible))
-        #     possible.remove(selected[-1])
-        # self._le2mserv.gestionnaire_graphique.infoserv(
-        #     trans_MRI(u"Paid periods") + u": {}".format(selected))
-        # for j in self._tous:
-        #     setattr(j, "_paid_periods", selected)
         yield (self._le2mserv.gestionnaire_experience.finalize_part(
             "MarketRiskInsurance"))
 
