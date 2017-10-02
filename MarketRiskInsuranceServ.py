@@ -11,7 +11,7 @@ import MarketRiskInsuranceParams as pms
 from MarketRiskInsuranceGui import DConfigure, DWebView
 from MarketRiskInsuranceTexts import trans_MRI
 import pandas as pd
-
+import datetime
 
 logger = logging.getLogger("le2m.{}".format(__name__))
 
@@ -103,6 +103,10 @@ class Serveur(object):
             self._le2mserv.gestionnaire_graphique.infoclt(
                 [None, le2mtrans(u"Period") + u" {}".format(period)],
                 fg="white", bg="gray")
+
+            self._le2mserv.gestionnaire_graphique.infoserv(
+                le2mtrans(u"Start time: {}".format(
+                    datetime.datetime.now().strftime("%H:%M:%S"))))
 
             # random value and incomes
             random_value = randint(1, 100)
