@@ -148,14 +148,14 @@ class Serveur(object):
                 transactions_list = list()
                 for j in m:
                     transactions_list.extend(j.get_transactions())
-                logger.debug(u"transactions_list: {}".format(transactions_list))
+                # logger.debug(u"transactions_list: {}".format(transactions_list))
 
                 # we eliminate the duplicates
                 transactions_set = [dict(t) for t in
                                     set([tuple(sorted(d.viewitems())) for d in
                                          transactions_list])]
                 transactions_set.sort(key=lambda x: x["MRI_trans_time"])
-                logger.debug(u"transactions_set: {}".format(transactions_set))
+                # logger.debug(u"transactions_set: {}".format(transactions_set))
 
                 # display on the server list
                 self._le2mserv.gestionnaire_graphique.infoserv(
