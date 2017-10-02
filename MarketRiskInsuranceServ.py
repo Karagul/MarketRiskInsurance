@@ -148,33 +148,43 @@ class Serveur(object):
                 transactions_list = list()
                 for j in m:
                     transactions_list.extend(j.get_transactions())
-                # logger.debug(u"transactions_list: {}".format(transactions_list))
 
                 # we eliminate the duplicates
                 transactions_set = [dict(t) for t in
                                     set([tuple(sorted(d.viewitems())) for d in
                                          transactions_list])]
                 transactions_set.sort(key=lambda x: x["MRI_trans_time"])
-                # logger.debug(u"transactions_set: {}".format(transactions_set))
 
-                # display on the server list
+                # Stats on transactions
                 self._le2mserv.gestionnaire_graphique.infoserv(
                     u"G{}".format(g.split("_")[2]))
                 df_trans_group = pd.DataFrame(transactions_set)
-                df_trans_group_contract_count = df_trans_group.groupby(
-                    df_trans_group.MRI_trans_contract).count()
-                df_trans_group_contract_mean = df_trans_group.groupby(
-                    df_trans_group.MRI_trans_contract).mean()
-                self._le2mserv.gestionnaire_graphique.infoserv(
-                    u"Triangle: {} trans., av. price {:.2f}€".format(
-                        df_trans_group_contract_count.loc[pms.TRIANGLE].MRI_trans_time,
-                        df_trans_group_contract_mean.loc[pms.TRIANGLE].MRI_trans_price
-                ))
-                self._le2mserv.gestionnaire_graphique.infoserv(
-                    u"Star: {} trans., av. price {:.2f}€".format(
-                        df_trans_group_contract_count.loc[pms.STAR].MRI_trans_time,
-                        df_trans_group_contract_mean.loc[pms.STAR].MRI_trans_price
-                ))
+                try:
+                    df_trans_group_contract_count = df_trans_group.groupby(
+                        df_trans_group.MRI_trans_contract).count()
+                    df_trans_group_contract_mean = df_trans_group.groupby(
+                        df_trans_group.MRI_trans_contract).mean()
+                    try:
+                        self._le2mserv.gestionnaire_graphique.infoserv(
+                            u"Triangle: {} trans., av. price {:.2f}€".format(
+                                df_trans_group_contract_count.loc[pms.TRIANGLE].MRI_trans_time,
+                                df_trans_group_contract_mean.loc[pms.TRIANGLE].MRI_trans_price
+                        ))
+                    except KeyError:
+                        self._le2mserv.gestionnaire_graphique.infoserv(
+                            u"Triangle: 0 trans.")
+                    try:
+                        self._le2mserv.gestionnaire_graphique.infoserv(
+                            u"Star: {} trans., av. price {:.2f}€".format(
+                                df_trans_group_contract_count.loc[pms.STAR].MRI_trans_time,
+                                df_trans_group_contract_mean.loc[pms.STAR].MRI_trans_price
+                        ))
+                    except KeyError:
+                        self._le2mserv.gestionnaire_graphique.infoserv(
+                            u"Star: 0 trans.")
+                except AttributeError:
+                    self._le2mserv.gestionnaire_graphique.infoserv(
+                        "No transaction")
 
                 # set the list of transactions in each player
                 for j in m:
