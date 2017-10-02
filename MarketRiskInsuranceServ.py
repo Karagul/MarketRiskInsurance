@@ -176,12 +176,6 @@ class Serveur(object):
                         df_trans_group_contract_mean.loc[pms.STAR].MRI_trans_price
                 ))
 
-                # self._le2mserv.gestionnaire_graphique.infoserv(
-                #     [u"{MRI_trans_time}: {MRI_trans_contract}, "
-                #      u"{MRI_trans_price}, {MRI_trans_buyer}, "
-                #      u"{MRI_trans_seller}".format(**t) for t in
-                #      transactions_set])
-
                 # set the list of transactions in each player
                 for j in m:
                     setattr(j, "_transactions_group", transactions_set)
