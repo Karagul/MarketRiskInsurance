@@ -104,6 +104,12 @@ class Serveur(object):
 
             # random value and incomes
             random_value = randint(1, 100)
+            period_event = pms.TRIANGLE if \
+                random_value < (pms.PROB_TRIANGLE + 1) else \
+                pms.STAR
+            self._le2mserv.gestionnaire_graphique.infoserv(le2mtrans(
+                u"Event") +u" : {}".format(
+                u"Triangle" if period_event == pms.TRIANGLE else u"Star"))
             for g in self._le2mserv.gestionnaire_groupes.get_groupes().viewkeys():
                 pms.INCOMES[g] = pms.get_incomes()
                 if pms.TREATMENT != pms.P_2_FIX_6:
