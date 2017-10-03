@@ -191,13 +191,13 @@ class RemoteMRI(IRemote):
 
         if offer["MRI_offer_type"] == pms.BUY:
             if offer["MRI_offer_contract"] == pms.TRIANGLE:
-                return "Si Triangle: {:.2f} et si Etoile: {:.2f}".format(
+                return "Revenu si Triangle: {:.2f} | Revenu si Etoile: {:.2f}".format(
                     self.balance_if_triangle - offer["MRI_offer_price"] +
                     pms.TRIANGLE_PAY,
                     self.balance_if_star - offer["MRI_offer_price"]
                 )
             else:
-                return "Si Triangle: {:.2f} et si Etoile: {:.2f}".format(
+                return "Revenu si Triangle: {:.2f} | Revenu si Etoile: {:.2f}".format(
                     self.balance_if_triangle - offer["MRI_offer_price"],
                     self.balance_if_star - offer["MRI_offer_price"] +
                     pms.STAR_PAY
@@ -206,13 +206,13 @@ class RemoteMRI(IRemote):
         else:
             if offer["MRI_offer_contract"] == pms.TRIANGLE:
                 if offer["MRI_offer_contract"] == pms.TRIANGLE:
-                    return "Si Triangle: {:.2f} et si Etoile: {:.2f}".format(
+                    return "Revenu si Triangle: {:.2f} | Revenu si Etoile: {:.2f}".format(
                         self.balance_if_triangle + offer["MRI_offer_price"] -
                         pms.TRIANGLE_PAY,
                         self.balance_if_star + offer["MRI_offer_price"]
                     )
             else:
-                return "Si Triangle: {:.2f} si Etoile: {:.2f}".format(
+                return "Revenu si Triangle: {:.2f} | Revenu si Etoile: {:.2f}".format(
                     self.balance_if_triangle + offer["MRI_offer_price"],
                     self.balance_if_star + offer["MRI_offer_price"] -
                     pms.STAR_PAY
