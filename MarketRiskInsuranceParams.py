@@ -19,10 +19,13 @@ P_6 = 2
 P_6_RANDOM = 3
 P_10 = 4
 P_2_FIX_6 = 5
+P_6_FIX_6 = 6
+
 TREATMENTS_NAMES = {
     P_2: "P_2", P_2_RANDOM: "P_2_RANDOM",
     P_6: "P_6", P_6_RANDOM: "P_6_RANDOM",
-    P_10: "P_10", P_2_FIX_6: "P_2_FIX_6"
+    P_10: "P_10", P_2_FIX_6: "P_2_FIX_6",
+    P_6_FIX_6: "P_6_FIX_6"
 }
 TREATMENTS_PROFILES = {
     P_2: [(10.14, 3.38), (3.38, 10.14)],
@@ -46,7 +49,7 @@ PRICE_MAKER = 1
 INCOMES = dict()
 
 # parameters -------------------------------------------------------------------
-TREATMENT = P_2_FIX_6
+TREATMENT = P_6_FIX_6
 MARKET_TIME = time(0, 2, 0)  # hour, minute, second
 SUMMARY_TIME = time(0, 1, 30)  # timer on the summary screen
 PROB_TRIANGLE = 50  # An integer between 1 and 100
@@ -71,13 +74,13 @@ def __format_value(val):
 
 def __get_fixed_incomes(profil_A, profil_B, *args):
     half_groups = TAILLE_GROUPES // 2
-    if TREATMENT == P_2 or TREATMENT == P_6 or TREATMENT == P_2_FIX_6:
+    if TREATMENT == P_10:
+        return [profil_A for _ in range(half_groups - 1)] + \
+               [profil_B for _ in range(half_groups - 1)] + \
+               [args[0] for _ in range(2)]
+    else:
         return [profil_A for _ in range(half_groups)] + \
                [profil_B for _ in range(half_groups)]
-    elif TREATMENT == P_10:
-        return [profil_A for _ in range(half_groups-1)] + \
-               [profil_B for _ in range(half_groups-1)] + \
-               [args[0] for _ in range(2)]
 
 
 def __get_random_incomes(profil_A, profil_B, radius):
@@ -110,7 +113,7 @@ def get_incomes():
     if TREATMENT == P_2 or TREATMENT == P_2_FIX_6:
         incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_2])
 
-    elif TREATMENT == P_6:
+    elif TREATMENT == P_6 or TREATMENT == P_6_FIX_6:
         incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_6])
 
     elif TREATMENT == P_10:

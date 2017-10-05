@@ -108,7 +108,7 @@ class Serveur(object):
                 le2mtrans(u"Start time: {}".format(
                     datetime.datetime.now().strftime("%H:%M:%S"))))
 
-            # random value and incomes
+            # event
             random_value = randint(1, 100)
             period_event = pms.TRIANGLE if \
                 random_value < (pms.PROB_TRIANGLE + 1) else \
@@ -116,19 +116,23 @@ class Serveur(object):
             self._le2mserv.gestionnaire_graphique.infoserv(le2mtrans(
                 u"Event") +u" : {}".format(
                 u"Triangle" if period_event == pms.TRIANGLE else u"Star"))
-            for g in self._le2mserv.gestionnaire_groupes.get_groupes().viewkeys():
-                pms.INCOMES[g] = pms.get_incomes()
-                if pms.TREATMENT != pms.P_2_FIX_6:
-                    shuffle(pms.INCOMES[g])
 
+            # incomes
+            self._le2mserv.gestionnaire_graphique.infoserv(u"Incomes")
+            for g in self._le2mserv.gestionnaire_groupes.get_groupes().keys():
+                pms.INCOMES[g] = pms.get_incomes()
+                logger.debug("G: {}: {}".format(g, pms.INCOMES[g]))
+                if pms.TREATMENT != (pms.P_2_FIX_6 and pms.P_6_FIX_6):
+                    shuffle(pms.INCOMES[g])
+                logger.debug("G: {}: {}".format(g, pms.INCOMES[g]))
+                self._le2mserv.gestionnaire_graphique.infoserv(
+                    u"G{} {}".format(g.split("_")[2], pms.INCOMES[g]))
+
+
+            # new period
             yield (self._le2mserv.gestionnaire_experience.run_func(
                 self._tous, "newperiod", period, random_value))
 
-            self._le2mserv.gestionnaire_graphique.infoserv(u"Incomes")
-            for g in self._le2mserv.gestionnaire_groupes.get_groupes().viewkeys():
-                self._le2mserv.gestionnaire_graphique.infoserv(
-                    u"G{} {}".format(g.split("_")[2], pms.INCOMES[g]))
-            
             # decision
             yield(self._le2mserv.gestionnaire_experience.run_step(
                 le2mtrans(u"Decision"), self._tous, "display_decision"))
