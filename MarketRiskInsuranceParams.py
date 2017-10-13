@@ -20,12 +20,14 @@ P_6_RANDOM = 3
 P_10 = 4
 P_2_FIX_6 = 5
 P_6_FIX_6 = 6
+P_2_NOTFIX_6 = 7
 
 TREATMENTS_NAMES = {
     P_2: "P_2", P_2_RANDOM: "P_2_RANDOM",
     P_6: "P_6", P_6_RANDOM: "P_6_RANDOM",
     P_10: "P_10", P_2_FIX_6: "P_2_FIX_6",
-    P_6_FIX_6: "P_6_FIX_6"
+    P_6_FIX_6: "P_6_FIX_6",
+    P_2_NOTFIX_6: "P_2_NOTFIX_6"
 }
 TREATMENTS_PROFILES = {
     P_2: [(10.14, 3.38), (3.38, 10.14)],
@@ -110,7 +112,7 @@ def __get_random_incomes(profil_A, profil_B, radius):
 
 def get_incomes():
     incomes = list()
-    if TREATMENT == P_2 or TREATMENT == P_2_FIX_6:
+    if TREATMENT == P_2 or TREATMENT == P_2_FIX_6 or TREATMENT == P_2_NOTFIX_6:
         incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_2])
 
     elif TREATMENT == P_6 or TREATMENT == P_6_FIX_6:
