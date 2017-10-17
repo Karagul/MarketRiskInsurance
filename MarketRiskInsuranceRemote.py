@@ -14,6 +14,14 @@ import MarketRiskInsuranceTexts as texts_MRI
 
 logger = logging.getLogger("le2m")
 
+
+def get_formated_value(value):
+    if value > 0:
+        return "+{:.2f}".format(value)
+    else:
+        return value
+
+
 class RemoteMRI(IRemote):
     """
     Class remote, remote_ methods can be called by the server
@@ -191,33 +199,24 @@ class RemoteMRI(IRemote):
 
         if offer["MRI_offer_type"] == pms.BUY:
             if offer["MRI_offer_contract"] == pms.TRIANGLE:
-                return "Revenu si Triangle: {:.2f} | Revenu si Etoile: {:.2f}".format(
-                    self.balance_if_triangle - offer["MRI_offer_price"] +
-                    pms.TRIANGLE_PAY,
-                    self.balance_if_star - offer["MRI_offer_price"]
-                )
+                return "Variation de revenu:\nSi Triangle: {} | si Etoile: {}".format(
+                    get_formated_value(- offer["MRI_offer_price"] + pms.TRIANGLE_PAY),
+                    get_formated_value(- offer["MRI_offer_price"]))
             else:
-                return "Revenu si Triangle: {:.2f} | Revenu si Etoile: {:.2f}".format(
-                    self.balance_if_triangle - offer["MRI_offer_price"],
-                    self.balance_if_star - offer["MRI_offer_price"] +
-                    pms.STAR_PAY
-                )
+                return "Variation de revenu:\nSi Triangle:, {} | si Etoile: {}".format(
+                    get_formated_value(- offer["MRI_offer_price"]),
+                    get_formated_value(- offer["MRI_offer_price"] +
+                    pms.STAR_PAY))
 
-        else:
+        else:  # SELL
             if offer["MRI_offer_contract"] == pms.TRIANGLE:
-                if offer["MRI_offer_contract"] == pms.TRIANGLE:
-                    return "Revenu si Triangle: {:.2f} | Revenu si Etoile: {:.2f}".format(
-                        self.balance_if_triangle + offer["MRI_offer_price"] -
-                        pms.TRIANGLE_PAY,
-                        self.balance_if_star + offer["MRI_offer_price"]
-                    )
+                return "Variation de revenu:\nSi Triangle: {} | si Etoile: {}".format(
+                    get_formated_value(offer["MRI_offer_price"] - pms.TRIANGLE_PAY),
+                    get_formated_value(offer["MRI_offer_price"]))
             else:
-                return "Revenu si Triangle: {:.2f} | Revenu si Etoile: {:.2f}".format(
-                    self.balance_if_triangle + offer["MRI_offer_price"],
-                    self.balance_if_star + offer["MRI_offer_price"] -
-                    pms.STAR_PAY
-                )
-
+                return "Variation de revenu:\nSi Triangle: {} | si Etoile: {}".format(
+                    get_formated_value(offer["MRI_offer_price"]),
+                    get_formated_value(offer["MRI_offer_price"] - pms.STAR_PAY))
 
     def remote_display_summary(self, period_content, transactions_group):
         """

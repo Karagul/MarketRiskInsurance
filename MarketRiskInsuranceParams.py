@@ -51,7 +51,7 @@ PRICE_MAKER = 1
 INCOMES = dict()
 
 # parameters -------------------------------------------------------------------
-TREATMENT = P_6_FIX_6
+TREATMENT = P_2_FIX_6
 MARKET_TIME = time(0, 2, 0)  # hour, minute, second
 SUMMARY_TIME = time(0, 1, 30)  # timer on the summary screen
 PROB_TRIANGLE = 50  # An integer between 1 and 100
