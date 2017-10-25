@@ -875,16 +875,8 @@ class GuiRecapitulatif(QtGui.QDialog):
             max_star_price = 0
         max_price = max(max_triangle_price, max_star_price)
 
-        transactions_zone = QtGui.QHBoxLayout()
-        transactions_zone.addSpacerItem(
-            QtGui.QSpacerItem(20, 5, QtGui.QSizePolicy.Expanding,
-                              QtGui.QSizePolicy.Fixed))
         transactions_layout = QtGui.QGridLayout()
-        transactions_zone.addLayout(transactions_layout)
-        transactions_zone.addSpacerItem(
-            QtGui.QSpacerItem(20, 5, QtGui.QSizePolicy.Expanding,
-                              QtGui.QSizePolicy.Fixed))
-        layout.addLayout(transactions_zone)
+        layout.addLayout(transactions_layout)
 
         # triangle ---
         triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
