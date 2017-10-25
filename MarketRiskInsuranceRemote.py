@@ -7,6 +7,8 @@ import datetime
 from twisted.internet import defer
 from twisted.spread import pb
 from client.cltremote import IRemote
+import pandas as pd
+import numpy as np
 import MarketRiskInsuranceParams as pms
 from MarketRiskInsuranceGui import GuiDecision, GuiRecapitulatif
 import MarketRiskInsuranceTexts as texts_MRI
@@ -203,7 +205,7 @@ class RemoteMRI(IRemote):
                     get_formated_value(- offer["MRI_offer_price"] + pms.TRIANGLE_PAY),
                     get_formated_value(- offer["MRI_offer_price"]))
             else:
-                return "Variation de revenu:\nSi Triangle:, {} | si Etoile: {}".format(
+                return "Variation de revenu:\nSi Triangle: {} | si Etoile: {}".format(
                     get_formated_value(- offer["MRI_offer_price"]),
                     get_formated_value(- offer["MRI_offer_price"] +
                     pms.STAR_PAY))
@@ -225,15 +227,25 @@ class RemoteMRI(IRemote):
         :param transactions_group
         :return: deferred
         """
-        logger.info(u"{} Summary - transactions_group: {}".format(
+        logger.info("{} Summary".format(self.le2mclt.uid))
+        logger.debug(u"{} Summary - transactions_group: {}".format(
             self._le2mclt.uid, transactions_group))
 
+        group_transactions = pd.DataFrame(transactions_group)
+        start_period = datetime.datetime.strptime(
+            period_content["MRI_time_start"], "%H:%M:%S")
+        group_transactions.loc[:, "MRI_time_diff"] = np.NAN
+        group_transactions.MRI_time_diff = group_transactions.apply(
+            lambda line: (datetime.datetime.strptime(
+                line.MRI_trans_time, "%H:%M:%S") - start_period).seconds, axis=1)
+
         # transactions
-        triangle_transactions = [t for t in transactions_group if
-                                 t["MRI_trans_contract"] == pms.TRIANGLE]
-        logger.debug(u"triangle_transactions: {}".format(triangle_transactions))
-        star_transactions = [t for t in transactions_group if
-                             t["MRI_trans_contract"] == pms.STAR]
+        triangle_transactions = group_transactions.loc[
+            group_transactions.MRI_trans_contract == pms.TRIANGLE, ]
+        # logger.debug(u"triangle_transactions: {}".format(triangle_transactions))
+        star_transactions = group_transactions.loc[
+            group_transactions.MRI_trans_contract == pms.STAR, ]
+        # logger.debug(u"star_transactions: {}".format(star_transactions))
 
         # history
         self.histo.append([period_content.get(k) for k in self.histo_vars])

@@ -266,28 +266,32 @@ class TransactionZone(QtGui.QWidget):
 
 
 class GraphicalZone(QtGui.QWidget):
-    def __init__(self, transactions, max_price, zone_size=(400, 200)):
+    def __init__(self, transactions, max_price, zone_size=(500, 200)):
         QtGui.QWidget.__init__(self)
 
         layout = QtGui.QVBoxLayout()
         self.setLayout(layout)
 
-        figure, graph = plt.subplots()
+        figure = plt.Figure(figsize=(7, 4), facecolor="white")
         canvas = FigureCanvas(figure)
         layout.addWidget(canvas)
 
         try:
-            graph.plot(range(1, len(transactions)+1),
-                       [t["MRI_trans_price"] for t in transactions], "*b")
-            graph.set_xlabel("")
-            graph.set_xticklabels([])
+            graph = figure.add_subplot(111)
+            graph.plot(transactions.MRI_time_diff,
+                       transactions.MRI_trans_price, "b+")
+            graph.set_xlim(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second)
+            graph.set_xlabel("Temps (secondes)")
+            graph.set_xticks(
+                range(0,
+                      pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 30))
             graph.set_ylabel(trans_MRI(u"Price"))
-            graph.set_xlim(0, len(transactions) + 2)
+            graph.set_xlim(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 5)
             graph.set_ylim(0, max_price + 0.5)
             graph.get_yaxis().grid(True)
         except ValueError:  # no transactions
             pass
-
+        figure.tight_layout()
         self.setFixedSize(*zone_size)
 
 
@@ -839,10 +843,16 @@ class GuiRecapitulatif(QtGui.QDialog):
         # period label and history button --------------------------------------
         self.ecran_historique = GuiHistorique(
             self, historique, size=SIZE_HISTO)
-        self.widperiod = WPeriod(
-            period=period, ecran_historique=self.ecran_historique,
-            parent=self)
-        layout.addWidget(self.widperiod)
+        layout_period = QtGui.QHBoxLayout()
+        label_period = QtGui.QLabel(le2mtrans("Period") + " {}".format(period))
+        layout_period.addWidget(label_period)
+        layout_period.addSpacerItem(
+            QtGui.QSpacerItem(20, 5, QtGui.QSizePolicy.Expanding,
+                              QtGui.QSizePolicy.Fixed))
+        button_history = QtGui.QPushButton(le2mtrans("History"))
+        button_history.clicked.connect(self.ecran_historique.show)
+        layout_period.addWidget(button_history)
+        layout.addLayout(layout_period)
 
         # timer
         self._compte_rebours = WCompterebours(
@@ -856,30 +866,36 @@ class GuiRecapitulatif(QtGui.QDialog):
 
         # transactions ---------------------------------------------------------
         try:
-            max_triangle_price = max(
-                [t["MRI_trans_price"] for t in triangle_transactions])
+            max_triangle_price = max(triangle_transactions.MRI_trans_price)
         except ValueError:  # no transaction
             max_triangle_price = 0
         try:
-            max_star_price = max([t["MRI_trans_price"] for t in
-                                  star_transactions])
+            max_star_price = max(star_transactions.MRI_trans_price)
         except ValueError:
             max_star_price = 0
         max_price = max(max_triangle_price, max_star_price)
 
+        transactions_zone = QtGui.QHBoxLayout()
+        transactions_zone.addSpacerItem(
+            QtGui.QSpacerItem(20, 5, QtGui.QSizePolicy.Expanding,
+                              QtGui.QSizePolicy.Fixed))
         transactions_layout = QtGui.QGridLayout()
-        layout.addLayout(transactions_layout)
+        transactions_zone.addLayout(transactions_layout)
+        transactions_zone.addSpacerItem(
+            QtGui.QSpacerItem(20, 5, QtGui.QSizePolicy.Expanding,
+                              QtGui.QSizePolicy.Fixed))
+        layout.addLayout(transactions_zone)
 
         # triangle ---
         triangle_label = QtGui.QLabel(trans_MRI(u"Triangle"))
         triangle_label.setStyleSheet("font-weight: bold;")
         transactions_layout.addWidget(triangle_label, 0, 0)
-        self._triangle_transaction_zone = TransactionZone(zone_size=(400, 250))
+        self._triangle_transaction_zone = TransactionZone(zone_size=(450, 250))
         try:
-            for t in triangle_transactions:
-                price = t["MRI_trans_price"]
-                buyer = t["MRI_trans_buyer"]
-                seller = t["MRI_trans_seller"]
+            for i, item in triangle_transactions.iterrows():
+                price = item.MRI_trans_price
+                buyer = item.MRI_trans_buyer
+                seller = item.MRI_trans_seller
                 implied, buyer_or_seller = False, None
                 if buyer == self._remote.le2mclt.uid or \
                                 seller == self._remote.le2mclt.uid:
@@ -893,19 +909,19 @@ class GuiRecapitulatif(QtGui.QDialog):
             pass
         transactions_layout.addWidget(self._triangle_transaction_zone, 1, 0)
         self._triangle_transactions_graph = GraphicalZone(
-            triangle_transactions, max_price, zone_size=(400, 250))
+            triangle_transactions, max_price, zone_size=(450, 250))
         transactions_layout.addWidget(self._triangle_transactions_graph, 2, 0)
 
         # star ---
         star_label = QtGui.QLabel(trans_MRI(u"Star"))
         star_label.setStyleSheet("font-weight: bold;")
         transactions_layout.addWidget(star_label, 0, 2)
-        self._star_transaction_zone = TransactionZone(zone_size=(400, 250))
+        self._star_transaction_zone = TransactionZone(zone_size=(450, 250))
         try:
-            for t in star_transactions:
-                price = t["MRI_trans_price"]
-                buyer = t["MRI_trans_buyer"]
-                seller = t["MRI_trans_seller"]
+            for i, item in star_transactions.iterrows():
+                price = item.MRI_trans_price
+                buyer = item.MRI_trans_buyer
+                seller = item.MRI_trans_seller
                 implied, buyer_or_seller = False, None
                 if buyer == self._remote.le2mclt.uid or \
                                 seller == self._remote.le2mclt.uid:
@@ -919,7 +935,7 @@ class GuiRecapitulatif(QtGui.QDialog):
             pass
         transactions_layout.addWidget(self._star_transaction_zone, 1, 2)
         self._star_transactions_graph = GraphicalZone(
-            star_transactions, max_price, zone_size=(400, 250))
+            star_transactions, max_price, zone_size=(450, 250))
         transactions_layout.addWidget(self._star_transactions_graph, 2, 2)
 
         separator = QtGui.QFrame()
