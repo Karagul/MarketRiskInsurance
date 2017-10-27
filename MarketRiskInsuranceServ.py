@@ -122,12 +122,13 @@ class Serveur(object):
             for g in self._le2mserv.gestionnaire_groupes.get_groupes().keys():
                 pms.INCOMES[g] = pms.get_incomes()
                 logger.debug("G: {}: {}".format(g, pms.INCOMES[g]))
-                if pms.TREATMENT != pms.P_2_FIX_6 and pms.TREATMENT != pms.P_6_FIX_6:
+                if pms.TREATMENT != pms.P_2_FIX_6 and \
+                   pms.TREATMENT != pms.P_2_FIX_6_V2 and \
+                   pms.TREATMENT != pms.P_6_FIX_6:
                     shuffle(pms.INCOMES[g])
                 logger.debug("G: {}: {}".format(g, pms.INCOMES[g]))
                 self._le2mserv.gestionnaire_graphique.infoserv(
                     u"G{} {}".format(g.split("_")[2], pms.INCOMES[g]))
-
 
             # new period
             yield (self._le2mserv.gestionnaire_experience.run_func(
