@@ -281,7 +281,7 @@ class GraphicalZone(QtGui.QWidget):
         try:
             graph = figure.add_subplot(111)
             graph.plot(transactions.MRI_time_diff,
-                       transactions.MRI_trans_price, color="k",
+                       transactions.MRI_trans_price, color="k", ls="",
                        marker=the_marker)
             graph.set_xlim(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second)
             graph.set_xlabel("Temps (secondes)")
@@ -289,7 +289,8 @@ class GraphicalZone(QtGui.QWidget):
                 range(0,
                       pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 10))
             graph.set_xticklabels(
-                range(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 30))
+                ["{}".format(i) if i%30==0 else "" for i in
+                 range(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 10)])
 
             graph.set_ylabel(trans_MRI(u"Price"))
             graph.set_xlim(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 5)
