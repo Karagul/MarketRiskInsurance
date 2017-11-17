@@ -293,8 +293,8 @@ class GraphicalZone(QtGui.QWidget):
                 ["{}".format(i) if i%30==0 else "" for i in
                  range(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 10)])
             graph.set_ylabel(trans_MRI(u"Price"))
-            graph.set_ylim(-0.5, max_price + 0.5)
-            graph.set_yticks(np.arange(0, max_price+0.1, 0.1))
+            graph.set_ylim(-0.25, max_price + 0.25)
+            graph.set_yticks(np.arange(0, max_price+0.1, 0.25))
             graph.grid()
         except ValueError:  # no transactions
             pass
