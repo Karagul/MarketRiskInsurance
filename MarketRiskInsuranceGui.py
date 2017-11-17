@@ -266,11 +266,13 @@ class TransactionZone(QtGui.QWidget):
 
 
 class GraphicalZone(QtGui.QWidget):
-    def __init__(self, transactions, max_price, zone_size=(500, 200)):
+    def __init__(self, transactions, max_price, triangle_or_star,
+                 zone_size=(500, 200)):
         QtGui.QWidget.__init__(self)
 
         layout = QtGui.QVBoxLayout()
         self.setLayout(layout)
+        the_marker = "^" if triangle_or_star == pms.TRIANGLE else "*"
 
         figure = plt.Figure(figsize=(7, 4), facecolor="white")
         canvas = FigureCanvas(figure)
@@ -279,16 +281,20 @@ class GraphicalZone(QtGui.QWidget):
         try:
             graph = figure.add_subplot(111)
             graph.plot(transactions.MRI_time_diff,
-                       transactions.MRI_trans_price, "b+")
+                       transactions.MRI_trans_price, color="k",
+                       marker=the_marker)
             graph.set_xlim(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second)
             graph.set_xlabel("Temps (secondes)")
             graph.set_xticks(
                 range(0,
-                      pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 30))
+                      pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 10))
+            graph.set_xticklabels(
+                range(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 30))
+
             graph.set_ylabel(trans_MRI(u"Price"))
             graph.set_xlim(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 5)
-            graph.set_ylim(0, max_price + 0.5)
-            graph.get_yaxis().grid(True)
+            graph.set_ylim(-0.5, max_price + 0.5)
+            graph.grid()
         except ValueError:  # no transactions
             pass
         figure.tight_layout()
@@ -901,7 +907,7 @@ class GuiRecapitulatif(QtGui.QDialog):
             pass
         transactions_layout.addWidget(self._triangle_transaction_zone, 1, 0)
         self._triangle_transactions_graph = GraphicalZone(
-            triangle_transactions, max_price, zone_size=(450, 250))
+            triangle_transactions, max_price, pms.TRIANGLE, zone_size=(450, 250))
         transactions_layout.addWidget(self._triangle_transactions_graph, 2, 0)
 
         # star ---
@@ -927,7 +933,7 @@ class GuiRecapitulatif(QtGui.QDialog):
             pass
         transactions_layout.addWidget(self._star_transaction_zone, 1, 2)
         self._star_transactions_graph = GraphicalZone(
-            star_transactions, max_price, zone_size=(450, 250))
+            star_transactions, max_price, pms.STAR, zone_size=(450, 250))
         transactions_layout.addWidget(self._star_transactions_graph, 2, 2)
 
         separator = QtGui.QFrame()
