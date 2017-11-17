@@ -7,6 +7,7 @@ import sys
 import logging
 from PyQt4 import QtGui, QtCore, QtWebKit
 from twisted.internet import defer
+import numpy as np
 from random import random, randint, choice
 from util.utili18n import le2mtrans
 import MarketRiskInsuranceParams as pms
@@ -283,18 +284,17 @@ class GraphicalZone(QtGui.QWidget):
             graph.plot(transactions.MRI_time_diff,
                        transactions.MRI_trans_price, color="k", ls="",
                        marker=the_marker)
-            graph.set_xlim(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second)
             graph.set_xlabel("Temps (secondes)")
+            graph.set_xlim(-5, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 5)
             graph.set_xticks(
                 range(0,
                       pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 10))
             graph.set_xticklabels(
                 ["{}".format(i) if i%30==0 else "" for i in
                  range(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 10)])
-
             graph.set_ylabel(trans_MRI(u"Price"))
-            graph.set_xlim(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 5)
             graph.set_ylim(-0.5, max_price + 0.5)
+            graph.set_yticks(np.arange(0, max_price+0.1, 0.1))
             graph.grid()
         except ValueError:  # no transactions
             pass
