@@ -231,17 +231,28 @@ class RemoteMRI(IRemote):
         logger.debug(u"{} Summary - transactions_group: {}".format(
             self._le2mclt.uid, transactions_group))
 
-        group_transactions = pd.DataFrame(transactions_group)
+        if not transactions_group:
+            group_transactions = pd.DataFrame(
+                columns = ["MRI_trans_time", "MRI_trans_contract",
+                           "MRI_trans_buyer", "MRI_trans_seller",
+                           "MRI_trans_price"])
+        else:
+            group_transactions = pd.DataFrame(transactions_group)
+
         start_period = datetime.datetime.strptime(
             period_content["MRI_time_start"], "%H:%M:%S")
-        group_transactions.loc[:, "MRI_time_diff"] = np.NAN
-        group_transactions.MRI_time_diff = group_transactions.apply(
-            lambda line: (datetime.datetime.strptime(
+
+        try:  # if no transaction
+            group_transactions.loc[:, "MRI_time_diff"] = np.NAN
+            group_transactions.MRI_time_diff = group_transactions.apply(
+                lambda line: (datetime.datetime.strptime(
                 line.MRI_trans_time, "%H:%M:%S") - start_period).seconds, axis=1)
+        except ValueError:
+            group_transactions.loc[:, "MRI_time_diff"] = []
 
         # transactions
         triangle_transactions = group_transactions.loc[
-            group_transactions.MRI_trans_contract == pms.TRIANGLE, ]
+                group_transactions.MRI_trans_contract == pms.TRIANGLE, ]
         # logger.debug(u"triangle_transactions: {}".format(triangle_transactions))
         star_transactions = group_transactions.loc[
             group_transactions.MRI_trans_contract == pms.STAR, ]

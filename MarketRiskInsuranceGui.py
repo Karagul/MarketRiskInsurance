@@ -279,25 +279,26 @@ class GraphicalZone(QtGui.QWidget):
         canvas = FigureCanvas(figure)
         layout.addWidget(canvas)
 
-        try:
-            graph = figure.add_subplot(111)
+        # logger.debug(transactions.MRI_time_diff, transactions.MRI_trans_price)
+
+        graph = figure.add_subplot(111)
+        if not transactions.empty:
             graph.plot(transactions.MRI_time_diff,
                        transactions.MRI_trans_price, color="k", ls="",
                        marker=the_marker)
-            graph.set_xlabel("Temps (secondes)")
-            graph.set_xlim(-5, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 5)
-            graph.set_xticks(
-                range(0,
-                      pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 10))
-            graph.set_xticklabels(
-                ["{}".format(i) if i%30==0 else "" for i in
-                 range(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 10)])
-            graph.set_ylabel(trans_MRI(u"Price"))
-            graph.set_ylim(-0.25, max_price + 0.25)
-            graph.set_yticks(np.arange(0, max_price+0.1, 0.25))
-            graph.grid()
-        except ValueError:  # no transactions
-            pass
+        graph.set_xlabel("Temps (secondes)")
+        graph.set_xlim(-5, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 5)
+        graph.set_xticks(
+            range(0,
+                  pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 10))
+        graph.set_xticklabels(
+            ["{}".format(i) if i%30==0 else "" for i in
+             range(0, pms.MARKET_TIME.minute * 60 + pms.MARKET_TIME.second + 1, 10)])
+        graph.set_ylabel(trans_MRI(u"Price"))
+        graph.set_ylim(-0.25, max_price + 0.25)
+        graph.set_yticks(np.arange(0, max_price+0.1, 0.25))
+        graph.grid()
+
         figure.tight_layout()
         self.setFixedSize(*zone_size)
 
@@ -875,11 +876,11 @@ class GuiRecapitulatif(QtGui.QDialog):
         try:
             max_triangle_price = max(triangle_transactions.MRI_trans_price)
         except ValueError:  # no transaction
-            max_triangle_price = 0
+            max_triangle_price = 1
         try:
             max_star_price = max(star_transactions.MRI_trans_price)
         except ValueError:
-            max_star_price = 0
+            max_star_price = 1
         max_price = max(max_triangle_price, max_star_price)
 
         transactions_layout = QtGui.QGridLayout()
