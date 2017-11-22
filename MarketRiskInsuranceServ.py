@@ -84,7 +84,7 @@ class Serveur(object):
             try:
                 self._le2mserv.gestionnaire_groupes.former_groupes(
                     self._le2mserv.gestionnaire_joueurs.get_players(),
-                    pms.TAILLE_GROUPES, forcer_nouveaux=True)
+                    pms.TAILLE_GROUPES, forcer_nouveaux=False)
             except ValueError as e:
                 self._le2mserv.gestionnaire_graphique.display_error(
                     e.message)
