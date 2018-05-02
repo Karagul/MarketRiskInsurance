@@ -24,11 +24,15 @@ P_2_NOTFIX_6 = 7
 P_2_FIX_6_V2 = 8  # same as P_2_FIX_6 except tooltip text (variation instead of income)
 
 TREATMENTS_NAMES = {
-    P_2: "P_2", P_2_RANDOM: "P_2_RANDOM",
-    P_6: "P_6", P_6_RANDOM: "P_6_RANDOM",
-    P_10: "P_10", P_2_FIX_6: "P_2_FIX_6",
+    P_2: "P_2",
+    P_2_RANDOM: "P_2_RANDOM",
+    P_6: "P_6",
+    P_6_RANDOM: "P_6_RANDOM",
+    P_10: "P_10",
+    P_2_FIX_6: "P_2_FIX_6",
     P_6_FIX_6: "P_6_FIX_6",
-    P_2_NOTFIX_6: "P_2_NOTFIX_6", P_2_FIX_6_V2 :"P_2_FIX_6_V2"
+    P_2_NOTFIX_6: "P_2_NOTFIX_6",
+    P_2_FIX_6_V2 :"P_2_FIX_6_V2"
 }
 TREATMENTS_PROFILES = {
     P_2: [(10.14, 3.38), (3.38, 10.14)],
