@@ -89,9 +89,9 @@ class PartieMRI(Partie, pb.Referenceable):
         new_offer = OffersMRI(offer)
         new_offer_dict = new_offer.todict()
         logger.debug(u"Offer created: {}".format(new_offer.todict()))
-        self.joueur.info(u"Offer {MRI_offer_contract}, "
-                         u"{MRI_offer_type}, {MRI_offer_price}".format(
-                            **new_offer_dict))
+        # self.joueur.info(u"Offer {MRI_offer_contract}, "
+        #                  u"{MRI_offer_type}, {MRI_offer_price}".format(
+        #                     **new_offer_dict))
         self.currentperiod.MRI_offers.append(new_offer)
         # add the offer to the screen of group members
         for j in self.joueur.group_composition:
