@@ -157,8 +157,8 @@ class PartieMRI(Partie, pb.Referenceable):
         # create a new offer (just for the player)
         new_offer_temp = OffersMRI(new_offer)
         self.currentperiod.MRI_offers.append(new_offer_temp)
-        self.joueur.info(u"Offer {MRI_offer_contract}, "
-                         u"{MRI_offer_type}, {MRI_offer_price}".format(**new_offer))
+        # self.joueur.info(u"Offer {MRI_offer_contract}, "
+        #                  u"{MRI_offer_type}, {MRI_offer_price}".format(**new_offer))
 
         # create the transaction
         transaction = dict()
