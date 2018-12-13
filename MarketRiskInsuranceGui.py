@@ -5,7 +5,7 @@ This module contains the GUI
 
 import sys
 import logging
-from PyQt4 import QtGui, QtCore, QtWebKit
+from PyQt4 import QtGui, QtCore  # QtWebKit
 from twisted.internet import defer
 import numpy as np
 from random import random, randint, choice
@@ -19,6 +19,7 @@ from client.cltgui.cltguiwidgets import WPeriod, WExplication, WCompterebours, \
 from client.cltgui.cltguitablemodels import TableModelHistorique
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+import pandas as pd
 
 
 SIZE_HISTO = (1300, 500)
@@ -993,30 +994,32 @@ class GuiRecapitulatif(QtGui.QDialog):
         self._compte_rebours.setStyleSheet("color: red;")
 
 
-class DWebView(QtGui.QDialog):
-    def __init__(self, html_file):
-        QtGui.QDialog.__init__(self)
-
-        layout = QtGui.QVBoxLayout()
-        self.setLayout(layout)
-
-        browser = QtWebKit.QWebView()
-        layout.addWidget(browser)
-
-        html_url = QtCore.QUrl.fromLocalFile(html_file)
-        browser.load(html_url)
-
-        button = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok)
-        button.accepted.connect(self.accept)
-        layout.addWidget(button)
-
-        self.setWindowTitle(u"WebView")
-        self.adjustSize()
+# class DWebView(QtGui.QDialog):
+#     def __init__(self, html_file):
+#         QtGui.QDialog.__init__(self)
+#
+#         layout = QtGui.QVBoxLayout()
+#         self.setLayout(layout)
+#
+#         browser = QtWebKit.QWebView()
+#         layout.addWidget(browser)
+#
+#         html_url = QtCore.QUrl.fromLocalFile(html_file)
+#         browser.load(html_url)
+#
+#         button = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok)
+#         button.accepted.connect(self.accept)
+#         layout.addWidget(button)
+#
+#         self.setWindowTitle(u"WebView")
+#         self.adjustSize()
 
 
 if __name__ == "__main__":
+    import datetime
     app = QtGui.QApplication(sys.argv)
-    transactions = [
+    start_period = datetime.datetime(2018, 12, 13, 13, 21, 0)
+    transactions = pd.DataFrame([
         {'MRI_trans_contract': 0, 'MRI_trans_time': u'13:21:24',
          'MRI_trans_price': 0.3, 'MRI_trans_seller': u'201701241320_j_1',
          'MRI_trans_buyer': u'201701241320_j_0'},
@@ -1026,7 +1029,10 @@ if __name__ == "__main__":
         {'MRI_trans_contract': 0, 'MRI_trans_time': u'13:21:39',
          'MRI_trans_price': 0.3, 'MRI_trans_seller': u'201701241320_j_1',
          'MRI_trans_buyer': u'201701241320_j_0'}
-    ]
-    graph = GraphicalZone(transactions, 2.5)
+    ])
+    transactions.loc[:, "MRI_time_diff"] = transactions.apply(
+        lambda line: (datetime.datetime.strptime(
+            line.MRI_trans_time, "%H:%M:%S") - start_period).seconds, axis=1)
+    graph = GraphicalZone(transactions, 2.5, 0)
     graph.show()
     sys.exit(app.exec_())

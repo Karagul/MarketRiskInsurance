@@ -22,6 +22,7 @@ P_2_FIX_6 = 5
 P_6_FIX_6 = 6
 P_2_NOTFIX_6 = 7
 P_2_FIX_6_V2 = 8  # same as P_2_FIX_6 except tooltip text (variation instead of income)
+P_8 = 9
 
 TREATMENTS_NAMES = {
     P_2: "P_2",
@@ -32,11 +33,13 @@ TREATMENTS_NAMES = {
     P_2_FIX_6: "P_2_FIX_6",
     P_6_FIX_6: "P_6_FIX_6",
     P_2_NOTFIX_6: "P_2_NOTFIX_6",
-    P_2_FIX_6_V2 :"P_2_FIX_6_V2"
+    P_2_FIX_6_V2 :"P_2_FIX_6_V2",
+    P_8: "P_8"
 }
 TREATMENTS_PROFILES = {
     P_2: [(10.14, 3.38), (3.38, 10.14)],
     P_6: [(8.07, 5.19), (10.06, 3.62)],
+    P_8: [(11.49, 2.03), (5.41, 8.11)],
     P_10: [(10.14, 3.38), (3.38, 10.14), (6.76, 6.76)]
 }
 BUY = BUYER = 0
@@ -56,7 +59,7 @@ PRICE_MAKER = 1
 INCOMES = dict()
 
 # parameters -------------------------------------------------------------------
-TREATMENT = P_2_FIX_6_V2
+TREATMENT = P_8
 MARKET_TIME = time(0, 2, 0)  # hour, minute, second
 SUMMARY_TIME = time(0, 1, 30)  # timer on the summary screen
 PROB_TRIANGLE = 50  # An integer between 1 and 100
@@ -137,5 +140,8 @@ def get_incomes():
             profil_A=TREATMENTS_PROFILES[P_6][0],
             profil_B=TREATMENTS_PROFILES[P_6][1],
             radius=(2, 4))
+
+    elif TREATMENT == P_8:
+        incomes = __get_fixed_incomes(*TREATMENTS_PROFILES[P_8])
 
     return incomes
