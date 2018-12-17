@@ -125,7 +125,8 @@ class Serveur(object):
                 if pms.TREATMENT != pms.P_2_FIX_6 and \
                    pms.TREATMENT != pms.P_2_FIX_6_V2 and \
                    pms.TREATMENT != pms.P_6_FIX_6 and \
-                   pms.TREATMENT != pms.P_10:
+                   pms.TREATMENT != pms.P_10 and \
+                   pms.TREATMENT != pms.P_8:
                     shuffle(pms.INCOMES[g])
                 logger.debug("G: {}: {}".format(g, pms.INCOMES[g]))
                 self._le2mserv.gestionnaire_graphique.infoserv(
